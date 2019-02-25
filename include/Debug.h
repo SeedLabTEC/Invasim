@@ -16,7 +16,7 @@
 
 /**
  * @brief Verify if NDEBUG flag is set, to use debug funtions
- * */ 
+ * */
 #ifndef NDEBUG
 #define dprintf(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
 #else

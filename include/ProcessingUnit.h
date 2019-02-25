@@ -14,16 +14,23 @@
 #include "Clock.h"
 #include "WorkPackage.h"
 
-enum Invasive_States { INVADED, INFECTED, FREE };
+enum Invasive_States
+{
+	INVADED,
+	INFECTED,
+	FREE
+};
 
-class ProcessingUnit {
-public: 
-	ProcessingUnit(int p_pu_id, Clock * _clk_instance);
+class ProcessingUnit
+{
+  public:
+	ProcessingUnit(int p_pu_id, Clock *_clk_instance);
 
 	void start();
 
-	void new_task(WorkPackage * _new_workload);
-private:
+	void new_task(WorkPackage *_new_workload);
+
+  private:
 	pthread_t pu_exe_thread;
 
 	//Registers
@@ -31,13 +38,13 @@ private:
 	int pu_id;
 
 	//Workload
-	WorkPackage * current_workload;
+	WorkPackage *current_workload;
 
 	//Clock
-	Clock * clk_instance;
+	Clock *clk_instance;
 
 	//Thread Methods
-	static void * executing(void * obj);
+	static void *executing(void *obj);
 };
 
 #endif

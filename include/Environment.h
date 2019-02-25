@@ -15,12 +15,13 @@
 
 #define DEFAULT_CORES 8
 
-class Environment {
-public: 
+class Environment
+{
+  public:
 	Environment();
-	
+
 	Environment(int _cpu_cores);
-	
+
 	void set_cpu_cores(int _cpu_cores);
 
 	int get_cpu_cores();
@@ -29,15 +30,14 @@ public:
 
 	void step(int steps);
 
-private:
+  private:
 	int cpu_cores;
 
-	ProcessingUnit * * cpu_instances;
+	ProcessingUnit **cpu_instances;
 
-	Clock * clk_instance;
+	Clock *clk_instance;
 
 	void init();
-
 };
 
 #endif

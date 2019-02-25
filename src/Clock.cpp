@@ -10,17 +10,20 @@
 /**
 * @brief Constructor
 **/
-Clock::Clock() { }
+Clock::Clock() {}
 
-pthread_mutex_t * Clock::get_cycle_mutex_ptr(){
+pthread_mutex_t *Clock::get_cycle_mutex_ptr()
+{
     return &this->cycle_mutex;
 }
 
-pthread_cond_t * Clock::get_cycle_cond_ptr(){
+pthread_cond_t *Clock::get_cycle_cond_ptr()
+{
     return &this->cycle_cond;
 }
 
-void Clock::next_cycle(){
+void Clock::next_cycle()
+{
     sleep(WAIT_SEC);
     pthread_cond_broadcast(&this->cycle_cond);
 }

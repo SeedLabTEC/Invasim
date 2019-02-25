@@ -15,21 +15,21 @@
 #include <pthread.h>
 #include <unistd.h>
 
-class Clock {
-public: 
+class Clock
+{
+  public:
 	Clock();
 
-	pthread_mutex_t * get_cycle_mutex_ptr();
+	pthread_mutex_t *get_cycle_mutex_ptr();
 
-	pthread_cond_t * get_cycle_cond_ptr();
+	pthread_cond_t *get_cycle_cond_ptr();
 
 	void next_cycle();
 
-private:
+  private:
 	pthread_mutex_t cycle_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-	pthread_cond_t  cycle_cond = PTHREAD_COND_INITIALIZER;
-
+	pthread_cond_t cycle_cond = PTHREAD_COND_INITIALIZER;
 };
 
 #endif

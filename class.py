@@ -28,10 +28,10 @@ def class_creator(name):
     class_h.write("#define INCLUDE_" + name.upper() + "_H_\n\n")
     class_h.write("#include \"Debug.h\"")
     class_h.write("\n\n")
-    class_h.write("class " + name + " {\n")
-    class_h.write("public: \n")
-    class_h.write("\t" + name + "();\n\n")
-    class_h.write("private:\n\n")
+    class_h.write("class " + name + " \n{\n")
+    class_h.write("\tpublic: \n")
+    class_h.write("\t\t" + name + "();\n\n")
+    class_h.write("\tprivate:\n\n")
     class_h.write("};\n\n")
     class_h.write("#endif")
 
@@ -39,7 +39,7 @@ def class_creator(name):
     class_s.write("/**\n")
     class_s.write("* @brief Constructor\n")
     class_s.write("**/\n")
-    class_s.write(name + "::" + name + "(){\n\n")
+    class_s.write(name + "::" + name + "()\n{\n\n")
     class_s.write("}")
     
     #Close files

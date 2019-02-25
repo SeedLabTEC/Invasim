@@ -9,12 +9,12 @@
 #define INCLUDE_WORKPACKAGE_H_
 #include "Debug.h"
 
-class WorkPackage {
-public: 
+class WorkPackage
+{
+  public:
 	WorkPackage();
 
-private:
-
+  private:
 };
 
 #endif

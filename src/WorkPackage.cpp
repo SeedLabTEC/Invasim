@@ -10,6 +10,6 @@
 /**
 * @brief Constructor
 **/
-WorkPackage::WorkPackage(){
-
+WorkPackage::WorkPackage()
+{
 }
