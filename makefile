@@ -3,7 +3,7 @@ V=-std=c++11
 SRC=src/
 BIN=bin/
 CMAIN=main.cpp
-CFILES=
+CFILES=$(SRC)Environment.cpp $(SRC)ProcessingUnit.cpp $(SRC)Clock.cpp
 CFLAGS=-Wall -lpthread
 APP=invasive_simulator
 
