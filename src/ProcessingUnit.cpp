@@ -48,10 +48,15 @@ JSON * ProcessingUnit::monitoring()
 {
 	JSON * json_info = new JSON;
 	*json_info = {
-		{"ID", this->pu_id},
-		{"State", STRING_STATES[this->pu_state]},
-		{"iLet", this->pu_id}
+			{"ID", this->pu_id},
+			{"State", STRING_STATES[this->pu_state]}
 	};
+	if (this->iLet_ptr != NULL)
+	{
+		(*json_info)["ILet"] = this->iLet_ptr->get_id();
+	} else {
+		(*json_info)["ILet"] = "NONE";
+	}
 	return json_info;
 }
 
