@@ -9,16 +9,26 @@
 #define INCLUDE_PROCESSINGUNIT_H_
 
 #include <pthread.h>
+#include <string>
 #include "Debug.h"
 
+#include "json.hpp"
+using JSON = nlohmann::json;
+
 #include "Clock.h"
-#include "WorkPackage.h"
+#include "ILet.h"
 
 enum Invasive_States
 {
 	INVADED,
 	INFECTED,
 	FREE
+};
+
+static const std::string STRING_STATES[] = {
+	"Invaded",
+	"Infected",
+	"Free"
 };
 
 class ProcessingUnit
@@ -28,7 +38,9 @@ class ProcessingUnit
 
 	void start();
 
-	void new_task(WorkPackage *_new_workload);
+	void new_task(ILet *_new_iLet);
+
+	JSON * monitoring();
 
   private:
 	pthread_t pu_exe_thread;
@@ -38,7 +50,8 @@ class ProcessingUnit
 	int pu_id;
 
 	//Workload
-	WorkPackage *current_workload;
+	int current_load;
+	ILet * iLet_ptr;
 
 	//Clock
 	Clock *clk_instance;
