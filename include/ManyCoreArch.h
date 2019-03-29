@@ -8,9 +8,10 @@
 #ifndef INCLUDE_MANYCOREARCH_H_
 #define INCLUDE_MANYCOREARCH_H_
 
+#include "Clock.h"
 #include "ILet.h"
 #include "ProcessingUnit.h"
-#include "Clock.h"
+#include "RandomAccessMemory.h"
 
 #include "json.hpp"
 using JSON = nlohmann::json;
@@ -39,6 +40,8 @@ class ManyCoreArch
 
 		Clock * clk_instance;
 		ProcessingUnit *** pu_array;
+		RandomAccessMemory * ram;
+
 };
 
 #endif

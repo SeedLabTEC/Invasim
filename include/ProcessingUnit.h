@@ -17,6 +17,7 @@ using JSON = nlohmann::json;
 
 #include "Clock.h"
 #include "ILet.h"
+#include "CacheMemory.h"
 
 enum Invasive_States
 {
@@ -48,6 +49,10 @@ class ProcessingUnit
 	//Registers
 	Invasive_States pu_state;
 	int pu_id;
+
+	//Memory
+	CacheMemory * cache_mem;
+	
 
 	//Workload
 	int current_load;

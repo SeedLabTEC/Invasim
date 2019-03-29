@@ -32,6 +32,7 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance)
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;
     this->clk_instance = _clk_instance;  
+    this->ram = new RandomAccessMemory();
 
 }
 

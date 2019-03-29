@@ -18,6 +18,9 @@ ProcessingUnit::ProcessingUnit(int _pu_id, Clock *_clk_instace)
 	this->current_load = 0;
 	this->iLet_ptr = NULL;
 	this->clk_instance = _clk_instace;
+
+	//Memory features
+	this->cache_mem = new CacheMemory(this->pu_id);
 }
 
 /**
