@@ -34,14 +34,8 @@ void Environment::init()
 {
     dprintf("ENVIRONMENT: Instanciating environment clock.\n");
     this->clk_instance = new Clock();
-    dprintf("ENVIRONMENT: Instanciating CPU vector.\n");
-    this->cpu_instances = new ProcessingUnit *[this->cpu_cores];
-
-    dprintf("ENVIRONMENT: Instanciating processing units.\n");
-    for (int i = 0; i < this->cpu_cores; i++)
-    {
-        this->cpu_instances[i] = new ProcessingUnit(i, this->clk_instance);
-    }
+    dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
+    this->many_core_instance = new ManyCoreArch(this->cpu_cores, this->cpu_cores, this->clk_instance);
 }
 
 /**
@@ -50,10 +44,7 @@ void Environment::init()
 void Environment::start_environment()
 {
     dprintf("ENVIRONMENT: Starting processing units.");
-    for (int i = 0; i < this->cpu_cores; i++)
-    {
-        this->cpu_instances[i]->start();
-    }
+    this->many_core_instance->start();
 }
 
 /**

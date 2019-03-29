@@ -10,7 +10,7 @@
 
 #include "Debug.h"
 
-#include "ProcessingUnit.h"
+#include "ManyCoreArch.h"
 #include "Clock.h"
 
 #define DEFAULT_CORES 8
@@ -33,7 +33,7 @@ class Environment
   private:
 	int cpu_cores;
 
-	ProcessingUnit **cpu_instances;
+	ManyCoreArch * many_core_instance;
 
 	Clock *clk_instance;
 
