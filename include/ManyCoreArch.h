@@ -12,6 +12,7 @@
 #include "ILet.h"
 #include "ProcessingUnit.h"
 #include "RandomAccessMemory.h"
+#include "ResourceAdmin.h"
 
 #include "json.hpp"
 using JSON = nlohmann::json;
@@ -25,6 +26,8 @@ class ManyCoreArch
 		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance);
 
 		void start();
+
+		void add_iLet(ILet * new_iLet);
 
 		std::vector<int> invade(ILet * new_ilet);
 
@@ -41,6 +44,7 @@ class ManyCoreArch
 		Clock * clk_instance;
 		ProcessingUnit *** pu_array;
 		RandomAccessMemory * ram;
+		ResourceAdmin * resource_manager;
 
 };
 

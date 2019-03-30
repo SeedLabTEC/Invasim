@@ -37,7 +37,7 @@ void ProcessingUnit::start()
 /**
  * 
  * */
-void ProcessingUnit::new_task(ILet * _new_iLet)
+void ProcessingUnit::new_task(ILet *_new_iLet)
 {
 	dprintf("CPU: id = %d, new iLet assiged\n", this->pu_id);
 	this->iLet_ptr = _new_iLet;
@@ -47,17 +47,18 @@ void ProcessingUnit::new_task(ILet * _new_iLet)
 /**
  * 
  * */
-JSON * ProcessingUnit::monitoring()
+JSON *ProcessingUnit::monitoring()
 {
-	JSON * json_info = new JSON;
+	JSON *json_info = new JSON;
 	*json_info = {
 		{"ID", this->pu_id},
-		{"State", STRING_STATES[this->pu_state]}
-	};
+		{"State", STRING_STATES[this->pu_state]}};
 	if (this->iLet_ptr != NULL)
 	{
 		(*json_info)["ILet"] = this->iLet_ptr->get_id();
-	} else {
+	}
+	else
+	{
 		(*json_info)["ILet"] = "NONE";
 	}
 	return json_info;
@@ -66,18 +67,15 @@ JSON * ProcessingUnit::monitoring()
 /**
  * 
  * */
-void * ProcessingUnit::executing(void *obj)
+void *ProcessingUnit::executing(void *obj)
 {
 	ProcessingUnit *current = (ProcessingUnit *)obj;
 	dprintf("CPU: New processing unit started id = %d.\n", current->pu_id);
 	pthread_mutex_t *clk_cycle_mutex = current->clk_instance->get_cycle_mutex_ptr();
 	pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
-	int i = 0;
 	while (1)
 	{
 		pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
-		dprintf("CPU: %s.\n", current->monitoring()->dump().c_str());
-		i++;
 	}
 	return NULL;
 }
