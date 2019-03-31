@@ -12,7 +12,7 @@
 **/
 Environment::Environment()
 {
-    dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n\n", DEFAULT_CORES);
+    dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n", DEFAULT_CORES);
     this->cpu_cores = DEFAULT_CORES;
     this->init();
 }
@@ -22,7 +22,7 @@ Environment::Environment()
 **/
 Environment::Environment(int _cpu_cores)
 {
-    dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n\n", _cpu_cores);
+    dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n", _cpu_cores);
     this->cpu_cores = _cpu_cores;
     this->init();
 }
@@ -36,6 +36,7 @@ void Environment::init()
     this->clk_instance = new Clock();
     dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
     this->many_core_instance = new ManyCoreArch(this->cpu_cores, this->cpu_cores, this->clk_instance);
+    this->env_monitor = new Monitor(this->many_core_instance, "/home/dennis/Documents/Invasim/bin", this->clk_instance);
 }
 
 /**
@@ -43,8 +44,11 @@ void Environment::init()
  * */
 void Environment::start_environment()
 {
-    dprintf("ENVIRONMENT: Starting processing units.");
+    dprintf("ENVIRONMENT: Starting environment components.\n");
     this->many_core_instance->start();
+    //Wait for components to start
+    sleep(WAIT_SEC);
+    this->env_monitor->start();
 }
 
 /**

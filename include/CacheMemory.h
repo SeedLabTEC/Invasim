@@ -26,10 +26,10 @@ struct cache_line
 class CacheMemory 
 {
 	public: 
-		CacheMemory(int _pu_id);
+		CacheMemory(int _x, int _y);
 
 	private:
-		int pu_id;
+		coordinate pu_coordinate;
 		cache_line * blocks;
 
 		Clock * clk_intance;

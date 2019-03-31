@@ -9,27 +9,58 @@
 #define INCLUDE_CLOCK_H_
 
 #include "Debug.h"
+#include <string>
 
 #define WAIT_SEC 1
+
+struct coordinate
+{
+	int x;
+	int y;
+};
+
+enum Invasive_States
+{
+	INVADED,
+	INFECTED,
+	FREE
+};
+
+static const std::string STRING_STATES[] = {
+		"Invaded",
+		"Infected",
+		"Free"};
 
 #include <pthread.h>
 #include <unistd.h>
 
 class Clock
 {
-  public:
+public:
 	Clock();
 
 	pthread_mutex_t *get_cycle_mutex_ptr();
 
 	pthread_cond_t *get_cycle_cond_ptr();
 
+	pthread_mutex_t *get_monitor_mutex_ptr();
+
+	pthread_cond_t *get_monitor_cond_ptr();
+
 	void next_cycle();
 
-  private:
+	int get_cycle();
+
+private:
 	pthread_mutex_t cycle_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 	pthread_cond_t cycle_cond = PTHREAD_COND_INITIALIZER;
+	
+	pthread_mutex_t monitor_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+	pthread_cond_t monitor_cond = PTHREAD_COND_INITIALIZER;
+
+	int cycle;
 };
 
 #endif

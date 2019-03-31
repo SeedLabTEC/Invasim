@@ -12,19 +12,17 @@
 **/
 ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance)
 {
-    dprintf("MANYCOREARCH: Manycore Architecture instance created.\n\t- Dimension: (%d, %d).\n\n", _x_dim, _y_dim);
+    dprintf("MANYCOREARCH: Manycore Architecture instance created.\n\t- Dimension: (%d, %d).\n", _x_dim, _y_dim);
 
     this->pu_array = new ProcessingUnit **[_x_dim];
 
     dprintf("MANYCOREARCH: Instanciating processing units in matrix.\n");
-    int id_gen = 0;
     for (int i = 0; i < _x_dim; i++)
     {
         this->pu_array[i] = new ProcessingUnit *[_y_dim];
         for (int j = 0; j < _y_dim; j++)
         {
-            this->pu_array[i][j] = new ProcessingUnit(id_gen, _clk_instance);
-            id_gen++;
+            this->pu_array[i][j] = new ProcessingUnit(i, j, _clk_instance);
         }
     }
 
@@ -37,7 +35,7 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance)
 
 void ManyCoreArch::start()
 {
-    dprintf("MANYCOREARCH: Starting processing units.");
+    dprintf("MANYCOREARCH: Starting processing units.\n");
     for (int i = 0; i < this->x_dim; i++)
     {
         for (int j = 0; j < this->y_dim; j++)
@@ -55,9 +53,16 @@ void ManyCoreArch::add_iLet(ILet *new_iLet)
 
 JSON *ManyCoreArch::monitoring()
 {
-    JSON *json_info = new JSON;
-    *json_info = {
-        {"ID", 1},
-        {"State", "In Progress..."}};
-    return json_info;
+    JSON *arch_info = new JSON;
+    JSON * resources_info = this->resource_manager->monitoring();
+    *arch_info = {
+        {"Processor", {
+            {"x",this->x_dim},
+            {"y", this->y_dim}
+        }},
+        {"Cycle", this->clk_instance->get_cycle()},
+        {"Status", *resources_info}
+    };
+    delete resources_info;
+    return arch_info;
 }

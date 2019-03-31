@@ -9,7 +9,6 @@
 #define INCLUDE_PROCESSINGUNIT_H_
 
 #include <pthread.h>
-#include <string>
 #include "Debug.h"
 
 #include "json.hpp"
@@ -19,27 +18,17 @@ using JSON = nlohmann::json;
 #include "ILet.h"
 #include "CacheMemory.h"
 
-enum Invasive_States
-{
-	INVADED,
-	INFECTED,
-	FREE
-};
-
-static const std::string STRING_STATES[] = {
-	"Invaded",
-	"Infected",
-	"Free"
-};
-
 class ProcessingUnit
 {
   public:
-	ProcessingUnit(int p_pu_id, Clock *_clk_instance);
+	ProcessingUnit(int _x, int _y, Clock *_clk_instance);
 
 	void start();
 
 	void new_task(ILet *_new_iLet);
+
+	coordinate get_coodinate();
+	Invasive_States get_state();
 
 	JSON * monitoring();
 
@@ -48,7 +37,7 @@ class ProcessingUnit
 
 	//Registers
 	Invasive_States pu_state;
-	int pu_id;
+	coordinate pu_coordenate;
 
 	//Memory
 	CacheMemory * cache_mem;

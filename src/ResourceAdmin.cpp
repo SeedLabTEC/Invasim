@@ -48,9 +48,25 @@ void ResourceAdmin::add_iLet(ILet * new_iLet)
     pthread_mutex_unlock(&this->ilet_mutex);
 }
 
-std::vector<int> ResourceAdmin::invade()
+std::vector<coordinate> ResourceAdmin::invade()
 {
-    std::vector<int> ret;
+    std::vector<coordinate> ret;
+
+    for(int i = 0; i < this->x_dim; i++)
+    {
+        for(int j = 0; j < this->y_dim; j++)
+        {
+            if (this->pu_array_ptr[i][j]->get_state() == FREE)
+            {
+                coordinate free_pu = this->pu_array_ptr[i][j]->get_coodinate();
+                dprintf("ResourceAdmin: Found a processor free coordenate (%d, %d)\n", free_pu.x, free_pu.y);
+                return ret;
+            }
+        }
+        
+    }
+    
+
     return ret;
 }
 
@@ -96,7 +112,8 @@ void *ResourceAdmin::managing(void *obj)
     while (1)
     {
         pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
-        dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump().c_str());
+        //dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump(4).c_str());
+        current->invade();
     }
     return NULL;
 }

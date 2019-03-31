@@ -54,7 +54,7 @@ class ResourceAdmin
 
 		void init(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, Clock * _clk_instance);
 
-		std::vector<int> invade();
+		std::vector<coordinate> invade();
 
 		void infect();
 

@@ -11,6 +11,7 @@
 #include "Debug.h"
 
 #include "ManyCoreArch.h"
+#include "Monitor.h"
 #include "Clock.h"
 
 #define DEFAULT_CORES 8
@@ -34,6 +35,7 @@ class Environment
 	int cpu_cores;
 
 	ManyCoreArch * many_core_instance;
+	Monitor * env_monitor;
 
 	Clock *clk_instance;
 

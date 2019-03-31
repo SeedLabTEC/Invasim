@@ -10,17 +10,18 @@
 /**
 * @brief Constructor
 **/
-ProcessingUnit::ProcessingUnit(int _pu_id, Clock *_clk_instace)
+ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
 {
-	dprintf("CPU: New processing unit id = %d\n", _pu_id);
+	dprintf("CPU: New processing unit coordenate = (%d, %d)\n", _x, _y);
 	this->pu_state = FREE;
-	this->pu_id = _pu_id;
+	this->pu_coordenate.x = _x;
+	this->pu_coordenate.y = _y;
 	this->current_load = 0;
 	this->iLet_ptr = NULL;
-	this->clk_instance = _clk_instace;
+	this->clk_instance = _clk_instance;
 
 	//Memory features
-	this->cache_mem = new CacheMemory(this->pu_id);
+	this->cache_mem = new CacheMemory(this->pu_coordenate.x, this->pu_coordenate.y);
 }
 
 /**
@@ -39,9 +40,19 @@ void ProcessingUnit::start()
  * */
 void ProcessingUnit::new_task(ILet *_new_iLet)
 {
-	dprintf("CPU: id = %d, new iLet assiged\n", this->pu_id);
+	dprintf("CPU: coordenate = (%d, %d), new iLet assiged\n", this->pu_coordenate.x, this->pu_coordenate.y);
 	this->iLet_ptr = _new_iLet;
 	this->pu_state = INVADED;
+}
+
+coordinate ProcessingUnit::get_coodinate()
+{
+	return this->pu_coordenate;
+}
+
+Invasive_States ProcessingUnit::get_state()
+{
+	return this->pu_state;
 }
 
 /**
@@ -51,7 +62,8 @@ JSON *ProcessingUnit::monitoring()
 {
 	JSON *json_info = new JSON;
 	*json_info = {
-		{"ID", this->pu_id},
+		{"Coordenate_x", this->pu_coordenate.x},
+		{"Coordenate_y", this->pu_coordenate.y},
 		{"State", STRING_STATES[this->pu_state]}};
 	if (this->iLet_ptr != NULL)
 	{
@@ -70,7 +82,7 @@ JSON *ProcessingUnit::monitoring()
 void *ProcessingUnit::executing(void *obj)
 {
 	ProcessingUnit *current = (ProcessingUnit *)obj;
-	dprintf("CPU: New processing unit started id = %d.\n", current->pu_id);
+	dprintf("CPU: New processing unit started coordenate = (%d, %d).\n", current->pu_coordenate.x, current->pu_coordenate.y);
 	pthread_mutex_t *clk_cycle_mutex = current->clk_instance->get_cycle_mutex_ptr();
 	pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
 	while (1)

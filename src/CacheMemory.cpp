@@ -10,9 +10,10 @@
 /**
 * @brief Constructor
 **/
-CacheMemory::CacheMemory(int _pu_id)
+CacheMemory::CacheMemory(int _x, int _y)
 {
-    this->pu_id = _pu_id;
+    this->pu_coordinate.x = _x;
+    this->pu_coordinate.y = _y;
     this->blocks = NULL;
     this->clk_intance = NULL;
 }
