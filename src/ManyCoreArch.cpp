@@ -51,18 +51,21 @@ void ManyCoreArch::add_iLet(ILet *new_iLet)
     this->resource_manager->add_iLet(new_iLet);
 }
 
+int ManyCoreArch::get_procs()
+{
+    return this->x_dim * this->y_dim;
+}
+
 JSON *ManyCoreArch::monitoring()
 {
     JSON *arch_info = new JSON;
-    JSON * resources_info = this->resource_manager->monitoring();
+    JSON *resources_info = this->resource_manager->monitoring();
     *arch_info = {
-        {"Processor", {
-            {"x",this->x_dim},
-            {"y", this->y_dim}
-        }},
-        {"Cycle", this->clk_instance->get_cycle()},
-        {"Status", *resources_info}
-    };
+        {"System",
+         {{"Processor",
+           {{"x", this->x_dim}, {"y", this->y_dim}}},
+          {"Cycle", this->clk_instance->get_cycle()}}},
+        {"Components", *resources_info}};
     delete resources_info;
     return arch_info;
 }

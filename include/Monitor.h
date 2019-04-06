@@ -8,7 +8,6 @@
 #ifndef INCLUDE_MONITOR_H_
 #define INCLUDE_MONITOR_H_
 
-#define PU_DIR "/processing_units"
 #define MANY_FILE "/manycore.json"
 #define RES_FILE "/resources.json"
 
@@ -43,6 +42,7 @@ class Monitor
 
 		void write_components(JSON * info);
 		void write_system(JSON * info);
+		void write_disk(std::string path, const char * data);
 
 		static void *monitoring(void *obj);
 

@@ -46,15 +46,37 @@ void Monitor::write_components(JSON * info)
 	
 	path.append(this->path_files);
 	path.append(RES_FILE);
-	std::ofstream resources_file (path.c_str());
-	resources_file << (*info)["Status"][0].dump().c_str() << std::endl;
-	resources_file.close();
-	
+	this->write_disk(path, (*info)["Components"][0].dump().c_str());
 	path.clear();
+
+	path.append(this->path_files);
+	int procs = this->manycore_ptr->get_procs();
+	for(int i = 1; i <= procs; i++)
+	{
+		std::string tmp = path;
+		tmp.append(PREFIX_PU);
+		tmp.append(std::to_string(i));
+		tmp.append(SUFIX_PU);
+
+		this->write_disk(tmp, (*info)["Components"][i].dump().c_str());
+		tmp.clear();
+	}
 }
 void Monitor::write_system(JSON * info)
 {
+	std::string path = "";
+	
+	path.append(this->path_files);
+	path.append(MANY_FILE);
+	this->write_disk(path, (*info)["System"].dump().c_str());
+	path.clear();
+}
 
+void Monitor::write_disk(std::string path, const char * data)
+{
+	std::ofstream resources_file (path.c_str());
+	resources_file << data << std::endl;
+	resources_file.close();
 }
 
 void *Monitor::monitoring(void *obj)
@@ -67,7 +89,8 @@ void *Monitor::monitoring(void *obj)
 	{
 		pthread_cond_wait(clk_monitor_cond, clk_monitor_mutex);
 		JSON *system_info = current->manycore_ptr->monitoring();
-		dprintf("MONITOR: System information: \n%s\n", system_info->dump().c_str());
+		//dprintf("MONITOR: System information: \n%s\n", system_info->dump(4).c_str());
+		current->write_system(system_info);
 		current->write_components(system_info);
 		delete system_info;
 	}

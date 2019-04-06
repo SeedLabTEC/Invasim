@@ -35,6 +35,8 @@ class ManyCoreArch
 
 		void retread(ILet * invaded_ilet);
 
+		int get_procs();
+		
 		JSON * monitoring();
 
 	private:

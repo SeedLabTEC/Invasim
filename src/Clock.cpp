@@ -40,7 +40,8 @@ void Clock::next_cycle()
     pthread_cond_broadcast(&this->cycle_cond);
     sleep(WAIT_SEC);
     this->cycle++;
-    pthread_cond_broadcast(&this->monitor_cond);
+    pthread_cond_signal(&this->monitor_cond);
+    sleep(WAIT_SEC);
 }
 
 int Clock::get_cycle()
