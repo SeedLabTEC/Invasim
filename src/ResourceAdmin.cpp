@@ -72,14 +72,11 @@ void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resour
 
 void ResourceAdmin::infect(ILet *ilet)
 {
-    pthread_mutex_lock(ilet->get_mutex());
     ilet->set_state(EXECUTING);
-    pthread_mutex_unlock(ilet->get_mutex());
 }
 
 void ResourceAdmin::retread(ILet *ilet)
 {
-    pthread_mutex_lock(ilet->get_mutex());
     unsigned int resoruces = ilet->get_resources()->size();
     for(unsigned int i = 0; i < resoruces; i++)
     {
@@ -87,7 +84,6 @@ void ResourceAdmin::retread(ILet *ilet)
         this->pu_array_ptr[position.x][position.y]->free_processor();
     }
     this->available += resoruces;
-    pthread_mutex_unlock(ilet->get_mutex());
 }
 
 JSON *ResourceAdmin::monitoring()
@@ -123,8 +119,8 @@ void *ResourceAdmin::managing(void *obj)
     while (1)
     {
         pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
-        //dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump(4).c_str());
-
+        dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump().c_str());
+        /*
         ILet *current_ilet = NULL;
         if (current->incomming_ilets.size() > 0)
         {
@@ -168,7 +164,6 @@ void *ResourceAdmin::managing(void *obj)
                     int terminate = current_ilet->finish_operation();
                     if (terminate)
                     {
-                        pthread_mutex_lock(current_ilet->get_mutex());
                         current_ilet->pop_operation();
                         if (current_ilet->get_current_operation()->get_operation() == RETREAT)
                         {
@@ -184,7 +179,6 @@ void *ResourceAdmin::managing(void *obj)
                         {
                             current_ilet->set_state(WAITING);
                         }
-                        pthread_mutex_unlock(current_ilet->get_mutex());
                     }
                 }
                 break;
@@ -220,6 +214,7 @@ void *ResourceAdmin::managing(void *obj)
                 }
             }
         }
+        */
     }
     return NULL;
 }

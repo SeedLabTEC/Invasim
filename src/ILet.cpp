@@ -84,8 +84,3 @@ void ILet::set_state(State_ILet new_state)
 {
 	this->state = new_state;
 }
-
-pthread_mutex_t *ILet::get_mutex()
-{
-	return &this->pu_mutex;
-}

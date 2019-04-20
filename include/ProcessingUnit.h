@@ -35,6 +35,7 @@ class ProcessingUnit
 
   private:
 	pthread_t pu_exe_thread;
+	pthread_mutex_t pu_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 	//Registers
 	Invasive_States pu_state;

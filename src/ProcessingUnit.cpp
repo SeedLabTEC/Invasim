@@ -40,9 +40,11 @@ void ProcessingUnit::start()
  * */
 void ProcessingUnit::invade(ILet *_new_iLet)
 {
+	pthread_mutex_lock(&this->pu_mutex);
 	dprintf("CPU: coordenate = (%d, %d), new iLet assiged\n", this->pu_coordenate.x, this->pu_coordenate.y);
 	this->iLet_ptr = _new_iLet;
 	this->pu_state = INVADED;
+	pthread_mutex_unlock(&this->pu_mutex);
 }
 
 coordinate ProcessingUnit::get_coodinate()
@@ -52,12 +54,17 @@ coordinate ProcessingUnit::get_coodinate()
 
 Invasive_States ProcessingUnit::get_state()
 {
-	return this->pu_state;
+	pthread_mutex_lock(&this->pu_mutex);
+	Invasive_States tmp_state = this->pu_state;
+	pthread_mutex_unlock(&this->pu_mutex);
+	return tmp_state;
 }
 
 void ProcessingUnit::free_processor()
 {
+	pthread_mutex_lock(&this->pu_mutex);
 	this->pu_state = FREE;
+	pthread_mutex_unlock(&this->pu_mutex);
 }
 
 /**
@@ -90,9 +97,31 @@ void *ProcessingUnit::executing(void *obj)
 	dprintf("CPU: New processing unit started coordenate = (%d, %d).\n", current->pu_coordenate.x, current->pu_coordenate.y);
 	pthread_mutex_t *clk_cycle_mutex = current->clk_instance->get_cycle_mutex_ptr();
 	pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
+
 	while (1)
 	{
 		pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
+
+		Invasive_States current_state = current->get_state();
+		switch (current_state)
+		{
+		case INVADED:
+			dprintf("CPU: Invaded processor = (%d, %d) by iLet = %d.\n",
+					current->pu_coordenate.x,
+					current->pu_coordenate.y,
+					current->iLet_ptr->get_id());
+			break;
+		case INFECTED:
+
+			break;
+		case FREE:
+			dprintf("CPU: Executing processor = (%d, %d).\n",
+					current->pu_coordenate.x,
+					current->pu_coordenate.y);
+			break;
+		default:
+			break;
+		}
 	}
 	return NULL;
 }

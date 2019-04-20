@@ -50,9 +50,8 @@ class ILet
 		std::vector<coordinate> * get_resources();
 
 		State_ILet get_state();
+		
 		void set_state(State_ILet new_state);
-
-		pthread_mutex_t * get_mutex();
 
 	private:
 		Operation * current_operation;
@@ -64,7 +63,6 @@ class ILet
 		State_ILet state;
 
 		int id_ilet;
-		pthread_mutex_t pu_mutex = PTHREAD_MUTEX_INITIALIZER;
 };
 
 #endif
