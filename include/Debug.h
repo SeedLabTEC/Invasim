@@ -23,4 +23,10 @@
 #define dprintf(fmt, ...) ((void)0)
 #endif
 
+struct coordinate
+{
+	int x;
+	int y;
+};
+
 #endif

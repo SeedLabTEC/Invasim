@@ -25,10 +25,11 @@ class ProcessingUnit
 
 	void start();
 
-	void new_task(ILet *_new_iLet);
+	void invade(ILet *_new_iLet);
 
 	coordinate get_coodinate();
 	Invasive_States get_state();
+	void free_processor();
 
 	JSON * monitoring();
 

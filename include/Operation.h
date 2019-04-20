@@ -21,6 +21,10 @@ class Operation
 {
 	public: 
 		Operation(Invasive_Operation _operation, int _parameter);
+		
+		Invasive_Operation get_operation();
+
+		int get_parameter();
 
 	private:
 		Invasive_Operation operation;

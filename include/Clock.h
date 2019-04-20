@@ -13,12 +13,6 @@
 
 #define WAIT_SEC 1
 
-struct coordinate
-{
-	int x;
-	int y;
-};
-
 enum Invasive_States
 {
 	INVADED,
@@ -26,10 +20,12 @@ enum Invasive_States
 	FREE
 };
 
-static const std::string STRING_STATES[] = {
-		"Invaded",
-		"Infected",
-		"Free"};
+static const std::string STRING_STATES[] = 
+{
+	"Invaded",
+	"Infected",
+	"Free"
+};
 
 #include <pthread.h>
 #include <unistd.h>

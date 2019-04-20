@@ -31,6 +31,7 @@ void ResourceAdmin::init(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y_dim
     this->clk_instance = _clk_instance;
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;
+    this->available = this->x_dim * this->y_dim;
 }
 
 void ResourceAdmin::start()
@@ -41,52 +42,62 @@ void ResourceAdmin::start()
     pthread_detach(this->pu_exe_thread);
 }
 
-void ResourceAdmin::add_iLet(ILet * new_iLet)
+void ResourceAdmin::add_iLet(ILet *new_iLet)
 {
     pthread_mutex_lock(&this->ilet_mutex);
-    this->iLet_queue.push(new_iLet);
+    this->incomming_ilets.push(new_iLet);
     pthread_mutex_unlock(&this->ilet_mutex);
 }
 
-std::vector<coordinate> ResourceAdmin::invade()
+std::vector<coordinate> ResourceAdmin::free_sides(coordinate pu_free)
 {
-    std::vector<coordinate> ret;
+}
 
-    for(int i = 0; i < this->x_dim; i++)
+void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resources, ILet *ilet)
+{
+    for (int i = 0; i < this->x_dim; i++)
     {
-        for(int j = 0; j < this->y_dim; j++)
+        for (int j = 0; j < this->y_dim; j++)
         {
             if (this->pu_array_ptr[i][j]->get_state() == FREE)
             {
                 coordinate free_pu = this->pu_array_ptr[i][j]->get_coodinate();
                 dprintf("ResourceAdmin: Found a processor free coordenate (%d, %d)\n", free_pu.x, free_pu.y);
-                return ret;
+                resources->push_back(free_pu);
+                this->pu_array_ptr[i][j]->invade(ilet);
             }
         }
-        
     }
-    
-
-    return ret;
 }
 
-void ResourceAdmin::infect()
+void ResourceAdmin::infect(ILet *ilet)
 {
+    pthread_mutex_lock(ilet->get_mutex());
+    ilet->set_state(EXECUTING);
+    pthread_mutex_unlock(ilet->get_mutex());
 }
 
-void ResourceAdmin::retread()
+void ResourceAdmin::retread(ILet *ilet)
 {
+    pthread_mutex_lock(ilet->get_mutex());
+    unsigned int resoruces = ilet->get_resources()->size();
+    for(unsigned int i = 0; i < resoruces; i++)
+    {
+        coordinate position = ilet->get_resources()->at(i);
+        this->pu_array_ptr[position.x][position.y]->free_processor();
+    }
+    this->available += resoruces;
+    pthread_mutex_unlock(ilet->get_mutex());
 }
 
 JSON *ResourceAdmin::monitoring()
 {
     JSON *array_info = new JSON;
     *array_info = JSON::array();
-    
+
     JSON resource_admin_info = {
-        {"Current_Ilets", this->iLet_queue.size()},
-        {"Max_Ilets", this->max_iLets}
-    };
+        {"Current_Ilets", this->incomming_ilets.size()},
+        {"Max_Ilets", this->max_iLets}};
 
     array_info->push_back(resource_admin_info);
 
@@ -113,7 +124,102 @@ void *ResourceAdmin::managing(void *obj)
     {
         pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
         //dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump(4).c_str());
-        current->invade();
+
+        ILet *current_ilet = NULL;
+        if (current->incomming_ilets.size() > 0)
+        {
+            pthread_mutex_lock(&current->ilet_mutex);
+            current_ilet = current->incomming_ilets.front();
+            current->incomming_ilets.pop();
+            pthread_mutex_unlock(&current->ilet_mutex);
+
+            current_ilet->pop_operation();
+            if (current_ilet->get_current_operation()->get_parameter() <= current->available)
+            {
+                current->invaded_ilets.push_back(current_ilet);
+            }
+            else
+            {
+                pthread_mutex_lock(&current->ilet_mutex);
+                current->incomming_ilets.push(current_ilet);
+                pthread_mutex_unlock(&current->ilet_mutex);
+            }
+        }
+
+        if (current->infected_ilets.size() > 0)
+        {
+            for (size_t i = 0; i < current->infected_ilets.size(); i++)
+            {
+                current_ilet = current->infected_ilets.at(i);
+                switch (current_ilet->get_state())
+                {
+                case WAITING:
+                {
+                    int start = current_ilet->execute_operation();
+                    if (start)
+                    {
+                        current->infect(current_ilet);
+                    }
+                }
+                break;
+
+                case EXECUTING:
+                {
+                    int terminate = current_ilet->finish_operation();
+                    if (terminate)
+                    {
+                        pthread_mutex_lock(current_ilet->get_mutex());
+                        current_ilet->pop_operation();
+                        if (current_ilet->get_current_operation()->get_operation() == RETREAT)
+                        {
+                            current_ilet->set_state(DONE);
+                        }
+                        else if (current_ilet->get_current_operation()->get_operation() == INVADE)
+                        {
+                            current_ilet->set_state(WAITING);
+                            current->invaded_ilets.push_back(current_ilet);
+                            current->infected_ilets.erase(current->infected_ilets.begin() + i);
+                        }
+                        else
+                        {
+                            current_ilet->set_state(WAITING);
+                        }
+                        pthread_mutex_unlock(current_ilet->get_mutex());
+                    }
+                }
+                break;
+
+                case DONE:
+                {
+                    current->retread(current_ilet);
+                    delete current_ilet;
+                    current->infected_ilets.erase(current->infected_ilets.begin() + i);
+                }
+                break;
+
+                default:
+                    break;
+                }
+            }
+        }
+
+        if (current->invaded_ilets.size() > 0)
+        {
+            for (size_t i = 0; i < current->invaded_ilets.size(); i++)
+            {
+                current_ilet = current->invaded_ilets.at(i);
+                current->invade(current_ilet->get_current_operation()->get_parameter(),
+                                current_ilet->get_resources(),
+                                current_ilet);
+
+                current_ilet->pop_operation();
+                if (current_ilet->get_current_operation()->get_operation() != INVADE)
+                {
+                    current->infected_ilets.push_back(current_ilet);
+                    current->invaded_ilets.erase(current->invaded_ilets.begin() + i);
+                }
+            }
+        }
     }
     return NULL;
 }

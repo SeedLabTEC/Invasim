@@ -9,6 +9,9 @@
 #define INCLUDE_ILET_H_
 
 #include <queue>
+#include <stdlib.h>
+#include <time.h>
+#include <pthread.h>
 #include "Debug.h"
 
 #include "Operation.h"
@@ -17,6 +20,13 @@ enum Type_ILet
 {
 	NORMAL,
 	MALICIOUS
+};
+
+enum State_ILet
+{
+	WAITING,
+	EXECUTING,
+	DONE
 };
 
 class ILet 
@@ -31,16 +41,30 @@ class ILet
 
 		void pop_operation();
 
-		void finish_operation();
-	
+		int execute_operation();
+
+		int finish_operation();
+
+		Operation * get_current_operation();
+
+		std::vector<coordinate> * get_resources();
+
+		State_ILet get_state();
+		void set_state(State_ILet new_state);
+
+		pthread_mutex_t * get_mutex();
+
 	private:
 		Operation * current_operation;
 		std::queue<Operation *> pending_operations;
 		std::queue<Operation *> done_operations;
+		std::vector<coordinate> * resources;
 		
 		Type_ILet type;
+		State_ILet state;
 
 		int id_ilet;
+		pthread_mutex_t pu_mutex = PTHREAD_MUTEX_INITIALIZER;
 };
 
 #endif

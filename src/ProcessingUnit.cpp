@@ -38,7 +38,7 @@ void ProcessingUnit::start()
 /**
  * 
  * */
-void ProcessingUnit::new_task(ILet *_new_iLet)
+void ProcessingUnit::invade(ILet *_new_iLet)
 {
 	dprintf("CPU: coordenate = (%d, %d), new iLet assiged\n", this->pu_coordenate.x, this->pu_coordenate.y);
 	this->iLet_ptr = _new_iLet;
@@ -53,6 +53,11 @@ coordinate ProcessingUnit::get_coodinate()
 Invasive_States ProcessingUnit::get_state()
 {
 	return this->pu_state;
+}
+
+void ProcessingUnit::free_processor()
+{
+	this->pu_state = FREE;
 }
 
 /**

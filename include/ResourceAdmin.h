@@ -46,19 +46,27 @@ class ResourceAdmin
 		//pthread_mutex_t control_bus_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 		Clock * clk_instance;
+		
 		int max_iLets;
-		ProcessingUnit *** pu_array_ptr;
-		std::queue<ILet *> iLet_queue;
 		int x_dim;
 		int y_dim;
+		int available;
+
+		ProcessingUnit *** pu_array_ptr;
+		std::queue<ILet *> incomming_ilets;
+		std::vector<ILet *> invaded_ilets;
+		std::vector<ILet *> infected_ilets;
+		
 
 		void init(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, Clock * _clk_instance);
+		
+		std::vector<coordinate> free_sides(coordinate pu_free);
 
-		std::vector<coordinate> invade();
+		void invade(int resources_amount, std::vector<coordinate> *resources, ILet * ilet);
 
-		void infect();
+		void infect(ILet * ilet);
 
-		void retread();
+		void retread(ILet * ilet);
 
 		static void * managing(void * obj);
 
