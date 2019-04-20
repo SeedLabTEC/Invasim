@@ -55,6 +55,7 @@ std::vector<coordinate> ResourceAdmin::free_sides(coordinate pu_free)
 
 void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resources, ILet *ilet)
 {
+    bool found = false;
     for (int i = 0; i < this->x_dim; i++)
     {
         for (int j = 0; j < this->y_dim; j++)
@@ -65,8 +66,15 @@ void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resour
                 dprintf("ResourceAdmin: Found a processor free coordenate (%d, %d)\n", free_pu.x, free_pu.y);
                 resources->push_back(free_pu);
                 this->pu_array_ptr[i][j]->invade(ilet);
+                found = true;
+                break;
             }
         }
+        if (found)
+        {
+            break;
+        }
+        
     }
 }
 
@@ -120,7 +128,7 @@ void *ResourceAdmin::managing(void *obj)
     {
         pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
         dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump().c_str());
-        /*
+        
         ILet *current_ilet = NULL;
         if (current->incomming_ilets.size() > 0)
         {
@@ -214,7 +222,6 @@ void *ResourceAdmin::managing(void *obj)
                 }
             }
         }
-        */
     }
     return NULL;
 }

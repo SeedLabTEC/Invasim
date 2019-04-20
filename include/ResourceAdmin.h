@@ -47,7 +47,7 @@ class ResourceAdmin
 
 		Clock * clk_instance;
 		
-		int max_iLets;
+		unsigned int max_iLets;
 		int x_dim;
 		int y_dim;
 		int available;

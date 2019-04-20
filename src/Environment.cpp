@@ -37,6 +37,7 @@ void Environment::init()
     dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
     this->many_core_instance = new ManyCoreArch(this->cpu_cores, this->cpu_cores, this->clk_instance);
     this->env_monitor = new Monitor(this->many_core_instance, "/home/dennis/Documents/Invasim/bin", this->clk_instance);
+    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance);
 }
 
 /**
@@ -48,6 +49,7 @@ void Environment::start_environment()
     this->many_core_instance->start();
     //Wait for components to start
     sleep(WAIT_SEC);
+    this->seq_ilet->start();
     this->env_monitor->start();
 }
 

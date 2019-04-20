@@ -12,6 +12,7 @@
 
 #include "ManyCoreArch.h"
 #include "Monitor.h"
+#include "SequenceIlet.h"
 #include "Clock.h"
 
 #define DEFAULT_CORES 8
@@ -36,6 +37,8 @@ class Environment
 
 	ManyCoreArch * many_core_instance;
 	Monitor * env_monitor;
+	SequenceIlet * seq_ilet;
+	
 
 	Clock *clk_instance;
 

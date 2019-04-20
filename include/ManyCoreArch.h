@@ -25,29 +25,29 @@ class ManyCoreArch
 	public: 
 		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance);
 
+		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance, int _max_ilets);
+
 		void start();
 
-		void add_iLet(ILet * new_iLet);
-
-		std::vector<int> invade(ILet * new_ilet);
-
-		void infect(ILet * invaded_ilet);
-
-		void retread(ILet * invaded_ilet);
+		void invade(ILet * new_iLet);
 
 		int get_procs();
+
+		int get_max_ilets();
 		
 		JSON * monitoring();
 
 	private:
 		int x_dim;
 		int y_dim;
+		unsigned int max_ilets;
 
 		Clock * clk_instance;
 		ProcessingUnit *** pu_array;
 		RandomAccessMemory * ram;
 		ResourceAdmin * resource_manager;
 
+		void init(int _x_dim, int _y_dim, Clock * _clk_instance);
 };
 
 #endif
