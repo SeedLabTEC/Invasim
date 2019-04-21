@@ -9,7 +9,7 @@
 #define INCLUDE_SEQUENCEILET_H_
 
 #include <vector>
-#include "Debug.h"
+#include "Utils.h"
 
 #include "Clock.h"
 #include "ManyCoreArch.h"
@@ -24,8 +24,8 @@ enum Sequence_Type
 class SequenceIlet 
 {
 	public: 
-		SequenceIlet(Clock * _clk_instance, ManyCoreArch * _manycore_ptr);
-		SequenceIlet(Sequence_Type _seq_type, Clock * _clk_instance, ManyCoreArch * _manycore_ptr);
+		SequenceIlet(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability);
+		SequenceIlet(Sequence_Type _seq_type, Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability);
 
 		void start();
 
@@ -36,8 +36,9 @@ class SequenceIlet
 		Clock * clk_instance;
 		ManyCoreArch * manycore_ptr;
 		std::vector<ILet *> created_ilets;
+		float decision_probability;
 
-		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr);
+		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability);
 		static void *generate(void *obj);
 };
 

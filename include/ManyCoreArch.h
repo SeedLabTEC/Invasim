@@ -18,7 +18,7 @@
 using JSON = nlohmann::json;
 
 #include <vector>
-#include "Debug.h"
+#include "Utils.h"
 
 class ManyCoreArch 
 {
@@ -33,7 +33,7 @@ class ManyCoreArch
 
 		int get_procs();
 
-		int get_max_ilets();
+		unsigned int get_max_ilets();
 		
 		JSON * monitoring();
 

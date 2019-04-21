@@ -12,7 +12,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
-#include "Debug.h"
+#include <random>
+#include "Utils.h"
 
 #include "Operation.h"
 
@@ -32,7 +33,7 @@ enum State_ILet
 class ILet 
 {
 	public: 
-		ILet(Type_ILet _type, int _id);
+		ILet(Type_ILet _type, int _id, float _decision_probability);
 		~ILet();
 
 		int get_id();
@@ -58,6 +59,9 @@ class ILet
 		std::queue<Operation *> pending_operations;
 		std::queue<Operation *> done_operations;
 		std::vector<coordinate> * resources;
+
+		std::default_random_engine generator;
+  		std::bernoulli_distribution distribution;
 		
 		Type_ILet type;
 		State_ILet state;

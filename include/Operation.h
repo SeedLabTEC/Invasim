@@ -8,7 +8,7 @@
 #ifndef INCLUDE_OPERATION_H_
 #define INCLUDE_OPERATION_H_
 
-#include "Debug.h"
+#include "Utils.h"
 
 enum Invasive_Operation
 {

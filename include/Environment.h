@@ -8,7 +8,7 @@
 #ifndef INCLUDE_ENVIRONMENT_H_
 #define INCLUDE_ENVIRONMENT_H_
 
-#include "Debug.h"
+#include "Utils.h"
 
 #include "ManyCoreArch.h"
 #include "Monitor.h"
@@ -16,24 +16,24 @@
 #include "Clock.h"
 
 #define DEFAULT_CORES 8
+#define DEFAULT_PROBABILITY 0.80
 
 class Environment
 {
   public:
 	Environment();
 
-	Environment(int _cpu_cores);
-
-	void set_cpu_cores(int _cpu_cores);
-
-	int get_cpu_cores();
+	Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir);
 
 	void start_environment();
 
 	void step(int steps);
 
   private:
-	int cpu_cores;
+	int x_dim;
+	int y_dim;
+	float decision_probability;
+	std::string working_dir;
 
 	ManyCoreArch * many_core_instance;
 	Monitor * env_monitor;

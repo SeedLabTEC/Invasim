@@ -19,7 +19,7 @@ using JSON = nlohmann::json;
 #include <pthread.h>
 #include <vector>
 #include <queue>
-#include "Debug.h"
+#include "Utils.h"
 
 class ResourceAdmin 
 {
@@ -55,18 +55,18 @@ class ResourceAdmin
 		ProcessingUnit *** pu_array_ptr;
 		std::queue<ILet *> incomming_ilets;
 		std::vector<ILet *> invaded_ilets;
-		std::vector<ILet *> infected_ilets;
+		std::vector<ILet *> execute_ilets;
 		
 
 		void init(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, Clock * _clk_instance);
-		
-		std::vector<coordinate> free_sides(coordinate pu_free);
 
 		void invade(int resources_amount, std::vector<coordinate> *resources, ILet * ilet);
 
 		void infect(ILet * ilet);
 
-		void retread(ILet * ilet);
+		void retreat(ILet * ilet);
+
+		bool verify_ilet(ILet * ilet);
 
 		static void * managing(void * obj);
 

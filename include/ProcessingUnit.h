@@ -9,7 +9,7 @@
 #define INCLUDE_PROCESSINGUNIT_H_
 
 #include <pthread.h>
-#include "Debug.h"
+#include "Utils.h"
 
 #include "json.hpp"
 using JSON = nlohmann::json;
@@ -26,11 +26,12 @@ class ProcessingUnit
 	void start();
 
 	void invade(ILet *_new_iLet);
+	void infect();
+	void retreat();
 
 	coordinate get_coodinate();
 	Invasive_States get_state();
-	void free_processor();
-
+	
 	JSON * monitoring();
 
   private:

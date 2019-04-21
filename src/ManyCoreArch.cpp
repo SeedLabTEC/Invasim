@@ -52,7 +52,7 @@ int ManyCoreArch::get_procs()
     return this->x_dim * this->y_dim;
 }
 
-int ManyCoreArch::get_max_ilets()
+unsigned int ManyCoreArch::get_max_ilets()
 {
     return this->max_ilets;
 }

@@ -21,7 +21,7 @@ struct cache_line
 	bool valid;
 };
 
-#include "Debug.h"
+#include "Utils.h"
 
 class CacheMemory 
 {

@@ -6,25 +6,30 @@
 **/
 
 #include "../include/Environment.h"
-
 /**
 * @brief Constructor
 **/
 Environment::Environment()
 {
     dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n", DEFAULT_CORES);
-    this->cpu_cores = DEFAULT_CORES;
+    this->x_dim = DEFAULT_CORES;
+    this->y_dim = DEFAULT_CORES;
+    this->decision_probability = DEFAULT_PROBABILITY;
     this->init();
+    this->env_monitor = new Monitor(this->many_core_instance, this->clk_instance);
 }
 
 /**
  * @brief 
 **/
-Environment::Environment(int _cpu_cores)
+Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir)
 {
-    dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n", _cpu_cores);
-    this->cpu_cores = _cpu_cores;
+    dprintf("ENVIRONMENT: Environment created.\n\t- Cores: (%d, %d).\n", _x_dim, _y_dim);
+    this->x_dim = _x_dim;
+    this->y_dim = _y_dim;
+    this->decision_probability = _decision_probability;
     this->init();
+    this->env_monitor = new Monitor(this->many_core_instance, _working_dir, this->clk_instance);
 }
 
 /**
@@ -35,9 +40,8 @@ void Environment::init()
     dprintf("ENVIRONMENT: Instanciating environment clock.\n");
     this->clk_instance = new Clock();
     dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
-    this->many_core_instance = new ManyCoreArch(this->cpu_cores, this->cpu_cores, this->clk_instance);
-    this->env_monitor = new Monitor(this->many_core_instance, "/home/dennis/Documents/Invasim/bin", this->clk_instance);
-    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance);
+    this->many_core_instance = new ManyCoreArch(this->x_dim, this->y_dim, this->clk_instance);
+    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability);
 }
 
 /**
@@ -62,20 +66,4 @@ void Environment::step(int steps)
     {
         this->clk_instance->next_cycle();
     }
-}
-
-/**
- * @brief 
-**/
-int Environment::get_cpu_cores()
-{
-    return this->cpu_cores;
-}
-
-/**
- * @brief 
-**/
-void Environment::set_cpu_cores(int _cpu_cores)
-{
-    this->cpu_cores = _cpu_cores;
 }

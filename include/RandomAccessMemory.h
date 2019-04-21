@@ -12,7 +12,7 @@
 
 #include "Clock.h"
 
-#include "Debug.h"
+#include "Utils.h"
 
 class RandomAccessMemory 
 {

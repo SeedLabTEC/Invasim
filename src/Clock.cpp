@@ -37,11 +37,11 @@ pthread_cond_t *Clock::get_monitor_cond_ptr()
 
 void Clock::next_cycle()
 {
-    dprintf("Clock: Cycle = %d---------------------------------------------------------\n", this->cycle);
+    dprintf("Clock: Cycle = %d--------------------------------\n", this->cycle);
     pthread_cond_broadcast(&this->cycle_cond);
     sleep(WAIT_SEC);
     this->cycle++;
-    pthread_cond_broadcast(&this->monitor_cond);
+    pthread_cond_signal(&this->monitor_cond);
     sleep(WAIT_SEC);
 }
 

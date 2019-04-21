@@ -21,13 +21,13 @@
 #include "Clock.h"
 #include "ManyCoreArch.h"
 
-#include "Debug.h"
+#include "Utils.h"
 
 class Monitor 
 {
 	public: 
 		Monitor(ManyCoreArch *_manycore_ptr, Clock * _clk_instance);
-		Monitor(ManyCoreArch *_manycore_ptr, char * _path_files, Clock * _clk_instance);
+		Monitor(ManyCoreArch *_manycore_ptr, std::string  _path_files, Clock * _clk_instance);
 
 		void start();
 

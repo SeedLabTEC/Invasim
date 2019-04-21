@@ -16,9 +16,9 @@ Monitor::Monitor(ManyCoreArch *_manycore_ptr, Clock *_clk_instance)
 	this->init(_manycore_ptr, _clk_instance);
 }
 
-Monitor::Monitor(ManyCoreArch *_manycore_ptr, char *_path_files, Clock *_clk_instance)
+Monitor::Monitor(ManyCoreArch *_manycore_ptr, std::string _path_files, Clock *_clk_instance)
 {
-	strcpy(this->path_files, _path_files);
+	strcpy(this->path_files, _path_files.c_str());
 	this->init(_manycore_ptr, _clk_instance);
 }
 
@@ -89,7 +89,7 @@ void *Monitor::monitoring(void *obj)
 	{
 		pthread_cond_wait(clk_monitor_cond, clk_monitor_mutex);
 		JSON *system_info = current->manycore_ptr->monitoring();
-		//dprintf("MONITOR: System information: \n%s\n", system_info->dump(4).c_str());
+		std::cout << "MONITOR: System information: \n" << system_info->dump(4).c_str() << std::endl;;
 		current->write_system(system_info);
 		current->write_components(system_info);
 		delete system_info;

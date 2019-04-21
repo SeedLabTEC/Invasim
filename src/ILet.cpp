@@ -6,17 +6,17 @@
 **/
 
 #include "../include/ILet.h"
-
 /**
 * @brief Constructor
 **/
-ILet::ILet(Type_ILet _type, int _id)
+ILet::ILet(Type_ILet _type, int _id, float _decision_probability)
 {
 	this->type = _type;
 	this->state = WAITING;
 	this->id_ilet = _id;
 	this->resources = new std::vector<coordinate>();
 	this->current_operation = NULL;
+	this->distribution = std::bernoulli_distribution(_decision_probability);
 }
 
 ILet::~ILet()
@@ -55,13 +55,13 @@ void ILet::pop_operation()
 
 int ILet::execute_operation()
 {
-	int is_exe = rand() % 2;
+	int is_exe = this->distribution(this->generator);
 	return is_exe;
 }
 
 int ILet::finish_operation()
 {
-	int is_finished = rand() % 2;
+	int is_finished = this->distribution(this->generator);
 	return is_finished;
 }
 

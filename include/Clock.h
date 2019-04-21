@@ -8,24 +8,10 @@
 #ifndef INCLUDE_CLOCK_H_
 #define INCLUDE_CLOCK_H_
 
-#include "Debug.h"
+#include "Utils.h"
 #include <string>
 
 #define WAIT_SEC 1
-
-enum Invasive_States
-{
-	INVADED,
-	INFECTED,
-	FREE
-};
-
-static const std::string STRING_STATES[] = 
-{
-	"Invaded",
-	"Infected",
-	"Free"
-};
 
 #include <pthread.h>
 #include <unistd.h>
