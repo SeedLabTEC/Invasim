@@ -16,6 +16,12 @@
 #include "ManyCoreArch.h"
 #include "ILet.h"
 
+#define MAX_CLOCKS 10
+#define MAX_INFECTIONS 1
+#define MAX_INVASIONS 1
+#define MAX_LOADS 10
+#define MAX_RESOURCES 0.50
+
 enum Sequence_Type
 {
 	RANDOM,
@@ -28,7 +34,11 @@ class SequenceIlet
 		SequenceIlet(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		SequenceIlet(Sequence_Type _seq_type, Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 
+		void set_generation_parameters(int _max_clocks, int _max_infections, int _max_invasions, int _max_loads, float _max_resources);
+
 		void start();
+
+		JSON * monitoring();
 
 	private:
 		pthread_t seq_thread;
@@ -37,7 +47,6 @@ class SequenceIlet
 		Clock * clk_instance;
 		ManyCoreArch * manycore_ptr;
 		std::vector<ILet *> created_ilets;
-		std::minstd_rand0 generator;
 
 		float decision_probability;
 		int seed;
@@ -45,7 +54,9 @@ class SequenceIlet
 		int max_infections;
 		int max_invasions;
 		int max_loads;
-		float max_resources;
+		int max_resources;
+
+		ILet * generate_ilet(int index);
 
 		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		static void *generate(void *obj);

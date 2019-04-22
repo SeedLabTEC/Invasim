@@ -10,6 +10,7 @@
 
 #define MANY_FILE "/manycore.json"
 #define RES_FILE "/resources.json"
+#define ILET_FILE "/ilets.json"
 
 #define PREFIX_PU "/unit_"
 #define SUFIX_PU ".json"
@@ -20,14 +21,15 @@
 
 #include "Clock.h"
 #include "ManyCoreArch.h"
+#include "SequenceIlet.h"
 
 #include "Utils.h"
 
 class Monitor 
 {
 	public: 
-		Monitor(ManyCoreArch *_manycore_ptr, Clock * _clk_instance);
-		Monitor(ManyCoreArch *_manycore_ptr, std::string  _path_files, Clock * _clk_instance);
+		Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock * _clk_instance);
+		Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::string  _path_files, Clock * _clk_instance);
 
 		void start();
 
@@ -37,11 +39,13 @@ class Monitor
 		Clock * clk_instance;
 		char path_files[PATH_MAX];
 		ManyCoreArch *manycore_ptr;
+		SequenceIlet *seq_ilet_ptr;
 
-		void init(ManyCoreArch *_manycore_ptr, Clock * _clk_instance);
+		void init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock * _clk_instance);
 
 		void write_components(JSON * info);
 		void write_system(JSON * info);
+		void write_ilets(JSON * info);
 		void write_disk(std::string path, const char * data);
 
 		static void *monitoring(void *obj);

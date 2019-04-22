@@ -10,22 +10,23 @@
 /**
 * @brief Constructor
 **/
-Monitor::Monitor(ManyCoreArch *_manycore_ptr, Clock *_clk_instance)
+Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock *_clk_instance)
 {
 	getcwd(this->path_files, PATH_MAX);
-	this->init(_manycore_ptr, _clk_instance);
+	this->init(_manycore_ptr, _seq_ilet_ptr, _clk_instance);
 }
 
-Monitor::Monitor(ManyCoreArch *_manycore_ptr, std::string _path_files, Clock *_clk_instance)
+Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::string _path_files, Clock *_clk_instance)
 {
 	strcpy(this->path_files, _path_files.c_str());
-	this->init(_manycore_ptr, _clk_instance);
+	this->init(_manycore_ptr, _seq_ilet_ptr, _clk_instance);
 }
 
-void Monitor::init(ManyCoreArch *_manycore_ptr, Clock *_clk_instance)
+void Monitor::init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock *_clk_instance)
 {
 	this->manycore_ptr = _manycore_ptr;
 	this->clk_instance = _clk_instance;
+	this->seq_ilet_ptr = _seq_ilet_ptr;
 	dprintf("MONITOR: Monitor created in directory %s\n", this->path_files);
 }
 
@@ -72,6 +73,16 @@ void Monitor::write_system(JSON * info)
 	path.clear();
 }
 
+void Monitor::write_ilets(JSON * info)
+{
+	std::string path = "";
+	
+	path.append(this->path_files);
+	path.append(ILET_FILE);
+	this->write_disk(path, (*info).dump().c_str());
+	path.clear();
+}
+
 void Monitor::write_disk(std::string path, const char * data)
 {
 	std::ofstream resources_file (path.c_str());
@@ -89,10 +100,13 @@ void *Monitor::monitoring(void *obj)
 	{
 		pthread_cond_wait(clk_monitor_cond, clk_monitor_mutex);
 		JSON *system_info = current->manycore_ptr->monitoring();
+		JSON *ilet_info = current->seq_ilet_ptr->monitoring();
 		std::cout << "MONITOR: System information: \n" << system_info->dump(4).c_str() << std::endl;;
 		current->write_system(system_info);
 		current->write_components(system_info);
+		current->write_ilets(ilet_info);
 		delete system_info;
+		delete ilet_info;
 	}
 	return NULL;
 }

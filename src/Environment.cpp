@@ -17,7 +17,7 @@ Environment::Environment()
     this->decision_probability = DEFAULT_PROBABILITY;
     this->seed = DEFAULT_SEED;
     this->init();
-    this->env_monitor = new Monitor(this->many_core_instance, this->clk_instance);
+    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet, this->clk_instance);
 }
 
 /**
@@ -31,7 +31,7 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
     this->decision_probability = _decision_probability;
     this->seed = _seed;
     this->init();
-    this->env_monitor = new Monitor(this->many_core_instance, _working_dir, this->clk_instance);
+    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet , _working_dir, this->clk_instance);
 }
 
 /**

@@ -17,6 +17,13 @@ enum Invasive_Operation
 	RETREAT
 };
 
+static const std::string STRING_OPERATIONS[] = 
+{
+	"Invade",
+	"Infect",
+	"Retreat"
+};
+
 class Operation 
 {
 	public: 
