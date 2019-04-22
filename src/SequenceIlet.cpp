@@ -10,16 +10,16 @@
 /**
 * @brief Constructor
 **/
-SequenceIlet::SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability)
+SequenceIlet::SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed)
 {
     this->seq_type = RANDOM;
-    this->init(_clk_instance, _manycore_ptr, _decision_probability);
+    this->init(_clk_instance, _manycore_ptr, _decision_probability, _seed);
 }
 
-SequenceIlet::SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability)
+SequenceIlet::SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed)
 {
     this->seq_type = _seq_type;
-    this->init(_clk_instance, _manycore_ptr, _decision_probability);
+    this->init(_clk_instance, _manycore_ptr, _decision_probability, _seed);
 }
 
 void SequenceIlet::start()
@@ -30,8 +30,10 @@ void SequenceIlet::start()
     pthread_detach(this->seq_thread);
 }
 
-void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability)
+void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed)
 {
+    this->seed = _seed;
+    srand(this->seed);
     this->decision_probability = _decision_probability;
     this->clk_instance = _clk_instance;
     this->manycore_ptr = _manycore_ptr;
@@ -50,7 +52,6 @@ void *SequenceIlet::generate(void *obj)
 
         if (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets() && i < 3)
         {
-
             ILet *new_ilet = new ILet(NORMAL, i, current->decision_probability);
             new_ilet->add_operation(INVADE, 4);
             new_ilet->add_operation(INFECT, 1);

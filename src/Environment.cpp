@@ -15,6 +15,7 @@ Environment::Environment()
     this->x_dim = DEFAULT_CORES;
     this->y_dim = DEFAULT_CORES;
     this->decision_probability = DEFAULT_PROBABILITY;
+    this->seed = DEFAULT_SEED;
     this->init();
     this->env_monitor = new Monitor(this->many_core_instance, this->clk_instance);
 }
@@ -22,12 +23,13 @@ Environment::Environment()
 /**
  * @brief 
 **/
-Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir)
+Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir, int _seed)
 {
     dprintf("ENVIRONMENT: Environment created.\n\t- Cores: (%d, %d).\n", _x_dim, _y_dim);
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;
     this->decision_probability = _decision_probability;
+    this->seed = _seed;
     this->init();
     this->env_monitor = new Monitor(this->many_core_instance, _working_dir, this->clk_instance);
 }
@@ -41,7 +43,7 @@ void Environment::init()
     this->clk_instance = new Clock();
     dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
     this->many_core_instance = new ManyCoreArch(this->x_dim, this->y_dim, this->clk_instance);
-    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability);
+    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability, this->seed);
 }
 
 /**

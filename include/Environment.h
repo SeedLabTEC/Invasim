@@ -17,13 +17,14 @@
 
 #define DEFAULT_CORES 8
 #define DEFAULT_PROBABILITY 0.80
+#define DEFAULT_SEED 1
 
 class Environment
 {
   public:
 	Environment();
 
-	Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir);
+	Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir, int _seed);
 
 	void start_environment();
 
@@ -32,6 +33,7 @@ class Environment
   private:
 	int x_dim;
 	int y_dim;
+	int seed;
 	float decision_probability;
 	std::string working_dir;
 
