@@ -41,12 +41,15 @@ class Monitor
 		ManyCoreArch *manycore_ptr;
 		SequenceIlet *seq_ilet_ptr;
 
+		bool first_components = true;
+		bool first_ilets = true;
+
 		void init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock * _clk_instance);
 
 		void write_components(JSON * info);
 		void write_system(JSON * info);
 		void write_ilets(JSON * info);
-		void write_disk(std::string path, const char * data);
+		void write_disk(std::string path, JSON data, bool append);
 
 		static void *monitoring(void *obj);
 
