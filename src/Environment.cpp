@@ -26,6 +26,12 @@ Environment::Environment()
 Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir, int _seed)
 {
     dprintf("ENVIRONMENT: Environment created.\n\t- Cores: (%d, %d).\n", _x_dim, _y_dim);
+    if (_x_dim * _y_dim > 1000)
+    {
+        std::cerr << "ERROR: Processing units can't exceed 1000." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;
     this->decision_probability = _decision_probability;
