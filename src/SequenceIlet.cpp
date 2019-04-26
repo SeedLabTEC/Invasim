@@ -81,11 +81,11 @@ ILet *SequenceIlet::generate_ilet(int index)
                 {"Parameter", resources}
             }, 
             {
-                {"Operation", STRING_OPERATIONS[INVADE]}, 
+                {"Operation", STRING_OPERATIONS[INFECT]}, 
                 {"Parameter", load}
             }, 
             {
-                {"Operation", STRING_OPERATIONS[INVADE]}, 
+                {"Operation", STRING_OPERATIONS[RETREAT]}, 
                 {"Parameter", 0}
             }}
         }
