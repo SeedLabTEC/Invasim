@@ -33,6 +33,16 @@ void ProcessingUnit::start()
 	pthread_create(&this->pu_exe_thread, NULL, ProcessingUnit::executing, (void *)this);
 	//detach threads
 	pthread_detach(this->pu_exe_thread);
+	#ifdef TEST
+    if (this->cache_mem != NULL)
+    {
+        std::cout << "TEST[AMN-04]: PASS" << std::endl;
+    }
+    else 
+    {
+        std::cout << "TEST[AMN-04]: FAIL" << std::endl;
+    }
+    #endif
 }
 
 /**
@@ -106,7 +116,9 @@ void *ProcessingUnit::executing(void *obj)
 	dprintf("PU = (%d, %d): New processing unit started.\n", current->pu_coordenate.x, current->pu_coordenate.y);
 	pthread_mutex_t *clk_cycle_mutex = current->clk_instance->get_cycle_mutex_ptr();
 	pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
-
+	#ifdef TEST
+	int test_execution = 0;
+	#endif
 	while (1)
 	{
 		pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
@@ -119,6 +131,9 @@ void *ProcessingUnit::executing(void *obj)
 					current->pu_coordenate.x,
 					current->pu_coordenate.y,
 					current->iLet_ptr->get_id());
+			#ifdef TEST
+			test_execution = 0;
+			#endif
 			break;
 		case INFECTED:
 			dprintf("PU = (%d, %d): Infected processor by ILet = %d.\n",
@@ -129,14 +144,31 @@ void *ProcessingUnit::executing(void *obj)
 			if (current->current_load > 0)
 			{
 				current->current_load--;
+				#ifdef TEST
+				test_execution++;
+				#endif
 			}
 			else
 			{
 				dprintf("PU = (%d, %d): Execution Done by ILet = %d.\n",
-					current->pu_coordenate.x,
-					current->pu_coordenate.y,
-					current->iLet_ptr->get_id());
+						current->pu_coordenate.x,
+						current->pu_coordenate.y,
+						current->iLet_ptr->get_id());
 				current->pu_state = INVADED;
+				#ifdef TEST
+				bool test_execution_complete =
+					current->iLet_ptr->get_current_operation()->get_parameter() ==
+					test_execution;
+				std::cout << "TEST[AMN-01]: "
+						  << (test_execution_complete ? "PASS" : "FAIL")
+						  << " Detail: PU = ("
+						  << current->pu_coordenate.x
+						  << ", "
+						  << current->pu_coordenate.y
+						  << ")"
+						  << std::endl;
+				test_execution = 0;
+				#endif
 			}
 			pthread_mutex_unlock(&current->pu_mutex);
 			break;
@@ -144,6 +176,9 @@ void *ProcessingUnit::executing(void *obj)
 			dprintf("PU = (%d, %d): Free processor.\n",
 					current->pu_coordenate.x,
 					current->pu_coordenate.y);
+			#ifdef TEST
+			test_execution = 0;
+			#endif
 			break;
 		default:
 			break;

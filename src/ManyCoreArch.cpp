@@ -31,6 +31,24 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, int _ma
 
 void ManyCoreArch::start()
 {
+    #ifdef TEST
+    if (this->ram != NULL)
+    {
+        std::cout << "TEST[AMN-04]: PASS" << std::endl;
+    }
+    else 
+    {
+        std::cout << "TEST[AMN-04]: FAIL" << std::endl;
+    }
+    if (this->resource_manager != NULL)
+    {
+        std::cout << "TEST[AMN-07]: PASS" << std::endl;
+    }
+    else 
+    {
+        std::cout << "TEST[AMN-07]: FAIL" << std::endl;
+    }
+    #endif
     dprintf("MANYCOREARCH: Starting processing units.\n");
     for (int i = 0; i < this->x_dim; i++)
     {

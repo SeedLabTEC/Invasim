@@ -111,13 +111,11 @@ void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resour
 				found = true;
 				break;
 			}
-			
 		}
 		if (found)
 		{
 			break;
 		}
-		
 	}
 	this->available -= resources_amount;
 }
@@ -168,10 +166,10 @@ void *ResourceAdmin::managing(void *obj)
 	pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
 	while (1)
 	{
-		
+
 		pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
 		dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump().c_str());
-		
+
 		ILet *current_ilet = NULL;
 
 		if (current->incomming_ilets.size() > 0)
@@ -200,7 +198,7 @@ void *ResourceAdmin::managing(void *obj)
 				pthread_mutex_unlock(&current->ilet_mutex);
 			}
 		}
-		
+
 		if (current->execute_ilets.size() > 0)
 		{
 			for (size_t i = 0; i < current->execute_ilets.size(); i++)
@@ -216,6 +214,22 @@ void *ResourceAdmin::managing(void *obj)
 
 						dprintf("ResourceAdmin: Infecting resources to Ilet = %d.\n", current_ilet->get_id());
 						current->infect(current_ilet);
+						#ifdef TEST
+						unsigned int test_resources = current_ilet->get_resources()->size();
+						bool test_is_infected = true;
+						for (unsigned int i = 0; i < test_resources; i++)
+						{
+							coordinate position = current_ilet->get_resources()->at(i);
+							if (current->pu_array_ptr[position.x][position.y]->get_state() != INFECTED)
+							{
+								test_is_infected = false;
+								break;
+							}
+						}
+						std::cout << "TEST[AMN-06]: "
+								  << (test_is_infected ? "PASS" : "FAIL")
+								  << std::endl;
+						#endif
 					}
 				}
 				break;
@@ -274,10 +288,10 @@ void *ResourceAdmin::managing(void *obj)
 				}
 			}
 		}
-		
+
 		if (current->invaded_ilets.size() > 0)
 		{
-			
+
 			for (size_t i = 0; i < current->invaded_ilets.size(); i++)
 			{
 				current_ilet = current->invaded_ilets.at(i);
@@ -293,7 +307,6 @@ void *ResourceAdmin::managing(void *obj)
 				}
 			}
 		}
-		
 	}
 	return NULL;
 }

@@ -31,13 +31,13 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
         std::cerr << "ERROR: Processing units can't exceed 1000." << std::endl;
         exit(EXIT_FAILURE);
     }
-    
+
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;
     this->decision_probability = _decision_probability;
     this->seed = _seed;
     this->init();
-    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet , _working_dir, this->clk_instance);
+    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet, _working_dir, this->clk_instance);
 }
 
 /**
@@ -57,6 +57,17 @@ void Environment::init()
  * */
 void Environment::start_environment()
 {
+    #ifdef TEST
+    if (this->x_dim * this->y_dim <= 1000 && this->many_core_instance->get_procs() <= 1000)
+    {
+        std::cout << "TEST[AMN-02]: PASS" << std::endl;
+    }
+    else
+    {
+        std::cout << "TEST[AMN-02]: FAIL" << std::endl;
+    }
+    #endif
+    
     dprintf("ENVIRONMENT: Starting environment components.\n");
     this->many_core_instance->start();
     //Wait for components to start
