@@ -20,7 +20,10 @@ SimulationWindow::SimulationWindow(QWidget *parent, simulation_data *_current_si
     this->env->start_environment();
     this->env->step(1);
 
-    this->processor_view = new ProcessorView(this);
+    this->processor_view = new ProcessorView(this,
+                                             this->current_sim_data->x_dim,
+                                             this->current_sim_data->y_dim,
+                                             this->current_sim_data->work_dir);
     this->processor_view->show();
 }
 
@@ -45,13 +48,7 @@ void SimulationWindow::closeEvent (QCloseEvent *event)
 void SimulationWindow::on_pushButton_released()
 {
     this->ui->pushButton->setEnabled(false);
-
-    for (int i = 0; i < 4; i++)
-    {
-        this->processor_view->processors[i]->update_data(this->cycle);
-
-    }
-
+    this->processor_view->update_processors(this->cycle);
     this->ui->pushButton->setEnabled(true);
     this->env->step(1);
     this->cycle++;

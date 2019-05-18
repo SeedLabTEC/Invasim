@@ -7,7 +7,7 @@ Processor::Processor(QGraphicsItem *parent, int coo_x, int coo_y, std::string js
     coo_y(coo_y),
     json_file(json_file)
 {
-    setRect(0,0,495,280);
+    setRect(0,0,50,50);
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
     brush.setColor(QColor("cyan"));
@@ -39,5 +39,5 @@ void Processor::update_data(unsigned int cycle)
     this->ilet_id = new_data[cycle]["ILet"];
     this->load = new_data[cycle]["Load"];
     this->state = new_data[cycle]["State"];
-    this->json_data->setPlainText(new_data[cycle].dump(2).c_str());
+    this->json_data->setPlainText((std::to_string(this->ilet_id).c_str()));
 }

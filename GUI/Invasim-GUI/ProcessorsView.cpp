@@ -1,8 +1,11 @@
 #include "ProcessorView.h"
 #include <QDebug>
 
-ProcessorView::ProcessorView(QWidget *parent) :
-    QGraphicsView(parent)
+ProcessorView::ProcessorView(QWidget *parent, int x_dim, int y_dim, std::string working_dir) :
+    QGraphicsView(parent),
+    x_dim(x_dim),
+    y_dim(y_dim),
+    working_dir(working_dir)
 {
     move(10,124);
     this->scene = new QGraphicsScene(0,0,1000,570);
@@ -18,28 +21,29 @@ ProcessorView::ProcessorView(QWidget *parent) :
     panel->setOpacity(0.2);
     scene->addItem(panel);
 
-    this->processors[0] = new Processor(NULL, 0, 0, "/home/dennis/invasim_data/unit_1.json");
-    this->processors[0]->setPos(0,0);
-    scene->addItem(this->processors[0]);
-    this->processors[0]->json_data = scene->addText("{}");
-    this->processors[0]->json_data->setPos(0,0);
+    this->processors = new Processor *[x_dim * y_dim];
 
-    this->processors[1] = new Processor(NULL, 0, 1, "/home/dennis/invasim_data/unit_2.json");
-    this->processors[1]->setPos(500,0);
-    scene->addItem(this->processors[1]);
-    this->processors[1]->json_data = scene->addText("{}");
-    this->processors[1]->json_data->setPos(590, 0);
+    int index = 1;
+    for (int i = 0; i < x_dim; i++) {
+        for (int j = 0; j < y_dim; j++) {
+            std::string tmp = working_dir;
+            tmp.append(PREFIX_PU);
+            tmp.append(std::to_string(index));
+            tmp.append(SUFIX_PU);
+            this->processors[index - 1] = new Processor(NULL, i, j, tmp);
+            this->processors[index - 1]->setPos(j*60, i*60);
+            scene->addItem(this->processors[index - 1]);
+            this->processors[index - 1]->json_data = scene->addText("{}");
+            this->processors[index - 1]->json_data->setPos(j*60, i*60);
+            index++;
+        }
+    }
+}
 
-    this->processors[2] = new Processor(NULL, 1, 0, "/home/dennis/invasim_data/unit_3.json");
-    this->processors[2]->setPos(0,285);
-    scene->addItem(this->processors[2]);
-    this->processors[2]->json_data = scene->addText("{}");
-    this->processors[2]->json_data->setPos(0, 280);
-
-    this->processors[3] = new Processor(NULL, 1, 1, "/home/dennis/invasim_data/unit_4.json");
-    this->processors[3]->setPos(500,285);
-    scene->addItem(this->processors[3]);
-    this->processors[3]->json_data = scene->addText("{}");
-    this->processors[3]->json_data->setPos(590, 280);
-
+void ProcessorView::update_processors(unsigned int cycle)
+{
+    int size_procs = this->x_dim * this->y_dim;
+    for (int i = 0; i < size_procs; i++) {
+        this->processors[i]->update_data(cycle);
+    }
 }
