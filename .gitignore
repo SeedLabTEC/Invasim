@@ -1,5 +1,6 @@
 bin/
 .vscode/
+*.json
 *.o
 moc_*
 ui_*
