@@ -2,3 +2,7 @@ bin/
 .vscode/
 *.o
 moc_*
+ui_*
+GUI/build-Invasim-GUI-Desktop_Qt_5_12_3_GCC_64bit-Debug/.qmake.stash
+GUI/build-Invasim-GUI-Desktop_Qt_5_12_3_GCC_64bit-Debug/Invasim-GUI
+GUI/build-Invasim-GUI-Desktop_Qt_5_12_3_GCC_64bit-Debug/compile_commands.json

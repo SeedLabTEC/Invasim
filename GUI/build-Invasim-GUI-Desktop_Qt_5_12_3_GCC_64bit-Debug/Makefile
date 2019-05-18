@@ -266,7 +266,6 @@ DIST          = ../../../../Qt/5.12.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/spec_post.prf \
-		../Invasim-GUI/.qmake.stash \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/toolchain.prf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/default_pre.prf \
@@ -504,7 +503,6 @@ Makefile: ../Invasim-GUI/Invasim-GUI.pro ../../../../Qt/5.12.3/gcc_64/mkspecs/li
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/toolchain.prf \
 		../../../../Qt/5.12.3/gcc_64/mkspecs/features/default_pre.prf \
@@ -702,7 +700,6 @@ Makefile: ../Invasim-GUI/Invasim-GUI.pro ../../../../Qt/5.12.3/gcc_64/mkspecs/li
 ../../../../Qt/5.12.3/gcc_64/mkspecs/features/qt_config.prf:
 ../../../../Qt/5.12.3/gcc_64/mkspecs/linux-g++/qmake.conf:
 ../../../../Qt/5.12.3/gcc_64/mkspecs/features/spec_post.prf:
-.qmake.stash:
 ../../../../Qt/5.12.3/gcc_64/mkspecs/features/exclusive_builds.prf:
 ../../../../Qt/5.12.3/gcc_64/mkspecs/features/toolchain.prf:
 ../../../../Qt/5.12.3/gcc_64/mkspecs/features/default_pre.prf:
@@ -1669,52 +1666,26 @@ SimulationDialog.o: ../Invasim-GUI/SimulationDialog.cpp ../Invasim-GUI/Simulatio
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qabstractbutton.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtGui/qicon.h \
 		ui_SimulationDialog.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/QVariant \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QApplication \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/qcoreapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/qeventloop.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qguiapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qinputmethod.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QDialogButtonBox \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QHBoxLayout \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qboxlayout.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qlayout.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qlayoutitem.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qgridlayout.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QLabel \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qlabel.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qframe.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QSpacerItem \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QSpinBox \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qspinbox.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qvalidator.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/qregularexpression.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QTextEdit \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qtextedit.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qtextdocument.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qtextoption.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qtextcursor.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qtextformat.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qpen.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QWidget \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDebug \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QMessageBox \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qmessagebox.h \
 		../Invasim-GUI/StartView.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QWidget \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QPushButton \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qpushbutton.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QCoreApplication \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qeventloop.h \
 		../Invasim-GUI/SimulationWindow.h \
 		../Invasim-GUI/ProcessorView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QGraphicsView \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qgraphicsview.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtGui/qpainter.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtGui/qtextoption.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtGui/qpen.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qscrollarea.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qframe.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qgraphicsscene.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QGraphicsScene \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QGraphicsRectItem \
@@ -1869,20 +1840,19 @@ SimulationWindow.o: ../Invasim-GUI/SimulationWindow.cpp ../Invasim-GUI/Simulatio
 		../../include/Monitor.h \
 		../../include/SequenceIlet.h \
 		ui_SimulationWindow.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/QVariant \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QApplication \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/qcoreapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/qeventloop.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qguiapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qinputmethod.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDebug \
+		../../../../Qt/5.12.3/gcc_64/include/QtGui/QCloseEvent \
+		../Invasim-GUI/StartView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QPushButton \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qpushbutton.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qabstractbutton.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtGui/qicon.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDebug \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/QCloseEvent
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/QCoreApplication \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qeventloop.h \
+		../Invasim-GUI/SimulationDialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QDialog \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QAbstractButton
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SimulationWindow.o ../Invasim-GUI/SimulationWindow.cpp
 
 main.o: ../Invasim-GUI/main.cpp ../Invasim-GUI/StartView.h \
@@ -2180,16 +2150,7 @@ StartView.o: ../Invasim-GUI/StartView.cpp ../Invasim-GUI/StartView.h \
 		../../include/ResourceAdmin.h \
 		../../include/Monitor.h \
 		../../include/SequenceIlet.h \
-		ui_StartView.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/QVariant \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QApplication \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qguiapplication.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtGui/qinputmethod.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QLabel \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qlabel.h \
-		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDebug
+		ui_StartView.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o StartView.o ../Invasim-GUI/StartView.cpp
 
 CacheMemory.o: ../../src/CacheMemory.cpp ../../include/CacheMemory.h \
