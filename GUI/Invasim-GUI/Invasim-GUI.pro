@@ -27,6 +27,7 @@ CONFIG += c++11
 
 SOURCES += \
         Processor.cpp \
+        ProcessorInfo.cpp \
         ProcessorsView.cpp \
         SimulationDialog.cpp \
         SimulationWindow.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
 
 HEADERS += \
         Processor.h \
+        ProcessorInfo.h \
         ProcessorView.h \
         SimulationDialog.h \
         SimulationWindow.h \
@@ -43,6 +45,7 @@ HEADERS += \
         ../../include/*
 
 FORMS += \
+        ProcessorInfo.ui \
         SimulationDialog.ui \
         SimulationWindow.ui \
         StartView.ui

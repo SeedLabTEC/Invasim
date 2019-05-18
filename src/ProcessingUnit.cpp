@@ -92,7 +92,7 @@ JSON *ProcessingUnit::monitoring()
 	}
 	else
 	{
-		(*json_info)["ILet"] = "NONE";
+		(*json_info)["ILet"] = -1;
 	}
 	return json_info;
 }
