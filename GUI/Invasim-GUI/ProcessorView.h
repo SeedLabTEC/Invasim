@@ -22,7 +22,7 @@ public:
     int y_dim;
     std::string working_dir;
 
-    void update_processors(unsigned int cycle);
+    void update_processors(unsigned int cycle, QVector<QColor> * ilet_colors_ptr);
 
 //public slots:
 };

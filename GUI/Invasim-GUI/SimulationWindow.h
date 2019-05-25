@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <qmessagebox.h>
+#include <IletsView.h>
 
 #include "ProcessorView.h"
 #include "../../include/Environment.h"
@@ -35,13 +36,19 @@ public:
     void closeEvent (QCloseEvent *event);
 
     unsigned int cycle = 0;
+    QVector<QColor> ilet_colors;
+    double current_hue = double(0.0);
 
 
 private slots:
     void on_pushButton_released();
 
+    void on_pushButton_2_released();
+
 private:
     Ui::SimulationWindow *ui;
+    void verify_ilet_colors();
+    void create_color();
 };
 
 #endif // SIMULATIONWINDOW_H

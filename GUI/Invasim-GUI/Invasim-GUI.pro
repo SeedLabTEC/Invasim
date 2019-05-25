@@ -26,6 +26,7 @@ DEFINES += NDEBUG
 CONFIG += c++11
 
 SOURCES += \
+        IletsView.cpp \
         Processor.cpp \
         ProcessorInfo.cpp \
         ProcessorsView.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
         ../../src/*
 
 HEADERS += \
+        IletsView.h \
         Processor.h \
         ProcessorInfo.h \
         ProcessorView.h \
@@ -45,6 +47,7 @@ HEADERS += \
         ../../include/*
 
 FORMS += \
+        IletsView.ui \
         ProcessorInfo.ui \
         SimulationDialog.ui \
         SimulationWindow.ui \
@@ -54,3 +57,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    processoricon.qrc

@@ -11,10 +11,12 @@
 #include "Utils.h"
 #include <string>
 
-#define WAIT_SEC 1
+#define WAIT_SEC 250
 
 #include <pthread.h>
 #include <unistd.h>
+#include <chrono>
+#include <thread>
 
 class Clock
 {

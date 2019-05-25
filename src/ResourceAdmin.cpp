@@ -78,46 +78,28 @@ JSON *ResourceAdmin::monitoring()
 void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resources, ILet *ilet)
 {
 	bool found = false;
-	coordinate free_pu;
+	int invaded_resources = 0;
 	for (int i = 0; i < this->x_dim; i++)
 	{
 		for (int j = 0; j < this->y_dim; j++)
 		{
-			if (this->pu_array_ptr[i][j]->get_state() == FREE)
-			{
-				free_pu = this->pu_array_ptr[i][j]->get_coodinate();
-				dprintf("ResourceAdmin: Found a processor free coordenate (%d, %d)\n", free_pu.x, free_pu.y);
-				found = true;
-				break;
-			}
+            if(this->pu_array_ptr[i][j]->get_state() == FREE)
+            {
+                coordinate new_pu = this->pu_array_ptr[i][j]->get_coodinate();
+                resources->push_back(new_pu);
+                this->pu_array_ptr[i][j]->invade(ilet);
+                invaded_resources++;
+                if (invaded_resources == resources_amount)
+                {
+                    found = true;
+                    break;
+                }
+            }
 		}
 		if (found)
 		{
 			break;
 		}
-	}
-	int invaded_resources = 0;
-	found = false;
-	for (int i = free_pu.x; i < this->x_dim; i++)
-	{
-		for (int j = free_pu.y; j < this->y_dim; j++)
-		{
-			coordinate new_pu = this->pu_array_ptr[i][j]->get_coodinate();
-			resources->push_back(new_pu);
-			this->pu_array_ptr[i][j]->invade(ilet);
-			invaded_resources++;
-			if (invaded_resources == resources_amount)
-			{
-				found = true;
-				break;
-			}
-			
-		}
-		if (found)
-		{
-			break;
-		}
-		
 	}
 	this->available -= resources_amount;
 }

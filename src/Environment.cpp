@@ -60,7 +60,7 @@ void Environment::start_environment()
     dprintf("ENVIRONMENT: Starting environment components.\n");
     this->many_core_instance->start();
     //Wait for components to start
-    sleep(WAIT_SEC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_SEC));
     this->seq_ilet->start();
     this->env_monitor->start();
 }

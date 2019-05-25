@@ -37,17 +37,21 @@
   <property name="windowTitle">
    <string>Invasim</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="processoricon.qrc">
+    <normaloff>:/Proc/processor_icon.png</normaloff>:/Proc/processor_icon.png</iconset>
+  </property>
   <widget class="QLabel" name="title_app">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>0</y>
-     <width>721</width>
-     <height>81</height>
+     <x>120</x>
+     <y>240</y>
+     <width>831</width>
+     <height>191</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:28pt; font-weight:600; color:#204a87;&quot;&gt;Invasim: A invasive computing simulator&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:36pt; font-weight:600; color:#000000;&quot;&gt;Invasim:&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:36pt; font-weight:600; color:#204a87;&quot;&gt;A invasive computing simulator&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QPushButton" name="simulate_button">
@@ -65,6 +69,8 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="processoricon.qrc"/>
+ </resources>
  <connections/>
 </ui>

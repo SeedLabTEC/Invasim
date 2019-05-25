@@ -39,10 +39,10 @@ void Clock::next_cycle()
 {
     dprintf("Clock: Cycle = %d--------------------------------\n", this->cycle);
     pthread_cond_broadcast(&this->cycle_cond);
-    sleep(WAIT_SEC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_SEC));
     this->cycle++;
     pthread_cond_signal(&this->monitor_cond);
-    sleep(WAIT_SEC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_SEC));
 }
 
 int Clock::get_cycle()
