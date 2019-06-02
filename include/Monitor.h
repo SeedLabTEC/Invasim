@@ -32,6 +32,8 @@ class Monitor
 		Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::string  _path_files, Clock * _clk_instance);
 
 		void start();
+		void write_disk(std::string path, JSON data, bool append);
+		std::string get_working_dir();
 
 	private:
 		pthread_t monitor_thread;
@@ -49,7 +51,6 @@ class Monitor
 		void write_components(JSON * info);
 		void write_system(JSON * info);
 		void write_ilets(JSON * info);
-		void write_disk(std::string path, JSON data, bool append);
 
 		static void *monitoring(void *obj);
 

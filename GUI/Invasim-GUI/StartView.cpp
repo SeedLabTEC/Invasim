@@ -49,3 +49,43 @@ void StartView::start_simulation()
         this->sim_data.is_set = false;
     }
 }
+
+void StartView::on_load_button_released()
+{
+    QString file = QFileDialog::getExistingDirectory(this, "Enter a directory with files", QDir::homePath());
+
+    try
+    {
+        std::string line;
+        std::ifstream r_file(file.toStdString().append("/params.json"));
+        std::getline(r_file, line);
+        r_file.close();
+
+        JSON params = JSON::parse(line);
+        this->set_simulation_data(
+                    params["working_dir"],
+                    params["x"],
+                    params["y"],
+                    params["probability"],
+                    params["seed"]);
+
+        line.clear();
+        r_file.open(file.toStdString().append("/manycore.json"));
+        std::getline(r_file, line);
+        r_file.close();
+        JSON manycore = JSON::parse(line);
+
+        SimulationWindow *new_window = new SimulationWindow(NULL, &this->sim_data, manycore["Cycle"], true);
+        this->showMinimized();
+        new_window->show();
+        this->sim_data.is_set = false;
+    }
+    catch(...)
+    {
+        QMessageBox::critical(
+                    this,
+                    "Error",
+                    "Can't find simulation files!");
+    }
+}
+

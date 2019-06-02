@@ -19,6 +19,8 @@
 #define DEFAULT_PROBABILITY 0.80
 #define DEFAULT_SEED 1
 
+#define PARAMS_FILE "/params.json"
+
 class Environment
 {
   public:
@@ -45,6 +47,7 @@ class Environment
 	Clock *clk_instance;
 
 	void init();
+	void write_params();
 };
 
 #endif

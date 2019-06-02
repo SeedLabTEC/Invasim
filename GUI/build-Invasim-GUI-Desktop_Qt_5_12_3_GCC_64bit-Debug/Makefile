@@ -1517,9 +1517,14 @@ moc_StartView.cpp: ../Invasim-GUI/StartView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QCoreApplication \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/qcoreapplication.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/qeventloop.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QFileDialog \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qdir.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDir \
 		../Invasim-GUI/SimulationDialog.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QDialog \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdialog.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QAbstractButton \
 		../Invasim-GUI/SimulationWindow.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qmessagebox.h \
@@ -2260,6 +2265,11 @@ SimulationDialog.o: ../Invasim-GUI/SimulationDialog.cpp ../Invasim-GUI/Simulatio
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QPushButton \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qpushbutton.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QCoreApplication \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QFileDialog \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qdir.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDir \
 		../Invasim-GUI/SimulationWindow.h \
 		../Invasim-GUI/IletsView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtGui/QStandardItemModel \
@@ -2454,6 +2464,11 @@ SimulationWindow.o: ../Invasim-GUI/SimulationWindow.cpp ../Invasim-GUI/Simulatio
 		../../../../Qt/5.12.3/gcc_64/include/QtGui/QCloseEvent \
 		../Invasim-GUI/StartView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QCoreApplication \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QFileDialog \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qdir.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDir \
 		../Invasim-GUI/SimulationDialog.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QAbstractButton
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SimulationWindow.o ../Invasim-GUI/SimulationWindow.cpp
@@ -2569,9 +2584,14 @@ main.o: ../Invasim-GUI/main.cpp ../Invasim-GUI/StartView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QCoreApplication \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/qcoreapplication.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/qeventloop.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QFileDialog \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qdir.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDir \
 		../Invasim-GUI/SimulationDialog.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QDialog \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdialog.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QAbstractButton \
 		../Invasim-GUI/SimulationWindow.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qmessagebox.h \
@@ -2726,9 +2746,14 @@ StartView.o: ../Invasim-GUI/StartView.cpp ../Invasim-GUI/StartView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QCoreApplication \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/qcoreapplication.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/qeventloop.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QFileDialog \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qdir.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdialog.h \
+		../../../../Qt/5.12.3/gcc_64/include/QtCore/QDir \
 		../Invasim-GUI/SimulationDialog.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QDialog \
-		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdialog.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QAbstractButton \
 		../Invasim-GUI/SimulationWindow.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qmessagebox.h \
@@ -2767,6 +2792,7 @@ StartView.o: ../Invasim-GUI/StartView.cpp ../Invasim-GUI/StartView.h \
 		../../include/SequenceIlet.h \
 		ui_StartView.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtCore/QVariant \
+		../../../../Qt/5.12.3/gcc_64/include/QtGui/QIcon \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/QApplication \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qapplication.h \
 		../../../../Qt/5.12.3/gcc_64/include/QtWidgets/qdesktopwidget.h \

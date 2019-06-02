@@ -18,6 +18,7 @@ Environment::Environment()
     this->seed = DEFAULT_SEED;
     this->init();
     this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet, this->clk_instance);
+    this->write_params();
 }
 
 /**
@@ -38,6 +39,7 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
     this->seed = _seed;
     this->init();
     this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet , _working_dir, this->clk_instance);
+    this->write_params();
 }
 
 /**
@@ -74,4 +76,22 @@ void Environment::step(int steps)
     {
         this->clk_instance->next_cycle();
     }
+}
+
+void Environment::write_params()
+{
+    //Store params
+    std::string path = "";
+    path.append(this->env_monitor->get_working_dir());
+    path.append(PARAMS_FILE);
+
+    JSON params = {
+        {"x", this->x_dim},
+        {"y", this->y_dim},
+        {"probability", this->decision_probability},
+        {"seed", this->seed},
+        {"working_dir", this->env_monitor->get_working_dir()}
+    };
+
+    this->env_monitor->write_disk(path, params, false);
 }

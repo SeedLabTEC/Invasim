@@ -41,6 +41,12 @@ void Monitor::start()
 	pthread_detach(this->monitor_thread);
 }
 
+std::string Monitor::get_working_dir()
+{
+	std::string path = this->path_files;
+	return path;
+}
+
 void Monitor::write_components(JSON *info)
 {
 	std::string path = "";

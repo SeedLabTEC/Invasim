@@ -4,8 +4,13 @@
 #include <QCloseEvent>
 #include "StartView.h"
 
-SimulationWindow::SimulationWindow(QWidget *parent, simulation_data *_current_sim_data) :
+SimulationWindow::SimulationWindow(QWidget *parent,
+                                   simulation_data *_current_sim_data,
+                                   unsigned int max_cycle,
+                                   bool is_loaded) :
     QWidget(parent),
+    is_loaded(is_loaded),
+    max_cycles(max_cycle),
     ui(new Ui::SimulationWindow)
 {
     ui->setupUi(this);
@@ -23,14 +28,17 @@ SimulationWindow::SimulationWindow(QWidget *parent, simulation_data *_current_si
     this->ui->seed_num_label->setNum(this->current_sim_data->seed);
     this->ui->dir_label->setText(this->current_sim_data->work_dir.c_str());
 
-    this->env = new Environment(
-                this->current_sim_data->x_dim,
-                this->current_sim_data->y_dim,
-                float(this->current_sim_data->decision / float(100)),
-                this->current_sim_data->work_dir,
-                this->current_sim_data->seed);
-    this->env->start_environment();
-    this->env->step(2);
+    if (!is_loaded)
+    {
+        this->env = new Environment(
+                    this->current_sim_data->x_dim,
+                    this->current_sim_data->y_dim,
+                    float(this->current_sim_data->decision / float(100)),
+                    this->current_sim_data->work_dir,
+                    this->current_sim_data->seed);
+        this->env->start_environment();
+        this->env->step(2);
+    }
 
     this->processor_view = new ProcessorView(this,
                                              this->current_sim_data->x_dim,
@@ -46,29 +54,69 @@ SimulationWindow::~SimulationWindow()
 
 void SimulationWindow::closeEvent (QCloseEvent *event)
 {
-    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Invasim",
+    QMessageBox::StandardButton exit_btn = QMessageBox::question( this, "Invasim",
                                                                 tr("Are you sure?\n"),
                                                                 QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes) {
+    if (exit_btn != QMessageBox::Yes)
+    {
         event->ignore();
-    } else {
-        std::string del_command = "rm -f ";
-        del_command.append(this->current_sim_data->work_dir);
-        del_command.append("/*.json");
-        system(del_command.c_str());
+    }
+    else
+    {
+        QMessageBox::StandardButton save_btn = QMessageBox::question( this, "Invasim",
+                                                                    tr("Do you want to save?\n"),
+                                                                    QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::Yes);
+        if(save_btn != QMessageBox::Yes)
+        {
+            std::string del_command = "rm -f ";
+            del_command.append(this->current_sim_data->work_dir);
+            del_command.append("/*.json");
+            system(del_command.c_str());
+        }
         event->accept();
+
     }
 }
+
+void SimulationWindow::step_one()
+{
+    this->processor_view->update_processors(this->cycle, &this->ilet_colors);
+    if(!is_loaded)
+    {
+        this->env->step(1);
+        this->cycle++;
+    }
+    else
+    {
+        if(this->cycle < (this->max_cycles - 1))
+        {
+            this->cycle++;
+            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_SEC));
+        }
+        else
+            this->sim_ended = true;
+    }
+
+    if(this->sim_ended)
+    {
+        QMessageBox::warning(
+                    this,
+                    "Warning",
+                    "Simulation is ended!");
+    }
+
+    this->verify_ilet_colors();
+}
+
 
 void SimulationWindow::on_pushButton_released()
 {
     this->ui->pushButton->setEnabled(false);
-    this->processor_view->update_processors(this->cycle, &this->ilet_colors);
+    this->step_one();
     this->ui->pushButton->setEnabled(true);
-    this->env->step(1);
-    this->cycle++;
-    this->verify_ilet_colors();
+
 }
 
 void SimulationWindow::verify_ilet_colors()
@@ -86,8 +134,7 @@ void SimulationWindow::verify_ilet_colors()
 
 void SimulationWindow::on_pushButton_2_released()
 {
-    IletsView *diag = new IletsView(this);
-    diag->working_dir = this->current_sim_data->work_dir;
+    IletsView *diag = new IletsView(this, this->current_sim_data->work_dir);
     diag->setModal(true);
     diag->exec();
     delete diag;

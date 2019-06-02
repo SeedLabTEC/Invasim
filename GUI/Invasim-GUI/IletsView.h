@@ -17,7 +17,7 @@ class IletsView : public QDialog
     Q_OBJECT
 
 public:
-    explicit IletsView(QWidget *parent = nullptr, std::string working_dir = ".");
+    explicit IletsView(QWidget *parent = nullptr, std::string _working_dir = ".");
     std::string working_dir;
     ~IletsView();
 

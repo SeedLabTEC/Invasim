@@ -1,9 +1,9 @@
 #include "IletsView.h"
 #include "ui_IletsView.h"
 
-IletsView::IletsView(QWidget *parent, std::string working_dir) :
+IletsView::IletsView(QWidget *parent, std::string _working_dir) :
     QDialog(parent),
-    working_dir(working_dir),
+    working_dir(_working_dir),
     ui(new Ui::IletsView)
 {
     ui->setupUi(this);

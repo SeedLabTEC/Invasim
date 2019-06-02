@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QCoreApplication>
 #include <string.h>
+#include <QFileDialog>
+#include <QDir>
 
 #include "SimulationDialog.h"
 #include "SimulationWindow.h"
@@ -26,6 +28,9 @@ public:
 
 public slots:
     void start_simulation();
+
+private slots:
+    void on_load_button_released();
 
 private:
     Ui::StartView *ui;
