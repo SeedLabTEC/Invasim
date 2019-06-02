@@ -10,6 +10,10 @@
 
 #include "Utils.h"
 
+/**
+ * @brief Enum of invasive computing operations
+ * 
+ */
 enum Invasive_Operation
 {
 	INVADE,
@@ -17,6 +21,10 @@ enum Invasive_Operation
 	RETREAT
 };
 
+/**
+ * @brief Array asociated with the enum Invasive_Operation
+ * 
+ */
 static const std::string STRING_OPERATIONS[] = 
 {
 	"Invade",
@@ -24,6 +32,10 @@ static const std::string STRING_OPERATIONS[] =
 	"Retreat"
 };
 
+/**
+ * @brief Operation representation with its corresponding parameter.
+ * 
+ */
 class Operation 
 {
 	public: 
@@ -34,7 +46,15 @@ class Operation
 		int get_parameter();
 
 	private:
+		/**
+		 * @brief Invasive operation
+		 * 
+		 */
 		Invasive_Operation operation;
+		/**
+		 * @brief Parameter of operation
+		 * 
+		 */
 		int parameter;
 };
 

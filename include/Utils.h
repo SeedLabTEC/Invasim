@@ -1,6 +1,6 @@
 /**
 * @file Utils.h
-* @brief Description
+* @brief Header with global includes and declarations
 * @author Dennis Porras Barrantes
 * @date 09/02/19
 **/
@@ -25,12 +25,21 @@
 #endif
 
 //Global Structs
+
+/**
+ * @brief Struct that represents a coordinate in the matrix of processors.
+ * 
+ */
 struct coordinate
 {
 	int x;
 	int y;
 };
 
+/**
+ * @brief Enum to define that differents states that a processing unit can have in invasive computing.
+ * 
+ */
 enum Invasive_States
 {
 	INVADED,
@@ -38,6 +47,10 @@ enum Invasive_States
 	FREE
 };
 
+/**
+ * @brief Array asociated to Invasive_States enum.
+ * 
+ */
 static const std::string STRING_STATES[] = 
 {
 	"Invaded",

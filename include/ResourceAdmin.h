@@ -1,6 +1,6 @@
 /**
 * @file ResourceAdmin.h
-* @brief Description
+* @brief Resource administrator class declaration.
 * @author Dennis Porras Barrantes
 * @date 29/03/19
 **/
@@ -21,6 +21,10 @@ using JSON = nlohmann::json;
 #include <queue>
 #include "Utils.h"
 
+/**
+ * @brief Resource administrator class representation that handles the incomming requests for resources.
+ * 
+ */
 class ResourceAdmin 
 {
 	public: 
@@ -40,21 +44,52 @@ class ResourceAdmin
 		 * @brief Mutex variable for handling petitions
 		*/
 		pthread_mutex_t ilet_mutex = PTHREAD_MUTEX_INITIALIZER;
-		/**
-		 * @brief Mutex variable for reading notifications
-		*/
-		//pthread_mutex_t control_bus_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+		/**
+		 * @brief Clock instance
+		 * 
+		 */
 		Clock * clk_instance;
-		
+		/**
+		 * @brief Max amount of iLets
+		 * 
+		 */
 		unsigned int max_iLets;
+		/**
+		 * @brief x dimensions of manycore
+		 * 
+		 */
 		int x_dim;
+		/**
+		 * @brief y dimensions of manycore
+		 * 
+		 */
 		int y_dim;
+		/**
+		 * @brief Available resources
+		 * 
+		 */
 		int available;
 
+		/**
+		 * @brief Matrix of processing units pointer
+		 * 
+		 */
 		ProcessingUnit *** pu_array_ptr;
+		/**
+		 * @brief Incomming iLets queue
+		 * 
+		 */
 		std::queue<ILet *> incomming_ilets;
+		/**
+		 * @brief Invaded iLets vector
+		 * 
+		 */
 		std::vector<ILet *> invaded_ilets;
+		/**
+		 * @brief Executing iLets vector
+		 * 
+		 */
 		std::vector<ILet *> execute_ilets;
 		
 

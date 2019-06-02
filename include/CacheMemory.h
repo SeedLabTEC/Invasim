@@ -1,6 +1,6 @@
 /**
 * @file CacheMemory.h
-* @brief Description
+* @brief Cache memory class declaration
 * @author Dennis Porras Barrantes
 * @date 29/03/19
 **/
@@ -23,15 +23,31 @@ struct cache_line
 
 #include "Utils.h"
 
+/**
+ * @brief Cache memory representation with a clock and a chunk of memory
+ * 
+ */
 class CacheMemory 
 {
 	public: 
 		CacheMemory(int _x, int _y);
 
 	private:
+		/**
+		 * @brief Coordinate of cache
+		 * 
+		 */
 		coordinate pu_coordinate;
+		/**
+		 * @brief Chunck of memory
+		 * 
+		 */
 		cache_line * blocks;
 
+		/**
+		 * @brief Clock instance
+		 * 
+		 */
 		Clock * clk_intance;
 };
 

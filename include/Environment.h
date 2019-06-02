@@ -1,6 +1,6 @@
 /**
 * @file Environment.h
-* @brief Description
+* @brief Environment class declaration.
 * @author Dennis Porras Barrantes
 * @date 09/02/19
 **/
@@ -10,6 +10,7 @@
 
 #include "Utils.h"
 
+//Components of environment
 #include "ManyCoreArch.h"
 #include "Monitor.h"
 #include "SequenceIlet.h"
@@ -21,6 +22,10 @@
 
 #define PARAMS_FILE "/params.json"
 
+/**
+ * @brief Environment class that containt the diferent components of the platform and its parameters.
+ * 
+ */
 class Environment
 {
   public:
@@ -33,17 +38,52 @@ class Environment
 	void step(int steps);
 
   private:
+	/**
+	 * @brief x dimension of manycore architrecture.
+	 * 
+	 */
 	int x_dim;
+	/**
+	 * @brief y dimension of manycore architecture
+	 * 
+	 */
 	int y_dim;
+	/**
+	 * @brief Seed for random number generation in iLet generator.
+	 * 
+	 */
 	int seed;
+	/**
+	 * @brief Decision probability of every iLet.
+	 * 
+	 */
 	float decision_probability;
+	/**
+	 * @brief Working directory path
+	 * 
+	 */
 	std::string working_dir;
 
+	/**
+	 * @brief Manycore instance
+	 * 
+	 */
 	ManyCoreArch * many_core_instance;
+	/**
+	 * @brief Monitor instance
+	 * 
+	 */
 	Monitor * env_monitor;
+	/**
+	 * @brief Sequencer iLet instance
+	 * 
+	 */
 	SequenceIlet * seq_ilet;
 	
-
+	/**
+	 * @brief Clock instance
+	 * 
+	 */
 	Clock *clk_instance;
 
 	void init();

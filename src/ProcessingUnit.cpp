@@ -1,6 +1,6 @@
 /**
 * @file ProcessingUnit.cpp
-* @brief Description
+* @brief Processing unit source
 * @author Dennis Porras Barrantes
 * @date 11/02/19
 **/
@@ -8,8 +8,12 @@
 #include "../include/ProcessingUnit.h"
 
 /**
-* @brief Constructor
-**/
+ * @brief Construct a new Processing Unit:: Processing Unit object
+ * 
+ * @param _x 
+ * @param _y 
+ * @param _clk_instance 
+ */
 ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
 {
 	dprintf("PU = (%d, %d): New processing unit coordenate.\n", _x, _y);
@@ -25,8 +29,9 @@ ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
 }
 
 /**
- * @brief Start method which initializes main thread 
- * */
+ * @brief Method that starts main thread
+ * 
+ */
 void ProcessingUnit::start()
 {
 	//create threads
@@ -36,8 +41,10 @@ void ProcessingUnit::start()
 }
 
 /**
+ * @brief Function that change the state of unit and assigns an iLet
  * 
- * */
+ * @param _new_iLet 
+ */
 void ProcessingUnit::invade(ILet *_new_iLet)
 {
 	pthread_mutex_lock(&this->pu_mutex);
@@ -47,6 +54,10 @@ void ProcessingUnit::invade(ILet *_new_iLet)
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
+/**
+ * @brief Function thta sets a workload and changes the state
+ * 
+ */
 void ProcessingUnit::infect(){
 	pthread_mutex_lock(&this->pu_mutex);
 	this->current_load = this->iLet_ptr->get_current_operation()->get_parameter();
@@ -54,6 +65,10 @@ void ProcessingUnit::infect(){
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
+/**
+ * @brief Function that remove the iLet and changes state
+ * 
+ */
 void ProcessingUnit::retreat()
 {
 	pthread_mutex_lock(&this->pu_mutex);
@@ -62,11 +77,21 @@ void ProcessingUnit::retreat()
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
+/**
+ * @brief Coodinate getter
+ * 
+ * @return coordinate 
+ */
 coordinate ProcessingUnit::get_coodinate()
 {
 	return this->pu_coordenate;
 }
 
+/**
+ * @brief State getter
+ * 
+ * @return Invasive_States 
+ */
 Invasive_States ProcessingUnit::get_state()
 {
 	pthread_mutex_lock(&this->pu_mutex);
@@ -76,51 +101,65 @@ Invasive_States ProcessingUnit::get_state()
 }
 
 /**
+ * @brief Funciton that gets all information of processing unit
  * 
- * */
+ * @return JSON* 
+ */
 JSON *ProcessingUnit::monitoring()
 {
 	JSON *json_info = new JSON;
+	//Json contruction
 	*json_info = {
 		{"Coordenate_x", this->pu_coordenate.x},
 		{"Coordenate_y", this->pu_coordenate.y},
 		{"Load", this->current_load},
 		{"State", STRING_STATES[this->pu_state]}};
+	//Set if in ilet;
 	if (this->iLet_ptr != NULL)
 	{
 		(*json_info)["ILet"] = this->iLet_ptr->get_id();
 	}
 	else
 	{
+		//When it has no ilet assigned
 		(*json_info)["ILet"] = -1;
 	}
 	return json_info;
 }
 
 /**
+ * @brief Exceuting thread function. Awaits for the clock signal to execute its different states
  * 
- * */
+ * @param obj 
+ * @return void* 
+ */
 void *ProcessingUnit::executing(void *obj)
 {
 	ProcessingUnit *current = (ProcessingUnit *)obj;
 	dprintf("PU = (%d, %d): New processing unit started.\n", current->pu_coordenate.x, current->pu_coordenate.y);
+	//Get clock signal and mutex
 	pthread_mutex_t *clk_cycle_mutex = current->clk_instance->get_cycle_mutex_ptr();
 	pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
 
+	//Start component loop
 	while (1)
 	{
+		//Await signal
 		pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
 
+		//get current state
 		Invasive_States current_state = current->get_state();
 		switch (current_state)
 		{
 		case INVADED:
+			//Invaded state
 			dprintf("PU = (%d, %d): Invaded processor by ILet = %d.\n",
 					current->pu_coordenate.x,
 					current->pu_coordenate.y,
 					current->iLet_ptr->get_id());
 			break;
 		case INFECTED:
+			//Reduce wokload
 			dprintf("PU = (%d, %d): Infected processor by ILet = %d.\n",
 					current->pu_coordenate.x,
 					current->pu_coordenate.y,
@@ -132,6 +171,7 @@ void *ProcessingUnit::executing(void *obj)
 			}
 			else
 			{
+				//End execution
 				dprintf("PU = (%d, %d): Execution Done by ILet = %d.\n",
 					current->pu_coordenate.x,
 					current->pu_coordenate.y,
@@ -141,6 +181,7 @@ void *ProcessingUnit::executing(void *obj)
 			pthread_mutex_unlock(&current->pu_mutex);
 			break;
 		case FREE:
+			//Free state
 			dprintf("PU = (%d, %d): Free processor.\n",
 					current->pu_coordenate.x,
 					current->pu_coordenate.y);

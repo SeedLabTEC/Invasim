@@ -1,6 +1,6 @@
 /**
 * @file ILet.h
-* @brief Description
+* @brief Ilet class declaration.
 * @author Dennis Porras Barrantes
 * @date 18/03/19
 **/
@@ -17,12 +17,20 @@
 
 #include "Operation.h"
 
+/**
+ * @brief Enum type to classify iLets
+ * 
+ */
 enum Type_ILet
 {
 	NORMAL,
 	MALICIOUS
 };
 
+/**
+ * @brief Enum for all the states that an iLet can have.
+ * 
+ */
 enum State_ILet
 {
 	WAITING,
@@ -30,6 +38,10 @@ enum State_ILet
 	DONE
 };
 
+/**
+ * @brief iLet class representation which is a package all task that a processing unit can execute.
+ * 
+ */
 class ILet 
 {
 	public: 
@@ -55,17 +67,49 @@ class ILet
 		void set_state(State_ILet new_state);
 
 	private:
+		/**
+		 * @brief Current operation of an iLet.
+		 * 
+		 */
 		Operation * current_operation;
+		/**
+		 * @brief Pending operation queue of an iLet.
+		 * 
+		 */
 		std::queue<Operation *> pending_operations;
+		/**
+		 * @brief Done operation queue of an iLet.
+		 * 
+		 */
 		std::queue<Operation *> done_operations;
+		/**
+		 * @brief Assigned resources coodinates to an iLet.
+		 * 
+		 */
 		std::vector<coordinate> * resources;
 
+		/**
+		 * @brief Bernoulli distribution generator
+		 * 
+		 */
 		std::default_random_engine generator;
   		std::bernoulli_distribution distribution;
 		
+		/**
+		 * @brief Type of iLet
+		 * 
+		 */
 		Type_ILet type;
+		/**
+		 * @brief State of iLet
+		 * 
+		 */
 		State_ILet state;
 
+		/**
+		 * @brief iLet identifier.
+		 * 
+		 */
 		int id_ilet;
 };
 

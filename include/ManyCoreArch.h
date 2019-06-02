@@ -1,6 +1,6 @@
 /**
 * @file ManyCoreArch.h
-* @brief Description
+* @brief Manycore architecture class declaration.
 * @author Dennis Porras Barrantes
 * @date 27/03/19
 **/
@@ -14,12 +14,17 @@
 #include "RandomAccessMemory.h"
 #include "ResourceAdmin.h"
 
+//Json library include and declaration
 #include "json.hpp"
 using JSON = nlohmann::json;
 
 #include <vector>
 #include "Utils.h"
 
+/**
+ * @brief Manycore architecture class that contains the matrix of processors and the resource administrator.
+ * 
+ */
 class ManyCoreArch 
 {
 	public: 
@@ -38,13 +43,41 @@ class ManyCoreArch
 		JSON * monitoring();
 
 	private:
+		/**
+		 * @brief x dimension of manycore architrecture.
+		 * 
+		 */
 		int x_dim;
+		/**
+		 * @brief y dimension of manycore architecture
+		 * 
+		 */
 		int y_dim;
+		/**
+		 * @brief Max amount of iLets supported
+		 * 
+		 */
 		unsigned int max_ilets;
 
+		/**
+		 * @brief Componets instances
+		 * 
+		 */
 		Clock * clk_instance;
+		/**
+		 * @brief Processing unit matrix
+		 * 
+		 */
 		ProcessingUnit *** pu_array;
+		/**
+		 * @brief RAM instance
+		 * 
+		 */
 		RandomAccessMemory * ram;
+		/**
+		 * @brief Resource administrator instance
+		 * 
+		 */
 		ResourceAdmin * resource_manager;
 
 		void init(int _x_dim, int _y_dim, Clock * _clk_instance);

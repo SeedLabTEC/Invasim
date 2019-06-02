@@ -1,6 +1,6 @@
 /**
 * @file ProcessingUnit.h
-* @brief Description
+* @brief Processing unit class declaration.
 * @author Dennis Porras Barrantes
 * @date 11/02/19
 **/
@@ -14,10 +14,15 @@
 #include "json.hpp"
 using JSON = nlohmann::json;
 
+//Components
 #include "Clock.h"
 #include "ILet.h"
 #include "CacheMemory.h"
 
+/**
+ * @brief Processing unit representation with the basic attributes, also supports the invasive computing operations 
+ * 
+ */
 class ProcessingUnit
 {
   public:
@@ -38,22 +43,41 @@ class ProcessingUnit
 	pthread_t pu_exe_thread;
 	pthread_mutex_t pu_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-	//Registers
+	/**
+	 * @brief State register
+	 * 
+	 */
 	Invasive_States pu_state;
+	/**
+	 * @brief Coordinate register
+	 * 
+	 */
 	coordinate pu_coordenate;
 
-	//Memory
+	/**
+	 * @brief Cache memory instance
+	 * 
+	 */
 	CacheMemory * cache_mem;
 	
 
-	//Workload
+	/**
+	 * @brief Workload
+	 * 
+	 */
 	int current_load;
+	/**
+	 * @brief Assigned iLet
+	 * 
+	 */
 	ILet * iLet_ptr;
 
-	//Clock
+	/**
+	 * @brief Clock instance
+	 * 
+	 */
 	Clock *clk_instance;
 
-	//Thread Methods
 	static void *executing(void *obj);
 };
 

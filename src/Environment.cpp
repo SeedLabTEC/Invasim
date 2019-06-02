@@ -1,14 +1,15 @@
 /**
 * @file Environment.cpp
-* @brief Description
+* @brief Environmnet source
 * @author Dennis Porras Barrantes
 * @date 09/02/19
 **/
 
 #include "../include/Environment.h"
 /**
-* @brief Constructor
-**/
+ * @brief Construct a new Environment:: Environment object
+ * 
+ */
 Environment::Environment()
 {
     dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n", DEFAULT_CORES);
@@ -22,8 +23,14 @@ Environment::Environment()
 }
 
 /**
- * @brief 
-**/
+ * @brief Construct a new Environment:: Environment object
+ * 
+ * @param _x_dim dimension
+ * @param _y_dim dimension
+ * @param _decision_probability iLet decision
+ * @param _working_dir working directory
+ * @param _seed to generate random numbers
+ */
 Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir, int _seed)
 {
     dprintf("ENVIRONMENT: Environment created.\n\t- Cores: (%d, %d).\n", _x_dim, _y_dim);
@@ -43,8 +50,9 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
 }
 
 /**
- * @brief
- * */
+ * @brief Function that initialize the components of environment.
+ * 
+ */
 void Environment::init()
 {
     dprintf("ENVIRONMENT: Instanciating environment clock.\n");
@@ -55,8 +63,9 @@ void Environment::init()
 }
 
 /**
- * @brief
- * */
+ * @brief Function that starts the components of the system
+ * 
+ */
 void Environment::start_environment()
 {
     dprintf("ENVIRONMENT: Starting environment components.\n");
@@ -68,8 +77,10 @@ void Environment::start_environment()
 }
 
 /**
- * @brief
- * */
+ * @brief Function to advance in time
+ * 
+ * @param steps 
+ */
 void Environment::step(int steps)
 {
     for (int i = 0; i < steps; i++)
@@ -78,13 +89,18 @@ void Environment::step(int steps)
     }
 }
 
+/**
+ * @brief Funtion to write the parameters of environment in disk
+ * 
+ */
 void Environment::write_params()
 {
-    //Store params
+    //Create path
     std::string path = "";
     path.append(this->env_monitor->get_working_dir());
     path.append(PARAMS_FILE);
 
+    //Params json
     JSON params = {
         {"x", this->x_dim},
         {"y", this->y_dim},

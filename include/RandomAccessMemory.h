@@ -1,6 +1,6 @@
 /**
 * @file RandomAccessMemory.h
-* @brief Description
+* @brief RAM class declaration.
 * @author Dennis Porras Barrantes
 * @date 29/03/19
 **/
@@ -14,6 +14,10 @@
 
 #include "Utils.h"
 
+/**
+ * @brief Random Access Memory class representation with a clock and chuck of memory.
+ * 
+ */
 class RandomAccessMemory 
 {
 	public: 

@@ -1,6 +1,6 @@
 /**
 * @file Clock.h
-* @brief Description
+* @brief Clack class declaration
 * @author Dennis Porras Barrantes
 * @date 15/02/19
 **/
@@ -11,6 +11,7 @@
 #include "Utils.h"
 #include <string>
 
+//Wait miliseconds
 #define WAIT_SEC 250
 
 #include <pthread.h>
@@ -18,6 +19,10 @@
 #include <chrono>
 #include <thread>
 
+/**
+ * @brief Clock class representation that generates signals to all components using a instance.
+ * 
+ */
 class Clock
 {
 public:
@@ -44,6 +49,10 @@ private:
 
 	pthread_cond_t monitor_cond = PTHREAD_COND_INITIALIZER;
 
+	/**
+	 * @brief Cycle counter
+	 * 
+	 */
 	int cycle;
 };
 

@@ -1,6 +1,6 @@
 /**
 * @file RandomAccessMemory.cpp
-* @brief Description
+* @brief RAM source
 * @author Dennis Porras Barrantes
 * @date 29/03/19
 **/
@@ -8,8 +8,9 @@
 #include "../include/RandomAccessMemory.h"
 
 /**
-* @brief Constructor
-**/
+ * @brief Construct a new Random Access Memory:: Random Access Memory object
+ * 
+ */
 RandomAccessMemory::RandomAccessMemory()
 {
     this->main_mem = NULL;
