@@ -55,4 +55,15 @@ make
 ```
 This will use the multilib support to build the libraries for the various cores (**riscy**, zeroriscy and so on). The right libraries will be selected depending on which compiler options you use. Invasim uses **riscy**.
 
+## RI5CY: RISC-V Core
+RI5CY is a small 4-stage RISC-V core. RI5CY fully implements the RV32IMFC instruction set and many custom instruction set extensions that improve its performance for signal processing applications. The core was developed as part of the [PULP platform](http://pulp.ethz.ch/) for energy-efficient computing and is currently used as the processing core for PULP and PULPino.
+### Sources
+To download all necessary sources run:
+```bash
+git clone https://github.com/pulp-platform/riscv.git
+```
 
+In Invasim, it is found in folder **RI5CY**, and to generate the model run the following command in **verilator_model**:
+```bash
+Invasim/verilator_model $: make
+```
