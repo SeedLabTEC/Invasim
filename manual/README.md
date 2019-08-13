@@ -63,7 +63,32 @@ To download all necessary sources run:
 git clone https://github.com/pulp-platform/riscv.git
 ```
 
-In Invasim, it is found in folder **RI5CY**, and to generate the model run the following command in **verilator_model**:
+In Invasim, it is found in folder **RI5CY**, and to generate the model run the following command in **RI5CY/verilator_model**:
 ```bash
-Invasim/verilator_model $: make
+Invasim/RI5CY/verilator_model $: make
 ```
+
+This will generate the processor model in C++ to be used in Invasim.
+
+### Basic Testbech
+**RI5CY** has a set of testbenches, in order to run them RISC-V toolchain path must be exported in RISCV:
+```bash
+export RISCV=/opt/riscv-pulp
+```
+To run the basic test called **core**, which is in folder **Invasim/RI5CY/tb/core**, run the next commands:
+```bash
+cd RI5CY/tb/core
+make
+```
+This will generate the models and compile tests, and then run all tests in the processor.
+### Custom programs
+In order to run custom programs in the model, the previous test should be run or at least compiled. In the same path, there is a folder called **custom** which contains a simple hello world in C. 
+To compile this program, run the following command:
+```bash
+make custom/hello_world.hex
+```
+This will generate a hexadecimal file with Verilog' BCD, this should be loaded in memory running the testbench previously compiled:
+```bash
+./testbench_verilator "+firmware=custom/hello_world.hex"
+```
+This starts the processor with the custom program. That program can be edited to explore other programs, and to create complex programs the *Makefile* shown how to compile them so they can be loaded in memory.
