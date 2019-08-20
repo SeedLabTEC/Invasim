@@ -3,3 +3,7 @@
 /build
 /Bender.lock
 /Bender.local
+*.elf
+*.hex
+*.map
+*.a

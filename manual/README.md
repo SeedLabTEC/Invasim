@@ -87,8 +87,37 @@ To compile this program, run the following command:
 ```bash
 make custom/hello_world.hex
 ```
-This will generate a hexadecimal file with Verilog' BCD, this should be loaded in memory running the testbench previously compiled:
+This will generate a hexadecimal file with Verilog's BCD, this should be loaded in memory running the testbench previously compiled:
 ```bash
 ./testbench_verilator "+firmware=custom/hello_world.hex"
 ```
+**Note:** Once the program is finished, the testbench doesn't stop then use the terminate signal (Ctrl+C).
+
 This starts the processor with the custom program. That program can be edited to explore other programs, and to create complex programs the *Makefile* shown how to compile them so they can be loaded in memory.
+
+### Running benchmarks
+Part of the development process was to test the core with different benchmarks to verify if the processor model works properly. This benchmarks are located in **RI5CY/tb/core/benchmark**, there are two:
+* Codes: Benchmark provided by Jorge Castro-Godínez.
+* MiBench: A free, commercially representative embedded benchmark suite.
+
+In each folder there are different programs that test the processor model, in order to compile them each program has a **Makefile** that will generate a elf file and a hexadecimal file.
+To execute the programs, the testbench and programs should be compiled before, then the testbech's firmware:
+```bash
+./testbench_verilator "+firmware=testbench/codes/fft/fft.hex"
+```
+
+**Note:** Once the program is finished, the testbench doesn't stop then use the terminate signal (Ctrl+C).
+
+#### Tested benchmarks
+The benchmarks were used to validate the processor model, due to limitations like no access to disk lectures and operating system support, some programs had to be excluded.
+The following list are the programs that could be compiled and run in the RI5CY processor model. The codes benchmarks verify if the result is correct but MiBench doesn't then the result is compared with the output when running in a personal computer :
+* **Adaptive Differential Pulse Code Modulation**: This Code benchmark program can compile and passes the test when running.
+* **Advanced Encryption Standard**: This Code benchmark program compiles and passes the test while running.
+* **Fast Fourier Transform**: Both benchmarks have this program and both can be compiled and run. Code benchmark program passes the test.
+* **JPEG Compression**: This  Code benchmark program can be compiled but it doesn't pass the test.
+* **Matrix Multiplication**: This Code benchmark program compiles and passes the test.
+* **Basic Math**: This MiBench program that make basic math operations compiles and generated the same outputs as a personal computer.
+* **String Search**: MiBench program that searches words in sentences can be compiled and generates the same outputs as a personal computer.
+
+The rest of the programs need access to disk, as the platform doesn't have a operating system it can be run.
+
