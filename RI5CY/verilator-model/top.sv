@@ -145,7 +145,9 @@ module top
       .data_wdata_i   ( data_wdata   ),
       .data_rdata_o   ( data_rdata   ),
       .data_rvalid_o  ( data_rvalid  ),
-      .data_gnt_o     ( data_gnt     )
+      .data_gnt_o     ( data_gnt     ),
+      .exit_valid_o   ( exit_valid_o ),
+      .exit_value_o   ( exit_value_o )
       );
 
 

@@ -2,6 +2,10 @@
 RISCV                    ?= /opt/riscv32-pulp
 RISCV_EXE_PREFIX         = $(RISCV)/bin/riscv32-unknown-elf-
 
+# Create bin file
+aes.bin: aes.hex Makefile
+	$(RISCV_EXE_PREFIX)objcopy -O binary aes.elf $@
+
 # Create hex file with Verilog bfd
 aes.hex: aes.elf Makefile
 	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@
@@ -19,4 +23,4 @@ aes.elf: aes.c
 
 # Clean binaries
 clean:
-	rm -f aes.elf aes.hex
+	rm -f aes.elf aes.hex aes.bin

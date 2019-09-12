@@ -19,6 +19,9 @@ using JSON = nlohmann::json;
 #include "ILet.h"
 #include "CacheMemory.h"
 
+#include "RI5CY.h"
+
+
 /**
  * @brief Processing unit representation with the basic attributes, also supports the invasive computing operations 
  * 
@@ -77,6 +80,11 @@ class ProcessingUnit
 	 * 
 	 */
 	Clock *clk_instance;
+
+	/**
+	 * @brief RI5CY processor model
+	 * */
+	RI5CY * cpu;
 
 	static void *executing(void *obj);
 };

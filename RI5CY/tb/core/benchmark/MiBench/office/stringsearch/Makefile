@@ -5,6 +5,10 @@ RISCV_EXE_PREFIX         = $(RISCV)/bin/riscv32-unknown-elf-
 #Source files
 SRC = bmhasrch.c  bmhisrch.c  bmhsrch.c  pbmsrch_small.c 
 
+# Create bin file
+search_small.bin: search_small.hex Makefile
+	$(RISCV_EXE_PREFIX)objcopy -O binary search_small.elf $@
+
 # Create hex file with Verilog bfd
 search_small.hex: search_small.elf Makefile
 	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@
@@ -20,4 +24,4 @@ search_small.elf: $(SRC)
 		-lm -lc -lgcc
 
 clean:
-	rm -rf search_small.elf search_small.hex
+	rm -rf search_small.elf search_small.hex search_small.bin

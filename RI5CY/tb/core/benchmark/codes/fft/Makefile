@@ -2,6 +2,10 @@
 RISCV                    ?= /opt/riscv32-pulp
 RISCV_EXE_PREFIX         = $(RISCV)/bin/riscv32-unknown-elf-
 
+# Create bin file
+fft.bin: fft.hex Makefile
+	$(RISCV_EXE_PREFIX)objcopy -O binary fft.elf $@
+
 # Create hex file with Verilog bfd
 fft.hex: fft.elf Makefile
 	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@
@@ -19,4 +23,4 @@ fft.elf: fft.c
 
 # Clean binaries
 clean:
-	rm -f fft.elf fft.hex
+	rm -f fft.elf fft.hex fft.bin

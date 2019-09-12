@@ -5,6 +5,10 @@ RISCV_EXE_PREFIX         = $(RISCV)/bin/riscv32-unknown-elf-
 # Source files
 SRC = rad2deg.c cubic.c isqrt.c basicmath_small.c
 
+# Create bin file
+basicmath.bin: basicmath.hex Makefile
+	$(RISCV_EXE_PREFIX)objcopy -O binary basicmath.elf $@
+
 # Create hex file with Verilog bfd
 basicmath.hex: basicmath.elf Makefile
 	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@
@@ -20,4 +24,4 @@ basicmath.elf: $(SRC)
 		-lm -lc -lgcc
 
 clean:
-	rm -rf basicmath.elf basicmath.hex
+	rm -rf basicmath.elf basicmath.hex basicmath.bin

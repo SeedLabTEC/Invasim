@@ -2,8 +2,12 @@
 RISCV                    ?= /opt/riscv32-pulp
 RISCV_EXE_PREFIX         = $(RISCV)/bin/riscv32-unknown-elf-
 
+# Create bin file
+adpcm.bin: adpcm.hex Makefile
+	$(RISCV_EXE_PREFIX)objcopy -O binary adpcm.elf $@
+
 # Create hex file with Verilog bfd
-adpcm.hex: adpcm.elf Makefile
+adpcm.hex: adpcm.elf 
 	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@
 
 # Build the program with RISCV toolchain
@@ -19,4 +23,4 @@ adpcm.elf: adpcm.c
 
 # Clean binaries
 clean:
-	rm -f adpcm.elf adpcm.hex
+	rm -f adpcm.elf adpcm.hex adpcm.bin

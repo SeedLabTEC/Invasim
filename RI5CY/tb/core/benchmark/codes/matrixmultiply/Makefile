@@ -2,6 +2,10 @@
 RISCV                    ?= /opt/riscv32-pulp
 RISCV_EXE_PREFIX         = $(RISCV)/bin/riscv32-unknown-elf-
 
+# Create bin file
+matrixmultiply.bin: matrixmultiply.hex Makefile
+	$(RISCV_EXE_PREFIX)objcopy -O binary matrixmultiply.elf $@
+
 # Create hex file with Verilog bfd
 matrixmultiply.hex: matrixmultiply.elf Makefile
 	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@
@@ -19,4 +23,4 @@ matrixmultiply.elf: matrixmultiply.c
 
 # Clean binaries
 clean:
-	rm -f matrixmultiply.elf matrixmultiply.hex
+	rm -f matrixmultiply.elf matrixmultiply.hex matrixmultiply.bin
