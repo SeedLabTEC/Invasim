@@ -14,9 +14,9 @@ Open a terminal in the program folder and run the next commands:
 
 2- The binary is stored in **$PROGRAM_DIR/bin**, it takes two parameters 
     
-    2.1- Processor cores.
+    2.1- Processor cores (x and y).
     2.2- Amount of cycles to run.
   ```console
-  user@Computer:~$ ./bin/invasive_simulator procs cycles
+  user@Computer:~$ ./bin/invasive_simulator x_dimesion y_dimension cycles
 
   ```
