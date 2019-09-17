@@ -43,10 +43,9 @@ SequenceIlet::SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCo
  * @param _max_loads 
  * @param _max_resources 
  */
-void SequenceIlet::set_generation_parameters(int _max_clocks, int _max_loads, float _max_resources)
+void SequenceIlet::set_generation_parameters(int _max_clocks, float _max_resources)
 {
     this->max_clocks = _max_clocks;
-    this->max_loads = _max_loads;
     this->max_resources = float(this->manycore_ptr->get_procs()) * _max_resources;
 }
 
@@ -78,7 +77,7 @@ JSON *SequenceIlet::monitoring()
         array_info->push_back(*this->ilets_info);
         this->ilet_check = false;
     }
-    
+
     return array_info;
 }
 
@@ -99,8 +98,29 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
     this->manycore_ptr = _manycore_ptr;
     this->ilets_info = new JSON;
     this->max_clocks = MAX_CLOCKS;
-    this->max_loads = MAX_LOADS;
     this->max_resources = float(this->manycore_ptr->get_procs()) * float(MAX_RESOURCES);
+
+    this->load_programs();
+}
+
+/**
+ * @brief Hacer xD
+ * 
+ **/
+void SequenceIlet::load_programs()
+{
+    for (unsigned int i = 0; i < STRING_PROGRAMS.size(); i++)
+    {
+        std::string bin_file_path = BENCHMARK + STRING_PROGRAMS.at(i);
+        std::ifstream ifd(bin_file_path, std::ios::binary | std::ios::ate);
+        int size = ifd.tellg();
+        ifd.seekg(0, std::ios::beg);
+        std::vector<char> * buffer = new std::vector<char>();
+        buffer->resize(size); // << resize not reserve
+        ifd.read(buffer->data(), size);
+
+        this->programs.push_back(buffer);
+    }
 }
 
 /**
@@ -115,33 +135,19 @@ ILet *SequenceIlet::generate_ilet(int index)
     ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability);
     int resources = rand() % (this->max_resources + 1) + 1;
     new_ilet->add_operation(INVADE, resources);
-    int load = rand() % (this->max_loads + 1) + 1;
-    new_ilet->add_operation(INFECT, load);
+    int program_index = rand() % this->programs.size();
+    new_ilet->add_operation(INFECT, this->programs.at(program_index));
     new_ilet->add_operation(RETREAT, 0);
-    
+
     //Store in info json
     JSON ilet_info = {
         {"Id", index},
-        {"Operations", {
-            {
-                {"Operation", STRING_OPERATIONS[INVADE]}, 
-                {"Parameter", resources}
-            }, 
-            {
-                {"Operation", STRING_OPERATIONS[INFECT]}, 
-                {"Parameter", load}
-            }, 
-            {
-                {"Operation", STRING_OPERATIONS[RETREAT]}, 
-                {"Parameter", 0}
-            }}
-        }
-    };
+        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", STRING_PROGRAMS[program_index]}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
     //Set data in pointer
     *this->ilets_info = ilet_info;
     //Set flag that an iLet has been created
     this->ilet_check = true;
-
+    std::cout << "New iLet: " << ilet_info.dump() << std::endl;
     return new_ilet;
 }
 
@@ -169,8 +175,8 @@ void *SequenceIlet::generate(void *obj)
         //Verify if there are no clocks to wait
         if (await_clocks == 0)
         {
-            //Verify if max amount of iLet in manycore  
-            if (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets())
+            //Verify if max amount of iLet in manycore
+            if (current->created_ilets.size() < 1)
             {
                 //Create an iLet and invade in manycore
                 ILet *new_ilet = current->generate_ilet(i);
@@ -180,8 +186,8 @@ void *SequenceIlet::generate(void *obj)
                 //generate await clocks
                 await_clocks = rand() % (current->max_clocks + 1);
             }
-        } 
-        else 
+        }
+        else
         {
             //Discount clock
             await_clocks--;

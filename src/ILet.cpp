@@ -68,6 +68,12 @@ void ILet::add_operation(Invasive_Operation _operation, int _parameter)
 	this->pending_operations.push(tmp_op);
 }
 
+void ILet::add_operation(Invasive_Operation _operation, std::vector<char> * _parameter)
+{
+	Operation *tmp_op = new Operation(_operation, _parameter);
+	this->pending_operations.push(tmp_op);
+}
+
 /**
  * @brief Pop an operation from iLet
  * 

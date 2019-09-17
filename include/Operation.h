@@ -10,6 +10,8 @@
 
 #include "Utils.h"
 
+#include <vector>
+
 /**
  * @brief Enum of invasive computing operations
  * 
@@ -40,10 +42,14 @@ class Operation
 {
 	public: 
 		Operation(Invasive_Operation _operation, int _parameter);
+		Operation(Invasive_Operation _operation, std::vector<char> * _parameter);
 		
 		Invasive_Operation get_operation();
 
+		std::vector<char> * get_program();
+
 		int get_parameter();
+
 
 	private:
 		/**
@@ -56,6 +62,11 @@ class Operation
 		 * 
 		 */
 		int parameter;
+		/**
+		 * @brief Pointer to program that is loaded in memory
+		 * 
+		 **/
+		std::vector<char> * buffer;
 };
 
 #endif

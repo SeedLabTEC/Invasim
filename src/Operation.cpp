@@ -17,6 +17,14 @@ Operation::Operation(Invasive_Operation _operation, int _parameter)
 {
     this->operation = _operation;
     this->parameter = _parameter;
+    this->buffer = NULL;
+}
+
+Operation::Operation(Invasive_Operation _operation, std::vector<char> * _parameter)
+{
+    this->operation = _operation;
+    this->parameter = 0;
+    this->buffer = _parameter;
 }
 
 /**
@@ -37,4 +45,12 @@ Invasive_Operation Operation::get_operation()
 int Operation::get_parameter()
 {
     return this->parameter;
+}
+
+/**
+ * @brief Getter for program buffer
+ **/
+std::vector<char> * Operation::get_program()
+{
+    return this->buffer;
 }

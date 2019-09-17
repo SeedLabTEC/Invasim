@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 /**
  * @brief Verify if NDEBUG flag is set, to use debug funtions
@@ -57,5 +58,24 @@ static const std::string STRING_STATES[] =
 	"Infected",
 	"Free"
 };
+
+#define BENCHMARK "RI5CY/tb/core/benchmark/"
+
+/**
+ * @brief Vector with all benchmarks in folder BENCHMARK.
+ * 
+ */
+static const std::vector<std::string> STRING_PROGRAMS = 
+{
+	
+    "codes/adpcm/adpcm.bin",
+    "codes/aes/aes.bin",
+    "codes/fft/fft.bin",
+    "codes/matrixmultiply/matrixmultiply.bin",
+    //"MiBench/automotive/automotive.bin",
+    "MiBench/office/stringsearch/search_small.bin"
+};
+
+
 
 #endif

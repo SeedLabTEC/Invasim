@@ -21,6 +21,8 @@ using JSON = nlohmann::json;
 
 #include "RI5CY.h"
 
+#define CYCLES 5
+
 
 /**
  * @brief Processing unit representation with the basic attributes, also supports the invasive computing operations 
@@ -63,12 +65,6 @@ class ProcessingUnit
 	 */
 	CacheMemory * cache_mem;
 	
-
-	/**
-	 * @brief Workload
-	 * 
-	 */
-	int current_load;
 	/**
 	 * @brief Assigned iLet
 	 * 

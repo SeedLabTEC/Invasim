@@ -5,7 +5,11 @@ BIN = bin/
 TOP = top
 
 CMAIN = main.cpp
-CFILES = 	$(SRC)RI5CY.cpp
+CFILES = $(SRC)Environment.cpp $(SRC)ProcessingUnit.cpp $(SRC)Clock.cpp \
+		 $(SRC)ILet.cpp $(SRC)Operation.cpp $(SRC)ManyCoreArch.cpp 		\
+		 $(SRC)CacheMemory.cpp $(SRC)RandomAccessMemory.cpp 			\
+		 $(SRC)ResourceAdmin.cpp $(SRC)Monitor.cpp 						\
+		 $(SRC)SequenceIlet.cpp $(SRC)RI5CY.cpp
 CFLAGS = -Wall -lpthread 
 
 VDIR = ./RI5CY/processor-model/riscv_core

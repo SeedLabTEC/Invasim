@@ -20,20 +20,26 @@ ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
 	this->pu_state = FREE;
 	this->pu_coordenate.x = _x;
 	this->pu_coordenate.y = _y;
-	this->current_load = 0;
+
 	this->iLet_ptr = NULL;
 	this->clk_instance = _clk_instance;
+
+	this->cpu = new RI5CY(_x); //TODO: Change to a better id
 
 	//Memory features
 	this->cache_mem = new CacheMemory(this->pu_coordenate.x, this->pu_coordenate.y);
 }
 
 /**
- * @brief Method that starts main thread
+ * @brief Method that starts main thread and processor model
  * 
  */
 void ProcessingUnit::start()
 {
+	// Start processor
+	this->cpu->init_processor();
+	this->cpu->stop_fetching();
+
 	//create threads
 	pthread_create(&this->pu_exe_thread, NULL, ProcessingUnit::executing, (void *)this);
 	//detach threads
@@ -58,9 +64,14 @@ void ProcessingUnit::invade(ILet *_new_iLet)
  * @brief Function thta sets a workload and changes the state
  * 
  */
-void ProcessingUnit::infect(){
+void ProcessingUnit::infect()
+{
 	pthread_mutex_lock(&this->pu_mutex);
-	this->current_load = this->iLet_ptr->get_current_operation()->get_parameter();
+	//Load program in processor memory
+	this->cpu->reset_processor();
+	this->cpu->load_program(0, *this->iLet_ptr->get_current_operation()->get_program());
+	this->cpu->start_fetching();
+
 	this->pu_state = INFECTED;
 	pthread_mutex_unlock(&this->pu_mutex);
 }
@@ -74,6 +85,7 @@ void ProcessingUnit::retreat()
 	pthread_mutex_lock(&this->pu_mutex);
 	this->pu_state = FREE;
 	this->iLet_ptr = NULL;
+	this->cpu->stop_fetching();
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
@@ -112,7 +124,7 @@ JSON *ProcessingUnit::monitoring()
 	*json_info = {
 		{"Coordenate_x", this->pu_coordenate.x},
 		{"Coordenate_y", this->pu_coordenate.y},
-		{"Load", this->current_load},
+		{"Load", 0},
 		{"State", STRING_STATES[this->pu_state]}};
 	//Set if in ilet;
 	if (this->iLet_ptr != NULL)
@@ -159,15 +171,14 @@ void *ProcessingUnit::executing(void *obj)
 					current->iLet_ptr->get_id());
 			break;
 		case INFECTED:
-			//Reduce wokload
 			dprintf("PU = (%d, %d): Infected processor by ILet = %d.\n",
 					current->pu_coordenate.x,
 					current->pu_coordenate.y,
 					current->iLet_ptr->get_id());
 			pthread_mutex_lock(&current->pu_mutex);
-			if (current->current_load > 0)
+			if (!current->cpu->is_done())
 			{
-				current->current_load--;
+				current->cpu->clock_spin(20);
 			}
 			else
 			{

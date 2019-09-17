@@ -9,7 +9,10 @@
 #define INCLUDE_SEQUENCEILET_H_
 
 #include <vector>
-#include <stdlib.h> 
+#include <stdlib.h>
+#include <fstream>
+#include <cstring> // for std::strlen
+#include <cstddef> // for std::size_t -> is a typedef on an unsinged int
 #include "Utils.h"
 
 #include "Clock.h"
@@ -35,83 +38,90 @@ enum Sequence_Type
  * @brief iLet sequencer that generates different tasks to the manycore architecture, depending on diferents parameters.
  * 
  */
-class SequenceIlet 
+class SequenceIlet
 {
-	public: 
-		SequenceIlet(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
-		SequenceIlet(Sequence_Type _seq_type, Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
+public:
+	SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);
+	SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);
 
-		void set_generation_parameters(int _max_clocks, int _max_loads, float _max_resources);
+	void set_generation_parameters(int _max_clocks, float _max_resources);
 
-		void start();
+	void start();
 
-		JSON * monitoring();
+	JSON *monitoring();
 
-	private:
-		pthread_t seq_thread;
+private:
+	pthread_t seq_thread;
 
-		/**
+	/**
 		 * @brief Type of sequencer
 		 * 
 		 */
-		Sequence_Type seq_type;
-		/**
+	Sequence_Type seq_type;
+	/**
 		 * @brief Clock instance
 		 * 
 		 */
-		Clock * clk_instance;
-		/**
+	Clock *clk_instance;
+	/**
 		 * @brief Manycore architecture pointer
 		 * 
 		 */
-		ManyCoreArch * manycore_ptr;
-		/**
+	ManyCoreArch *manycore_ptr;
+	/**
 		 * @brief Created iLets vector
 		 * 
 		 */
-		std::vector<ILet *> created_ilets;
-		/**
+	std::vector<ILet *> created_ilets;
+	/**
 		 * @brief Json with all iLets
 		 * 
 		 */
-		JSON * ilets_info;
+	JSON *ilets_info;
 
-		/**
+	/**
 		 * @brief Decision probability to start and end an iLet
 		 * 
 		 */
-		float decision_probability;
-		/**
+	float decision_probability;
+	/**
 		 * @brief Seed to generate random parameters
 		 * 
 		 */
-		int seed;
-		/**
+	int seed;
+	/**
 		 * @brief Max amount of clock that the sequencer waits
 		 * 
 		 */
-		int max_clocks;
-		/**
+	int max_clocks;
+	/**
 		 * @brief Max amount of load that an ilet can have
 		 * 
 		 */
-		int max_loads;
-		/**
+	// int max_loads;
+	/**
 		 * @brief Max amount of resources that an iLet can request
 		 * 
 		 */
-		int max_resources;
+	int max_resources;
 
-		/**
+	/**
 		 * @brief Flag that notice when a iLet is created
 		 * 
 		 */
-		bool ilet_check = false;
+	bool ilet_check = false;
 
-		ILet * generate_ilet(int index);
+	/**
+		 * @brief Vector with all precompiled programs
+		 * 
+		 **/
+	std::vector<std::vector<char> *> programs;
 
-		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
-		static void *generate(void *obj);
+	ILet *generate_ilet(int index);
+
+	void init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);
+	void load_programs();
+	static void *generate(void *obj);
 };
 
 #endif
