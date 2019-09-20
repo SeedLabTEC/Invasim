@@ -147,7 +147,7 @@ ILet *SequenceIlet::generate_ilet(int index)
     *this->ilets_info = ilet_info;
     //Set flag that an iLet has been created
     this->ilet_check = true;
-    std::cout << "New iLet: " << ilet_info.dump() << std::endl;
+    std::cout << "New iLet: " << ilet_info.dump(4) << std::endl;
     return new_ilet;
 }
 

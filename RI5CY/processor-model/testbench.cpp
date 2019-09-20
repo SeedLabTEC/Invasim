@@ -338,12 +338,13 @@ main (int    argc,
   
 
   cout << "Cycling clock to run for a few instructions" << endl;
+  int i = 0;
   while (cpu->program_exit != 1)
   {
-    clockSpin(5);
+    clockSpin(1000);
+    i++;
   }
-  
-
+  printf("Se terminó en %d\n", i);
   REGfilePrint();
   cout << endl;
  

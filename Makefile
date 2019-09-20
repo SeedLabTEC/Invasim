@@ -10,11 +10,10 @@ CFILES = $(SRC)Environment.cpp $(SRC)ProcessingUnit.cpp $(SRC)Clock.cpp \
 		 $(SRC)CacheMemory.cpp $(SRC)RandomAccessMemory.cpp 			\
 		 $(SRC)ResourceAdmin.cpp $(SRC)Monitor.cpp 						\
 		 $(SRC)SequenceIlet.cpp $(SRC)RI5CY.cpp
-CFLAGS = -Wall -lpthread 
+CFLAGS = -Wall -lpthread -DNDEBUG
 
 VDIR = ./RI5CY/processor-model/riscv_core
-VOBJS = $(VDIR)/verilated.o       \
-        $(VDIR)/verilated_vcd_c.o
+VOBJS = $(VDIR)/verilated.o       
 VLIB = $(VDIR)/V$(TOP)__ALL.a
 
 CINC = 	-I$(VDIR) -I/usr/local/share/verilator/include/ \

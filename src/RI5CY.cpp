@@ -21,6 +21,7 @@ RI5CY::RI5CY(int _id)
 void RI5CY::load_program(uint32_t addr, const std::vector<char> &v)
 {
     dprintf("CORE RI5CY %d: Start program address : 0x%x\n", this->id, addr);
+    std::cout << "Start program address : " << addr << std::endl;
     unsigned int offset = 0;
     for (unsigned int i = 0; i < v.size(); ++i)
     {
@@ -55,6 +56,7 @@ void RI5CY::init_processor()
     this->cpu->irq_i = 0;
     this->cpu->debug_req_i = 0;
     this->cpu->program_exit = 0;
+    std::cout << "Processor initialized" << std::endl;
 }
 
 void RI5CY::reset_processor()
@@ -63,16 +65,19 @@ void RI5CY::reset_processor()
     this->clock_spin(5);
     this->cpu->rstn_i = 1;
     this->clock_spin(5);
+    std::cout << "Done with processor reset" << std::endl;
 }
 
 void RI5CY::stop_fetching()
 {
     this->cpu->fetch_enable_i = 0;
+    std::cout << "Processor stopped fetching" << std::endl;
 }
 
 void RI5CY::start_fetching()
 {
     this->cpu->fetch_enable_i = 1;
+    std::cout << "Processor started fetching" << std::endl;
 }
 
 bool RI5CY::is_done()

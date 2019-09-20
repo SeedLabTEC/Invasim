@@ -284,7 +284,7 @@ void *ResourceAdmin::managing(void *obj)
 					int start = current_ilet->execute_operation();
 					if (start)
 					{
-
+						std::cout << "Starting executing i-Let: " << current_ilet->get_id() << std::endl;
 						dprintf("ResourceAdmin: Infecting resources to Ilet = %d.\n", current_ilet->get_id());
 						current->infect(current_ilet);
 					}
@@ -295,7 +295,6 @@ void *ResourceAdmin::managing(void *obj)
 				{
 					//When executing ask if it has to be terminted
 					int terminate = 1; //current_ilet->finish_operation();
-					std::cout << "\033[1;31mTerminar: \033[0m" << terminate << std::endl;
 					if (!terminate)
 					{
 						dprintf("ResourceAdmin: Ilet = %d to be terminated.\n", current_ilet->get_id());
@@ -306,6 +305,7 @@ void *ResourceAdmin::managing(void *obj)
 						bool is_done = current->verify_ilet(current_ilet);
 						if (is_done)
 						{
+							std::cout << "Execution of i-Let " << current_ilet->get_id() << " is done!" << std::endl;
 							dprintf("ResourceAdmin: Ilet = %d is done.\n", current_ilet->get_id());
 							current_ilet->set_state(DONE);
 						}
@@ -321,6 +321,7 @@ void *ResourceAdmin::managing(void *obj)
 						dprintf("ResourceAdmin: Ilet = %d terminated.\n", current_ilet->get_id());
 						current->retreat(current_ilet);
 						current->execute_ilets.erase(current->execute_ilets.begin() + i);
+						std::cout << "Retreat complete of i-Let " << current_ilet->get_id() << std::endl;
 					}
 					else
 					{

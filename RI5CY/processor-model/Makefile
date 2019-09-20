@@ -81,8 +81,8 @@ VLIB = $(VDIR)/V$(TOP)__ALL.a
 VSMK = V$(TOP).mk
 VMK  = $(VDIR)/$(VSMK)
 
-$(TESTBENCH): $(VOBJS)
-	$(CC) $(CCINC) $(SOURCE) $(VOBJS) $(VLIB)
+# $(TESTBENCH): $(VOBJS)
+# 	$(CC) $(CCINC) $(SOURCE) $(VOBJS) $(VLIB)
 
 $(VOBJS): $(VMK) $(VLIB) Makefile
 	for f in $@; \

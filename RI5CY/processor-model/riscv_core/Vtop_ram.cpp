@@ -189,18 +189,6 @@ void Vtop_ram::_settle__TOP__top__ram_i__1(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at ram.sv:61
-    vlSymsp->TOP__top__ram_i.__PVT__exit_value_o = 0U;
-    if (vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__data_req_pmp) {
-	if (vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__data_we_ex) {
-	    if ((0x400000U <= vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_addr_int)) {
-		if ((0x20000004U == vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_addr_int)) {
-		    vlSymsp->TOP__top__ram_i.__PVT__exit_value_o 
-			= vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_wdata;
-		}
-	    }
-	}
-    }
 }
 
 VL_INLINE_OPT void Vtop_ram::_sequent__TOP__top__ram_i__2(Vtop__Syms* __restrict vlSymsp) {
@@ -322,18 +310,6 @@ VL_INLINE_OPT void Vtop_ram::_combo__TOP__top__ram_i__4(Vtop__Syms* __restrict v
 	    if ((0x400000U > vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_addr_int)) {
 		vlSymsp->TOP__top__ram_i.__PVT__ram_data_wdata 
 		    = vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_wdata;
-	    }
-	}
-    }
-    // ALWAYS at ram.sv:61
-    vlSymsp->TOP__top__ram_i.__PVT__exit_value_o = 0U;
-    if (vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__data_req_pmp) {
-	if (vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__data_we_ex) {
-	    if ((0x400000U <= vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_addr_int)) {
-		if ((0x20000004U == vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_addr_int)) {
-		    vlSymsp->TOP__top__ram_i.__PVT__exit_value_o 
-			= vlSymsp->TOP__top.__PVT__riscv_core_i__DOT__load_store_unit_i__DOT__data_wdata;
-		}
 	    }
 	}
     }

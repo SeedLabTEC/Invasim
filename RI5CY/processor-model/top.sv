@@ -166,10 +166,10 @@ module top
       if (~rstn_i)
         program_exit = 0;
       else if (exit_valid_o) begin
-          if (exit_value_o == 0)
-              $display("EXIT SUCCESS");
-          else
-              $display("EXIT FAILURE: %d", exit_value_o);
+          // if (exit_value_o == 0)
+          //     $display("EXIT SUCCESS");
+          // else
+          //     $display("EXIT FAILURE: %d", exit_value_o);
           program_exit = 1;
       end
   end

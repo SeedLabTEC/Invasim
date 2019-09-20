@@ -63,6 +63,7 @@ pthread_cond_t *Clock::get_monitor_cond_ptr()
 void Clock::next_cycle()
 {
     dprintf("Clock: Cycle = %d--------------------------------\n", this->cycle);
+    std::cout << "Clock: Cycle = " << this->cycle << "--------------------------------" << std::endl;
     pthread_cond_broadcast(&this->cycle_cond);
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_SEC));
     this->cycle++;

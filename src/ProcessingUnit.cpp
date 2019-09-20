@@ -178,7 +178,7 @@ void *ProcessingUnit::executing(void *obj)
 			pthread_mutex_lock(&current->pu_mutex);
 			if (!current->cpu->is_done())
 			{
-				current->cpu->clock_spin(20);
+				current->cpu->clock_spin(100);
 			}
 			else
 			{
