@@ -9,6 +9,7 @@
 #define INCLUDE_OPERATION_H_
 
 #include "Utils.h"
+#include <vector>
 
 /**
  * @brief Enum of invasive computing operations
@@ -39,11 +40,16 @@ static const std::string STRING_OPERATIONS[] =
 class Operation 
 {
 	public: 
-		Operation(Invasive_Operation _operation, int _parameter);
+		
+		//Operation::Operation(Invasive_Operation _operation, int _parameter);
+	
+		Operation(Invasive_Operation _operation, int _parameter, std::vector<std::string> _codeOperation);
 		
 		Invasive_Operation get_operation();
 
 		int get_parameter();
+
+		std::string get_codeOperation(int inst);
 
 	private:
 		/**
@@ -56,6 +62,11 @@ class Operation
 		 * 
 		 */
 		int parameter;
+		/**
+		 * @brief Parameter of all code of operation
+		 * 
+		 */
+		std::vector<std::string> codeOperation;
 };
 
 #endif

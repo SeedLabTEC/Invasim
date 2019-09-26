@@ -9,12 +9,16 @@
 #define INCLUDE_SEQUENCEILET_H_
 
 #include <vector>
+#include<string>
 #include <stdlib.h> 
 #include "Utils.h"
 
 #include "Clock.h"
 #include "ManyCoreArch.h"
 #include "ILet.h"
+
+#include "../libs/cpp/pugiconfig.hpp"
+#include "../libs/cpp/pugixml.hpp"
 
 //iLet generation parameters
 #define MAX_CLOCKS 10
@@ -108,10 +112,11 @@ class SequenceIlet
 		 */
 		bool ilet_check = false;
 
-		ILet * generate_ilet(int index);
+		ILet * generate_ilet(int index, std::vector<std::string> codeFlow);
 
 		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		static void *generate(void *obj);
+		std::vector<std::vector<std::string>> getBlocksCode();
 };
 
 #endif

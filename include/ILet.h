@@ -50,7 +50,8 @@ class ILet
 
 		int get_id();
 
-		void add_operation(Invasive_Operation _operation, int _parameter);
+		//void add_operation(Invasive_Operation _operation, int _parameter);
+		void add_operation(Invasive_Operation _operation, int _parameter, std::vector<std::string> _codeOperation);
 
 		void pop_operation();
 

@@ -78,7 +78,7 @@ JSON *SequenceIlet::monitoring()
         array_info->push_back(*this->ilets_info);
         this->ilet_check = false;
     }
-    
+
     return array_info;
 }
 
@@ -109,34 +109,25 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
  * @param index 
  * @return ILet* 
  */
-ILet *SequenceIlet::generate_ilet(int index)
+ILet *SequenceIlet::generate_ilet(int index, std::vector<std::string> codeFlow)
 {
     //Generate a iLet according to the parameters
     ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability);
+
+    // HERE WE NEED TO CHANGE THE
     int resources = rand() % (this->max_resources + 1) + 1;
-    new_ilet->add_operation(INVADE, resources);
-    int load = rand() % (this->max_loads + 1) + 1;
-    new_ilet->add_operation(INFECT, load);
-    new_ilet->add_operation(RETREAT, 0);
+    new_ilet->add_operation(INVADE, resources, codeFlow); // add operation invade
     
+    //int load = rand() % (this->max_loads + 1) + 1;
+    int load = codeFlow.size();
+    new_ilet->add_operation(INFECT, load, codeFlow); // add operation infect
+
+    new_ilet->add_operation(RETREAT, 0, codeFlow); // add operation retreat
+
     //Store in info json
     JSON ilet_info = {
         {"Id", index},
-        {"Operations", {
-            {
-                {"Operation", STRING_OPERATIONS[INVADE]}, 
-                {"Parameter", resources}
-            }, 
-            {
-                {"Operation", STRING_OPERATIONS[INFECT]}, 
-                {"Parameter", load}
-            }, 
-            {
-                {"Operation", STRING_OPERATIONS[RETREAT]}, 
-                {"Parameter", 0}
-            }}
-        }
-    };
+        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", load}, {"FirstInst", codeFlow[0]}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
     //Set data in pointer
     *this->ilets_info = ilet_info;
     //Set flag that an iLet has been created
@@ -162,6 +153,10 @@ void *SequenceIlet::generate(void *obj)
     int i = 0;
     //Assign await clocks for generation
     int await_clocks = 0;
+
+    std::vector<std::vector<std::string>> iletsCode = current->getBlocksCode();
+    int iletsCount = iletsCode.size(); // temporal code where number of blocks == ilets
+
     while (1)
     {
         //Await clock signal
@@ -169,23 +164,49 @@ void *SequenceIlet::generate(void *obj)
         //Verify if there are no clocks to wait
         if (await_clocks == 0)
         {
-            //Verify if max amount of iLet in manycore  
-            if (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets())
+            //Verify if max amount of iLet in manycore
+            if ( (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (i < iletsCount) )
             {
                 //Create an iLet and invade in manycore
-                ILet *new_ilet = current->generate_ilet(i);
+                ILet *new_ilet = current->generate_ilet(i, iletsCode[i] );
                 current->created_ilets.push_back(new_ilet);
                 current->manycore_ptr->invade(new_ilet);
                 i++;
                 //generate await clocks
                 await_clocks = rand() % (current->max_clocks + 1);
             }
-        } 
-        else 
+        }
+        else
         {
             //Discount clock
             await_clocks--;
         }
     }
     return NULL;
+}
+
+std::vector<std::vector<std::string>> SequenceIlet::getBlocksCode()
+{
+    pugi::xml_document doc;
+    doc.load_file("/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow.xml");
+    pugi::xml_node blocks = doc.child("Blocks");
+    std::vector<std::vector<std::string>> iletsCode;
+
+    for (pugi::xml_node block = blocks.first_child(); block; block = block.next_sibling()) // go over blocks
+    {
+        //pugi::xml_attribute id = block.first_attribute();
+        //std::cout << " " << id.name() << "=" << id.value() << std::endl;
+        std::vector<std::string> temporalInstructions;
+        for (pugi::xml_node child = block.first_child(); child; child = child.next_sibling()) // go over instructions of blocks
+        {
+            std::string nodeName = child.name();
+            // to get instruction or intersection
+            if (nodeName == "instruction")
+            {
+                temporalInstructions.push_back((std::string)child.first_child().value()); // push instruction to temporal list
+            }
+        }
+        iletsCode.push_back(temporalInstructions); // push the vector of charts to principal list
+    }
+    return iletsCode;
 }

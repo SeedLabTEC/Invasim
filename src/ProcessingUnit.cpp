@@ -58,7 +58,8 @@ void ProcessingUnit::invade(ILet *_new_iLet)
  * @brief Function thta sets a workload and changes the state
  * 
  */
-void ProcessingUnit::infect(){
+void ProcessingUnit::infect()
+{
 	pthread_mutex_lock(&this->pu_mutex);
 	this->current_load = this->iLet_ptr->get_current_operation()->get_parameter();
 	this->pu_state = INFECTED;
@@ -167,15 +168,16 @@ void *ProcessingUnit::executing(void *obj)
 			pthread_mutex_lock(&current->pu_mutex);
 			if (current->current_load > 0)
 			{
-				current->current_load--;
+				std::cout<< current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_load - 1) << std::endl;
+				current->current_load--; ////////////////////////////// DO SOMETHING WITH CODE
 			}
 			else
 			{
 				//End execution
 				dprintf("PU = (%d, %d): Execution Done by ILet = %d.\n",
-					current->pu_coordenate.x,
-					current->pu_coordenate.y,
-					current->iLet_ptr->get_id());
+						current->pu_coordenate.x,
+						current->pu_coordenate.y,
+						current->iLet_ptr->get_id());
 				current->pu_state = INVADED;
 			}
 			pthread_mutex_unlock(&current->pu_mutex);

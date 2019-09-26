@@ -61,10 +61,22 @@ int ILet::get_id()
  * 
  * @param _operation 
  * @param _parameter 
- */
+ 
 void ILet::add_operation(Invasive_Operation _operation, int _parameter)
 {
 	Operation *tmp_op = new Operation(_operation, _parameter);
+	this->pending_operations.push(tmp_op);
+}*/
+
+/**
+ * @brief Add operation in iLet
+ * 
+ * @param _operation 
+ * @param _parameter 
+ */
+void ILet::add_operation(Invasive_Operation _operation, int _parameter, std::vector<std::string> _codeOperation)
+{
+	Operation *tmp_op = new Operation(_operation, _parameter, _codeOperation);
 	this->pending_operations.push(tmp_op);
 }
 
