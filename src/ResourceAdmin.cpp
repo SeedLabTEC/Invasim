@@ -294,7 +294,7 @@ void *ResourceAdmin::managing(void *obj)
 				case EXECUTING:
 				{
 					//When executing ask if it has to be terminted
-					int terminate = current_ilet->finish_operation();
+					int terminate = 1;
 					if (!terminate)
 					{
 						dprintf("ResourceAdmin: Ilet = %d to be terminated.\n", current_ilet->get_id());
