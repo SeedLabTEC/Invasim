@@ -8,7 +8,7 @@ cutBlockValues = ["beq", "bnez", "bge", "blt", "j", "jr",
                   "jal", "jalr", "call"]  # BNEZ-J-JR-JAL-JALR-EBREAK
 
 
-def dependenciesSearch():
+def blockIletsSearch():
     print("Deps")
 
 

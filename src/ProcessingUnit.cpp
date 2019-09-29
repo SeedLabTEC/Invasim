@@ -168,9 +168,10 @@ void *ProcessingUnit::executing(void *obj)
 			pthread_mutex_lock(&current->pu_mutex);
 			if (current->current_load > 0)
 			{
-				std::cout << current->current_load - 1 << std::endl;
-				std::cout<< current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_load - 1) << std::endl;
-				current->current_load--; ////////////////////////////// DO SOMETHING WITH CODE
+				////////////////////////////// DO SOMETHING WITH CODE
+				//std::cout << current->current_load - 1 << std::endl;
+				//std::cout<< current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_load - 1) << std::endl;
+				current->current_load--;
 			}
 			else
 			{

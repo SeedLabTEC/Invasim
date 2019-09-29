@@ -113,10 +113,11 @@ class SequenceIlet
 		bool ilet_check = false;
 
 		ILet * generate_ilet(int index, std::vector<std::string> codeFlow);
+		int calcBlocks(std::vector<std::vector<std::string>> calcBlock);
 
 		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		static void *generate(void *obj);
-		std::vector<std::vector<std::string>> getBlocksCode();
+		std::vector<std::vector<std::vector<std::string>>> getBlocksCode();
 };
 
 #endif

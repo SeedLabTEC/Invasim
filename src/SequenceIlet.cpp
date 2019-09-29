@@ -117,7 +117,7 @@ ILet *SequenceIlet::generate_ilet(int index, std::vector<std::string> codeFlow)
     // HERE WE NEED TO CHANGE THE
     int resources = rand() % (this->max_resources + 1) + 1;
     new_ilet->add_operation(INVADE, resources, codeFlow); // add operation invade
-    
+
     //int load = rand() % (this->max_loads + 1) + 1;
     int load = codeFlow.size();
     new_ilet->add_operation(INFECT, load, codeFlow); // add operation infect
@@ -153,60 +153,86 @@ void *SequenceIlet::generate(void *obj)
     int i = 0;
     //Assign await clocks for generation
     int await_clocks = 0;
+    //Assign await clocks for generation of blocks
+    int await_clocks_between_blocks = 0;
+    // to manipulate the ilets
+    int go_block_ilets = -1;
+    int go_block_ilets_count = 0;
 
-    std::vector<std::vector<std::string>> iletsCode = current->getBlocksCode();
-    int iletsCount = iletsCode.size(); // temporal code where number of blocks == ilets
+    std::vector<std::vector<std::vector<std::string>>> iletsCode = current->getBlocksCode();
+    int iletsCount = iletsCode[0].size(); // temporal code where number of blocks == ilets
 
     while (1)
     {
         //Await clock signal
         pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
+
         //Verify if there are no clocks to wait
         if (await_clocks == 0)
         {
             //Verify if max amount of iLet in manycore
-            if ( (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (i < iletsCount) )
+            if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount))
             {
+                if (await_clocks_between_blocks == 0)
+                {
+                    go_block_ilets++; // go to next block of ilets
+                    await_clocks_between_blocks = current->calcBlocks(iletsCode[go_block_ilets]);
+                    iletsCount = iletsCode[go_block_ilets].size();
+                    go_block_ilets_count = 0;
+                }
+
                 //Create an iLet and invade in manycore
-                ILet *new_ilet = current->generate_ilet(i, iletsCode[i] );
+                ILet *new_ilet = current->generate_ilet(i, iletsCode[go_block_ilets][go_block_ilets_count]); // change here
                 current->created_ilets.push_back(new_ilet);
                 current->manycore_ptr->invade(new_ilet);
                 i++;
+                go_block_ilets_count++;
                 //generate await clocks
                 await_clocks = rand() % (current->max_clocks + 1);
+                // add the await clocks between two ilets
+                await_clocks_between_blocks = await_clocks_between_blocks + await_clocks;
             }
         }
         else
         {
             //Discount clock
             await_clocks--;
+            await_clocks_between_blocks--;
         }
     }
     return NULL;
 }
 
-std::vector<std::vector<std::string>> SequenceIlet::getBlocksCode()
+std::vector<std::vector<std::vector<std::string>>> SequenceIlet::getBlocksCode()
 {
     pugi::xml_document doc;
     doc.load_file("/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow.xml");
     pugi::xml_node blocks = doc.child("Blocks");
-    std::vector<std::vector<std::string>> iletsCode;
-
+    std::vector<std::vector<std::vector<std::string>>> iletsCode;
+    
     for (pugi::xml_node block = blocks.first_child(); block; block = block.next_sibling()) // go over blocks
     {
-        //pugi::xml_attribute id = block.first_attribute();
-        //std::cout << " " << id.name() << "=" << id.value() << std::endl;
-        std::vector<std::string> temporalInstructions;
-        for (pugi::xml_node child = block.first_child(); child; child = child.next_sibling()) // go over instructions of blocks
+        std::vector<std::vector<std::string>> temporalBlock;
+        for (pugi::xml_node ilet = block.first_child(); ilet; ilet = ilet.next_sibling()) // go over instructions of blocks
         {
-            std::string nodeName = child.name();
-            // to get instruction or intersection
-            if (nodeName == "instruction")
+            std::vector<std::string> temporalIlet;
+            for (pugi::xml_node instruction = ilet.first_child(); instruction; instruction = instruction.next_sibling()) // go over instructions of blocks
             {
-                temporalInstructions.push_back((std::string)child.first_child().value()); // push instruction to temporal list
+                std::string nodeName = instruction.name();
+                if (nodeName == "instruction")
+                {
+                    temporalIlet.push_back((std::string)instruction.first_child().value()); // push instruction to temporal list
+                }
             }
+            std::reverse(std::begin(temporalIlet), std::end(temporalIlet)); // reverse because processing unit go back on instructions
+            temporalBlock.push_back(temporalIlet);
         }
-        iletsCode.push_back(temporalInstructions); // push the vector of charts to principal list
+        iletsCode.push_back(temporalBlock); // push the vector of charts to principal list
     }
     return iletsCode;
+}
+
+int SequenceIlet::calcBlocks(std::vector<std::vector<std::string>> calcBlock)
+{
+    return 4;
 }
