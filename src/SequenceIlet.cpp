@@ -155,40 +155,53 @@ void *SequenceIlet::generate(void *obj)
     int await_clocks = 0;
     //Assign await clocks for generation of blocks
     int await_clocks_between_blocks = 0;
+    int iletsCount = 0; // temporal code where number of blocks == ilets
+
     // to manipulate the ilets
     int go_block_ilets = -1;
     int go_block_ilets_count = 0;
 
     std::vector<std::vector<std::vector<std::string>>> iletsCode = current->getBlocksCode();
-    int iletsCount = iletsCode[0].size(); // temporal code where number of blocks == ilets
+    
 
     while (1)
     {
         //Await clock signal
         pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
 
+        //std::cout << " await_clocks " << await_clocks << std::endl;
+        //std::cout << " await_clocks_between_blocks " << await_clocks_between_blocks << std::endl;
         //Verify if there are no clocks to wait
         if (await_clocks == 0)
         {
-            //Verify if max amount of iLet in manycore
-            if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount))
+            if (await_clocks_between_blocks == 0)
             {
-                if (await_clocks_between_blocks == 0)
-                {
-                    go_block_ilets++; // go to next block of ilets
-                    await_clocks_between_blocks = current->calcBlocks(iletsCode[go_block_ilets]);
-                    iletsCount = iletsCode[go_block_ilets].size();
-                    go_block_ilets_count = 0;
-                }
+                go_block_ilets++; // go to next block of ilets
+                await_clocks_between_blocks = current->calcBlocks(iletsCode[go_block_ilets]);
+                iletsCount = iletsCode[go_block_ilets].size();
+                go_block_ilets_count = 0;
 
+                //std::cout << " go_block_ilets " << go_block_ilets << std::endl;
+            }
+            else
+            {
+                await_clocks_between_blocks--;
+            }
+
+            //Verify if max amount of iLet in manycore
+            if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount) )
+            {
+                //std::cout << " go_block_ilets_count " << go_block_ilets_count << std::endl;
                 //Create an iLet and invade in manycore
                 ILet *new_ilet = current->generate_ilet(i, iletsCode[go_block_ilets][go_block_ilets_count]); // change here
                 current->created_ilets.push_back(new_ilet);
                 current->manycore_ptr->invade(new_ilet);
                 i++;
                 go_block_ilets_count++;
+
                 //generate await clocks
                 await_clocks = rand() % (current->max_clocks + 1);
+                //std::cout << " INSIDE ADD " << await_clocks << std::endl;
                 // add the await clocks between two ilets
                 await_clocks_between_blocks = await_clocks_between_blocks + await_clocks;
             }
@@ -209,7 +222,7 @@ std::vector<std::vector<std::vector<std::string>>> SequenceIlet::getBlocksCode()
     doc.load_file("/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow.xml");
     pugi::xml_node blocks = doc.child("Blocks");
     std::vector<std::vector<std::vector<std::string>>> iletsCode;
-    
+
     for (pugi::xml_node block = blocks.first_child(); block; block = block.next_sibling()) // go over blocks
     {
         std::vector<std::vector<std::string>> temporalBlock;
@@ -234,5 +247,14 @@ std::vector<std::vector<std::vector<std::string>>> SequenceIlet::getBlocksCode()
 
 int SequenceIlet::calcBlocks(std::vector<std::vector<std::string>> calcBlock)
 {
-    return 4;
+    int total = 0;
+    int onGo = calcBlock.size();
+
+    for (int i; i < onGo; ++i)
+    {
+        total = total + calcBlock[i].size();
+    }
+    //std::cout << " TOTAL FUNC" << total << std::endl;
+
+    return total;
 }
