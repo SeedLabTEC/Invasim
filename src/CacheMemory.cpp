@@ -1,11 +1,12 @@
 /**
 * @file CacheMemory.cpp
 * @brief Cache memory source
-* @author Dennis Porras Barrantes
-* @date 29/03/19
+* @author Jairo Ortega Calderon
+* @date 20/09/19
 **/
 
 #include "../include/CacheMemory.h"
+
 
 /**
  * @brief Construct a new Cache Memory:: Cache Memory object
@@ -13,10 +14,22 @@
  * @param _x dimension
  * @param _y dimension
  */
-CacheMemory::CacheMemory(int _x, int _y)
-{
-    this->pu_coordinate.x = _x;
-    this->pu_coordinate.y = _y;
-    this->blocks = NULL;
-    this->clk_intance = NULL;
+CacheMemory::CacheMemory(){
+    this->blocks = new cache_line [DEFAULT_BlOCKS];
+    for(int x = 0; x < DEFAULT_BlOCKS; x++){
+        this->blocks[x].tag = 0;
+        this->blocks[x].data = 0; 
+
+    }
+}
+
+
+void CacheMemory::write(int _index, int _addr, int _data){
+    this->blocks[_index].tag = _addr;
+    this->blocks[_index].data = _data; 
+
+}
+
+int CacheMemory::read (int _index){
+    return this->blocks[_index].data;
 }
