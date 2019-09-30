@@ -41,7 +41,9 @@ class CacheController
         int readData(int _address);
         int readDataAux();
         void sendEvent(int paddress, bool ptype, std::string paction);
-        void writeData(int _address, int _)data)
+        void writeData(int _address, int _data);
+        int readDataEvent(event _event);
+        void writeDataEvent(event _event);
 
-
+};
 #endif

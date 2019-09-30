@@ -51,7 +51,7 @@ int CacheController::readData(int _address){
             sendEvent(_address, false, "miss");//place RM
         }
         else{
-            this->dataToMem.data = this->cache->read(_address);
+            this->dataToMem.data = this->cache->read(_address % DEFAULT_BlOCKS);
             this->dataToMem.addr = _address;
             this->intNetw->pushDataMem(dataToMem); //WB
             sendEvent(_address, false, "miss"); //place RM
@@ -87,7 +87,7 @@ void CacheController::writeData(int _address, int _data){
             this->cache->write((_address % DEFAULT_BlOCKS),_address, _data);
         }
         else{
-            this->dataToMem.data = this->cache->read(_address);
+            this->dataToMem.data = this->cache->read(_address % DEFAULT_BlOCKS);
             this->dataToMem.addr = _address;
             this->intNetw->pushDataMem(dataToMem); //WB
 
@@ -98,7 +98,41 @@ void CacheController::writeData(int _address, int _data){
     }
 }
 
+int CacheController::readDataEvent(event _event){
+    if(this->states[(_event.tag % DEFAULT_BlOCKS)].tag == _event.tag){
+        if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == modified){
+            this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(readMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+            return this->cache->read(_event.tag % DEFAULT_BlOCKS);
+        }
+        else if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == shared)
+            return this->cache->read(_event.tag % DEFAULT_BlOCKS);
+        else
+            return -1;
+    }
+    else{
+        return -1;
+    }
+}
 
+void CacheController::writeDataEvent(event _event){
+    if(this->states[(_event.tag % DEFAULT_BlOCKS)].tag == _event.tag){
+        if(_event.action == "invalidate"){
+            this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(invalidateBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+        }
+        else{
+            if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == shared){
+                this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(writeMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+            }
+            else if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == modified){
+                this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(writeMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+                this->dataToMem.data = this->cache->read((_event.tag % DEFAULT_BlOCKS));
+                this->dataToMem.addr = _event.tag;
+                this->intNetw->pushDataMem(dataToMem); //WB
+            }
+
+        }
+    }
+}
 
 void CacheController::sendEvent(int paddress, bool ptype, std::string paction){
     this->event.tag = paddress;
