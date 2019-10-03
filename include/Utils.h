@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <cassert>
 #include <iostream>
+#include <vector>
+#include<string>
 
 /**
  * @brief Verify if NDEBUG flag is set, to use debug funtions
@@ -34,6 +36,17 @@ struct coordinate
 {
 	int x;
 	int y;
+};
+
+/**
+ * @brief Struct that represents a subprocess inside an ilet
+ * 
+ */
+struct subProcess
+{
+	bool state;
+	int puWork;
+	std::vector<std::string> code;
 };
 
 /**

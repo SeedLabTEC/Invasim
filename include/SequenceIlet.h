@@ -117,7 +117,8 @@ class SequenceIlet
 
 		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		static void *generate(void *obj);
-		std::vector<std::vector<std::vector<std::string>>> getBlocksCode();
+		std::vector<std::vector<std::vector<std::string>>> getBlocksCode(std::string programID);
+		std::vector<std::vector<std::vector<std::vector<std::string>>>> getPrograms();
 };
 
 #endif

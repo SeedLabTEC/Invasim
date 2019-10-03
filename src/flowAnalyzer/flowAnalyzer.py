@@ -2,6 +2,9 @@
 from xml.etree import ElementTree as ET
 import xml.dom.minidom
 import numpy as np
+from tkinter import filedialog
+from tkinter import *
+import os
 
 blocksRootFirstAnalisis = ET.Element('Blocks')  # root of blocks flow
 cutBlockValues = ["beq", "bnez", "bge", "blt", "j", "jr",
@@ -161,7 +164,7 @@ def createLogicFlow(readFile, writeFile):
 
         # search last instruction of block to break the while
         if(tempBlock[-1].tag != "intersection"):
-            print("Flow finished")
+            #print("Flow finished")
             break
         else:
             # if is necessary return to next block of called block
@@ -204,5 +207,17 @@ def createLogicFlow(readFile, writeFile):
     readyToProcess.close()
 
 
-crateBlocks("./codes/test.s", "./analyzerResults/blocks.xml")
-createLogicFlow("./analyzerResults/blocks.xml", "./analyzerResults/flow.xml")
+def main():
+    os.makedirs("./analyzerResults/blocks", exist_ok=True)
+    os.makedirs("./analyzerResults/flow", exist_ok=True)
+
+    root = Tk()
+    filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"),("all files","*.*")), multiple=True)
+
+    index = 0
+    for ele in filenames:
+        crateBlocks(ele, "./analyzerResults/blocks/blocks"+str(index)+".xml")
+        createLogicFlow("./analyzerResults/blocks/blocks"+str(index)+".xml", "./analyzerResults/flow/flow"+str(index)+".xml")
+        index = index+1
+
+main()

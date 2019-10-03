@@ -60,5 +60,13 @@ int Operation::get_parameter()
  */
 std::string Operation::get_codeOperation(int inst)
 {
-    return this->codeOperation[inst];
+    //std::cout << inst << std::endl;
+    if ((inst >= 0) && (inst < (int)this->codeOperation.size()))
+    {
+        return this->codeOperation[inst];
+    }
+    else
+    {
+        return "Nope";
+    }
 }

@@ -5,6 +5,9 @@
 #include <QMessageBox>
 #include "StartView.h"
 
+#include <QFileDialog>
+#include <QDir>
+
 SimulationDialog::SimulationDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SimulationDialog)
@@ -76,4 +79,13 @@ void SimulationDialog::on_buttonBox_clicked(QAbstractButton *button)
                         "Changes were not applied");
         }
     }
+}
+
+void SimulationDialog::on_pushButton_clicked()
+{
+    QString analysisPath = QDir::homePath();
+    QString filePath = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath());
+    QMessageBox::information(this, "..",filePath);
+    //QFile::copy(filePath, analysisPath);
+
 }

@@ -161,9 +161,8 @@ void *SequenceIlet::generate(void *obj)
     int go_block_ilets = -1;
     int go_block_ilets_count = 0;
 
-    std::vector<std::vector<std::vector<std::string>>> iletsCode = current->getBlocksCode();
-    
-
+    std::vector<std::vector<std::vector<std::string>>> iletsCode = current->getPrograms()[0];
+    std::cout << " herere " << std::endl;
     while (1)
     {
         //Await clock signal
@@ -176,12 +175,19 @@ void *SequenceIlet::generate(void *obj)
         {
             if (await_clocks_between_blocks == 0)
             {
-                go_block_ilets++; // go to next block of ilets
-                await_clocks_between_blocks = current->calcBlocks(iletsCode[go_block_ilets]);
-                iletsCount = iletsCode[go_block_ilets].size();
-                go_block_ilets_count = 0;
-
-                //std::cout << " go_block_ilets " << go_block_ilets << std::endl;
+                if (go_block_ilets < (int)iletsCode.size() - 1)
+                {
+                    go_block_ilets++; // go to next block of ilets
+                    await_clocks_between_blocks = current->calcBlocks(iletsCode[go_block_ilets]);
+                    iletsCount = iletsCode[go_block_ilets].size();
+                    go_block_ilets_count = 0;
+                }
+                else
+                {
+                    await_clocks_between_blocks = 0;
+                    iletsCount = 0;
+                    go_block_ilets_count = 0;
+                }
             }
             else
             {
@@ -189,9 +195,8 @@ void *SequenceIlet::generate(void *obj)
             }
 
             //Verify if max amount of iLet in manycore
-            if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount) )
+            if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount))
             {
-                //std::cout << " go_block_ilets_count " << go_block_ilets_count << std::endl;
                 //Create an iLet and invade in manycore
                 ILet *new_ilet = current->generate_ilet(i, iletsCode[go_block_ilets][go_block_ilets_count]); // change here
                 current->created_ilets.push_back(new_ilet);
@@ -216,10 +221,24 @@ void *SequenceIlet::generate(void *obj)
     return NULL;
 }
 
-std::vector<std::vector<std::vector<std::string>>> SequenceIlet::getBlocksCode()
+std::vector<std::vector<std::vector<std::vector<std::string>>>> SequenceIlet::getPrograms()
 {
+
+    std::vector<std::vector<std::vector<std::vector<std::string>>>> programs;
+
+    for (int i = 0; i < 2; ++i)
+    {
+        programs.push_back(getBlocksCode(std::to_string(i)));
+    }
+    return programs;
+}
+std::vector<std::vector<std::vector<std::string>>> SequenceIlet::getBlocksCode(std::string programID)
+{
+    //std::string programID = "0";
+    std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow/flow" + programID + ".xml";
+    const char *cstr = loadFlow.c_str();
     pugi::xml_document doc;
-    doc.load_file("/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow.xml");
+    doc.load_file(cstr);
     pugi::xml_node blocks = doc.child("Blocks");
     std::vector<std::vector<std::vector<std::string>>> iletsCode;
 
@@ -242,6 +261,7 @@ std::vector<std::vector<std::vector<std::string>>> SequenceIlet::getBlocksCode()
         }
         iletsCode.push_back(temporalBlock); // push the vector of charts to principal list
     }
+
     return iletsCode;
 }
 
@@ -254,7 +274,6 @@ int SequenceIlet::calcBlocks(std::vector<std::vector<std::string>> calcBlock)
     {
         total = total + calcBlock[i].size();
     }
-    //std::cout << " TOTAL FUNC" << total << std::endl;
 
     return total;
 }

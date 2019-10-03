@@ -168,7 +168,8 @@ void *ProcessingUnit::executing(void *obj)
 			pthread_mutex_lock(&current->pu_mutex);
 			if (current->current_load > 0)
 			{
-				std::cout << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_load - 1) << std::endl; // execute code
+				std::cout<<"ON ILET "<< current->iLet_ptr->get_id()<<" ON UNIT "<< current->get_coodinate().x << " "<< current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_load - 1) << std::endl; // execute code
+				
 				current->current_load--;
 			}
 			else
