@@ -26,7 +26,7 @@ Operation::Operation(Invasive_Operation _operation, int _parameter)
  * @param _parameter 
  * @param _codeOperation 
  */
-Operation::Operation(Invasive_Operation _operation, int _parameter, std::vector<std::string> _codeOperation)
+Operation::Operation(Invasive_Operation _operation, int _parameter, std::vector<subProcess> _codeOperation)
 {
     this->operation = _operation;
     this->parameter = _parameter;
@@ -58,12 +58,12 @@ int Operation::get_parameter()
  * 
  * @return std::string
  */
-std::string Operation::get_codeOperation(int inst)
+std::string Operation::get_codeOperation(int sub, int inst)
 {
     //std::cout << inst << std::endl;
-    if ((inst >= 0) && (inst < (int)this->codeOperation.size()))
+    if ((inst >= 0) && (inst < (int)this->codeOperation[sub].code.size()))
     {
-        return this->codeOperation[inst];
+        return this->codeOperation[sub].code[inst];
     }
     else
     {

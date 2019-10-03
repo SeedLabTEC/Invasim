@@ -109,7 +109,7 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
  * @param index 
  * @return ILet* 
  */
-ILet *SequenceIlet::generate_ilet(int index, std::vector<std::string> codeFlow)
+ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow)
 {
     //Generate a iLet according to the parameters
     ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability);
@@ -127,7 +127,7 @@ ILet *SequenceIlet::generate_ilet(int index, std::vector<std::string> codeFlow)
     //Store in info json
     JSON ilet_info = {
         {"Id", index},
-        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", load}, {"FirstInst", codeFlow[0]}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
+        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", load}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
     //Set data in pointer
     *this->ilets_info = ilet_info;
     //Set flag that an iLet has been created
@@ -152,26 +152,48 @@ void *SequenceIlet::generate(void *obj)
     //Counter to assign identifier
     int i = 0;
     //Assign await clocks for generation
-    int await_clocks = 0;
+    //int await_clocks = 0;
     //Assign await clocks for generation of blocks
-    int await_clocks_between_blocks = 0;
-    int iletsCount = 0; // temporal code where number of blocks == ilets
+    //int await_clocks_between_blocks = 0;
+    //int iletsCount = 0; // temporal code where number of blocks == ilets
 
     // to manipulate the ilets
-    int go_block_ilets = -1;
-    int go_block_ilets_count = 0;
+    //int go_block_ilets = -1;
+    //int go_block_ilets_count = 0;
 
-    std::vector<std::vector<std::vector<std::string>>> iletsCode = current->getPrograms()[0];
-    std::cout << " herere " << std::endl;
+    int clocks_control = 0;
+
+    std::vector<std::vector<std::vector<subProcess>>> iletsCode = current->getPrograms();
+    std::vector<int> ilets_clocks_control_by_program = current->allProgramsWork(iletsCode);
+
+    std::cout << " TO START " << std::endl;
+
     while (1)
     {
         //Await clock signal
         pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
 
+        for (int progCount = 0; progCount < (int)iletsCode.size(); progCount++) // run over programs
+        {
+            for (int iletsProgCount = 0; iletsProgCount < (int)iletsCode[progCount].size(); iletsProgCount++) // run over ilets on program separated by branch
+            {
+
+                if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (clocks_control))
+                {
+                    //Create an iLet and invade in manycore
+                    // ID: {prog, ilet, sub}
+                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][iletsProgCount]); // change here
+                    current->created_ilets.push_back(new_ilet);
+                    current->manycore_ptr->invade(new_ilet);
+                }
+            }
+        }
+        ++clocks_control;
+
         //std::cout << " await_clocks " << await_clocks << std::endl;
         //std::cout << " await_clocks_between_blocks " << await_clocks_between_blocks << std::endl;
         //Verify if there are no clocks to wait
-        if (await_clocks == 0)
+        /**if (await_clocks == 0)
         {
             if (await_clocks_between_blocks == 0)
             {
@@ -195,85 +217,117 @@ void *SequenceIlet::generate(void *obj)
             }
 
             //Verify if max amount of iLet in manycore
-            if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount))
+            //if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount) )
+            if ( (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) )
             {
                 //Create an iLet and invade in manycore
-                ILet *new_ilet = current->generate_ilet(i, iletsCode[go_block_ilets][go_block_ilets_count]); // change here
-                current->created_ilets.push_back(new_ilet);
-                current->manycore_ptr->invade(new_ilet);
+                //ILet *new_ilet = current->generate_ilet(i, iletsCode[go_block_ilets][go_block_ilets_count]); // change here
+                
+                //current->created_ilets.push_back(new_ilet);
+                //current->manycore_ptr->invade(new_ilet);
                 i++;
-                go_block_ilets_count++;
+                //go_block_ilets_count++;
 
                 //generate await clocks
                 await_clocks = rand() % (current->max_clocks + 1);
                 //std::cout << " INSIDE ADD " << await_clocks << std::endl;
                 // add the await clocks between two ilets
-                await_clocks_between_blocks = await_clocks_between_blocks + await_clocks;
+                //await_clocks_between_blocks = await_clocks_between_blocks + await_clocks;
             }
         }
         else
         {
             //Discount clock
             await_clocks--;
-            await_clocks_between_blocks--;
-        }
+            //await_clocks_between_blocks--;
+        }*/
     }
     return NULL;
 }
 
-std::vector<std::vector<std::vector<std::vector<std::string>>>> SequenceIlet::getPrograms()
+std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
 
-    std::vector<std::vector<std::vector<std::vector<std::string>>>> programs;
+    std::vector<std::vector<std::vector<subProcess>>> programs;
+    int quantity = 2;
 
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < quantity; ++i)
     {
         programs.push_back(getBlocksCode(std::to_string(i)));
     }
+
     return programs;
 }
-std::vector<std::vector<std::vector<std::string>>> SequenceIlet::getBlocksCode(std::string programID)
+std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string programID)
 {
-    //std::string programID = "0";
     std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow/flow" + programID + ".xml";
     const char *cstr = loadFlow.c_str();
     pugi::xml_document doc;
     doc.load_file(cstr);
     pugi::xml_node blocks = doc.child("Blocks");
-    std::vector<std::vector<std::vector<std::string>>> iletsCode;
+    std::vector<std::vector<subProcess>> iletsFromCode;
 
     for (pugi::xml_node block = blocks.first_child(); block; block = block.next_sibling()) // go over blocks
     {
-        std::vector<std::vector<std::string>> temporalBlock;
+        std::vector<subProcess> temporalBlock;
         for (pugi::xml_node ilet = block.first_child(); ilet; ilet = ilet.next_sibling()) // go over instructions of blocks
         {
-            std::vector<std::string> temporalIlet;
+            subProcess temporalSubCode;
+            std::vector<std::string> subCode;
             for (pugi::xml_node instruction = ilet.first_child(); instruction; instruction = instruction.next_sibling()) // go over instructions of blocks
             {
                 std::string nodeName = instruction.name();
                 if (nodeName == "instruction")
                 {
-                    temporalIlet.push_back((std::string)instruction.first_child().value()); // push instruction to temporal list
+                    std::string instStringPut = (std::string)instruction.first_child().value();
+                    subCode.push_back(instStringPut); // push instruction to temporal list
                 }
             }
-            std::reverse(std::begin(temporalIlet), std::end(temporalIlet)); // reverse because processing unit go back on instructions
-            temporalBlock.push_back(temporalIlet);
+            std::reverse(std::begin(subCode), std::end(subCode)); // reverse because processing unit go back on instructions
+
+            temporalSubCode.state = false;
+            temporalSubCode.puWork = subCode.size();
+            temporalSubCode.code = subCode;
+
+            temporalBlock.push_back(temporalSubCode);
         }
-        iletsCode.push_back(temporalBlock); // push the vector of charts to principal list
+
+        iletsFromCode.push_back(temporalBlock); // push the vector of charts to principal list
     }
 
-    return iletsCode;
+    return iletsFromCode;
 }
 
-int SequenceIlet::calcBlocks(std::vector<std::vector<std::string>> calcBlock)
+int SequenceIlet::calcWorkIlet(std::vector<subProcess> calcIlet)
 {
     int total = 0;
-    int onGo = calcBlock.size();
-
-    for (int i; i < onGo; ++i)
+    int onGo = calcIlet.size();
+    for (int i = 0; i < onGo; ++i)
     {
-        total = total + calcBlock[i].size();
+        total = total + calcIlet[i].code.size();
     }
+    
+    return total;
+}
 
+int SequenceIlet::calcWorkProgram(std::vector<std::vector<subProcess>> calcProgram)
+{
+    int total = 0;
+    int onGo = calcProgram.size();
+    for (int i = 0; i < onGo; ++i)
+    {
+        total = total + calcWorkIlet(calcProgram[i]);
+    }
+    return total;
+}
+
+std::vector<int> SequenceIlet::allProgramsWork(std::vector<std::vector<std::vector<subProcess>>> programs)
+{
+    std::vector<int> total;
+    int onGo = programs.size();
+    for (int i = 0; i < onGo; ++i)
+    {
+        total.push_back(calcWorkProgram(programs[i]));
+    }
     return total;
 }

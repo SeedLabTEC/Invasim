@@ -74,7 +74,7 @@ void ILet::add_operation(Invasive_Operation _operation, int _parameter)
  * @param _operation 
  * @param _parameter 
  */
-void ILet::add_operation(Invasive_Operation _operation, int _parameter, std::vector<std::string> _codeOperation)
+void ILet::add_operation(Invasive_Operation _operation, int _parameter, std::vector<subProcess> _codeOperation)
 {
 	Operation *tmp_op = new Operation(_operation, _parameter, _codeOperation);
 	this->pending_operations.push(tmp_op);

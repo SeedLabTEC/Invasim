@@ -43,13 +43,13 @@ class Operation
 		
 		//Operation::Operation(Invasive_Operation _operation, int _parameter);
 	
-		Operation(Invasive_Operation _operation, int _parameter, std::vector<std::string> _codeOperation);
+		Operation(Invasive_Operation _operation, int _parameter, std::vector<subProcess> _codeOperation);
 		
 		Invasive_Operation get_operation();
 
 		int get_parameter();
 
-		std::string get_codeOperation(int inst);
+		std::string get_codeOperation(int sub, int inst);
 
 	private:
 		/**
@@ -66,7 +66,7 @@ class Operation
 		 * @brief Parameter of all code of operation
 		 * 
 		 */
-		std::vector<std::string> codeOperation;
+		std::vector<subProcess> codeOperation;
 };
 
 #endif
