@@ -51,6 +51,8 @@ class Operation
 
 		std::string get_codeOperation(int sub, int inst);
 		std::vector<subProcess> get_subProcess();
+		void set_codeOperation(int sub, coordinate pu);
+		void reduce_WorkOfProcess(int sub);
 
 	private:
 		/**

@@ -22,6 +22,7 @@ ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
 	this->pu_coordenate.y = _y;
 	this->current_load = 0;
 	this->iLet_ptr = NULL;
+	this->current_used = -1;
 	this->clk_instance = _clk_instance;
 
 	//Memory features
@@ -75,6 +76,7 @@ void ProcessingUnit::retreat()
 	pthread_mutex_lock(&this->pu_mutex);
 	this->pu_state = FREE;
 	this->iLet_ptr = NULL;
+	this->current_used = -1;
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
@@ -201,6 +203,42 @@ void *ProcessingUnit::executing(void *obj)
 				current->pu_state = INVADED;
 			}
 			*/
+
+			if (current->current_used == -1)
+			{
+				for (int spi = 0; spi < (int)current->iLet_ptr->get_current_operation()->get_subProcess().size(); spi++)
+				{
+					if (!current->iLet_ptr->get_current_operation()->get_subProcess()[spi].state)
+					{
+						current->iLet_ptr->get_current_operation()->set_codeOperation(spi, current->get_coodinate());
+						current->current_used = spi;
+						break;
+					}
+					//std::cout << "sip " << spi << " " << current->iLet_ptr->get_current_operation()->get_subProcess()[spi].state << std::endl;
+				}
+			} else {
+				current->current_load = current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork;
+			}
+
+			if ( (current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork > 0) && (current->current_used !=-1) )
+			{
+				//std::cout << "current->current_load "<<current->current_load << std::endl; 
+				//std::cout << "current->current_used  "<<current->current_used << std::endl; 
+				std::cout << "ON ILET "<< current->iLet_ptr->get_id()<< " PROGRAM "<< current->iLet_ptr->get_program_id() << " PROCESS "<< current->current_used << " ON UNIT " << current->get_coodinate().x << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
+				current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
+				//std::cout<<"ON ILET "<< current->iLet_ptr->get_id()<<" ON UNIT "<< current->get_coodinate().x << std::endl;
+				current->current_load--;
+			}
+			else
+			{
+				//End execution
+				dprintf("PU = (%d, %d): Execution Done by ILet = %d.\n",
+						current->pu_coordenate.x,
+						current->pu_coordenate.y,
+						current->iLet_ptr->get_id());
+				current->pu_state = INVADED;
+			}
+			/**
 			if (current->current_load > 0)
 			{
 				std::cout << "ON ILET " << current->iLet_ptr->get_id() << " ON UNIT " << current->get_coodinate().x << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(0, current->current_load - 1) << std::endl; // execute code
@@ -215,7 +253,7 @@ void *ProcessingUnit::executing(void *obj)
 						current->pu_coordenate.y,
 						current->iLet_ptr->get_id());
 				current->pu_state = INVADED;
-			}
+			}*/
 			////////////////////////////////////////////////////////////////////////////////////////////////
 			pthread_mutex_unlock(&current->pu_mutex);
 			break;

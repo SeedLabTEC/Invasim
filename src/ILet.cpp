@@ -152,3 +152,13 @@ void ILet::set_state(State_ILet new_state)
 {
 	this->state = new_state;
 }
+
+/**
+ * @brief Gettter of iLet program
+ * 
+ * @return Id of program 
+ */
+int ILet::get_program_id()
+{
+	return this->id_program;
+}

@@ -80,3 +80,32 @@ std::vector<subProcess> Operation::get_subProcess()
 {
     return this->codeOperation;
 }
+
+/**
+ * @brief Setter for execution one instruction of code
+ * 
+ * @return void
+ */
+void Operation::set_codeOperation(int sub, coordinate pu)
+{
+    //std::cout << inst << std::endl;
+    if ((sub >= 0) && (sub < (int)this->codeOperation.size()))
+    {
+        this->codeOperation[sub].state = true;
+        this->codeOperation[sub].SPxPU = pu; 
+    }
+}
+
+/**
+ * @brief Setter reduce WorkLoad process
+ * 
+ * @return void
+ */
+void Operation::reduce_WorkOfProcess(int sub)
+{
+    //std::cout << inst << std::endl;
+    if ((sub >= 0) && (sub < (int)this->codeOperation.size()))
+    {
+        this->codeOperation[sub].puWork = this->codeOperation[sub].puWork-1;
+    }
+}

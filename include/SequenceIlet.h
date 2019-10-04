@@ -117,6 +117,7 @@ class SequenceIlet
 		int calcWorkProgram(std::vector<std::vector<subProcess>> calcProgram);
 		std::vector<int> allProgramsWork(std::vector<std::vector<std::vector<subProcess>>> programs);
 		int maxSubProcessWork(std::vector<subProcess>);
+		bool checkTerminated(int prog, std::vector<ILet *> iletsList);
 
 		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		static void *generate(void *obj);

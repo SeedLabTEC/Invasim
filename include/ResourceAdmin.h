@@ -38,6 +38,7 @@ class ResourceAdmin
 
 		JSON * monitoring();
 
+		std::vector<ILet *> get_invaded();
 	private:
 		pthread_t pu_exe_thread;
 		/**

@@ -67,6 +67,8 @@ class ILet
 		
 		void set_state(State_ILet new_state);
 
+		int get_program_id();
+
 	private:
 		/**
 		 * @brief Current operation of an iLet.

@@ -67,6 +67,11 @@ class ProcessingUnit
 	 */
 	int current_load;
 	/**
+	 * @brief Used
+	 * 
+	 */
+	int current_used;
+	/**
 	 * @brief Assigned iLet
 	 * 
 	 */

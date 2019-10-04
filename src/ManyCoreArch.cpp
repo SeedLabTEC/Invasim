@@ -139,3 +139,13 @@ void ManyCoreArch::init(int _x_dim, int _y_dim, Clock *_clk_instance)
     this->clk_instance = _clk_instance;
     this->ram = new RandomAccessMemory();
 }
+
+/**
+ * @brief Getter of list of ilets on invaded
+ * 
+ * @param obj 
+ * @return std::vector<ILet *>
+ */
+std::vector<ILet *> ManyCoreArch::get_invaded(){
+	return this->resource_manager->get_invaded();
+}

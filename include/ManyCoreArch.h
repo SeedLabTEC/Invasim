@@ -42,6 +42,8 @@ class ManyCoreArch
 		
 		JSON * monitoring();
 
+		std::vector<ILet *> get_invaded();
+
 	private:
 		/**
 		 * @brief x dimension of manycore architrecture.

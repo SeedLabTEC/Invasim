@@ -215,6 +215,20 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
 }
 
 /**
+ * @brief Getter of list of ilets on invaded
+ * 
+ * @param obj 
+ * @return std::vector<ILet *>
+ */
+std::vector<ILet *> ResourceAdmin::get_invaded(){
+	//std::cout << "lsReAd " << this->invaded_ilets.size() << std::endl;
+	//std::cout << "lsReAd " << this->execute_ilets.size() << std::endl;
+	
+	return this->execute_ilets;
+}
+
+
+/**
  * @brief Execution thread function that handles all requests with its resources
  * 
  * @param obj 
