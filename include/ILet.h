@@ -45,7 +45,7 @@ enum State_ILet
 class ILet 
 {
 	public: 
-		ILet(Type_ILet _type, int _id, float _decision_probability);
+		ILet(Type_ILet _type, int _id, float _decision_probability, int idProgram);
 		~ILet();
 
 		int get_id();
@@ -112,6 +112,11 @@ class ILet
 		 * 
 		 */
 		int id_ilet;
+		/**
+		 * @brief Program identifier.
+		 * 
+		 */
+		int id_program;
 };
 
 #endif

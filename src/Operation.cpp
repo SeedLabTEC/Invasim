@@ -70,3 +70,13 @@ std::string Operation::get_codeOperation(int sub, int inst)
         return "Nope";
     }
 }
+
+/**
+ * @brief Getter for subProcess
+ * 
+ * @return std::string
+ */
+std::vector<subProcess> Operation::get_subProcess()
+{
+    return this->codeOperation;
+}

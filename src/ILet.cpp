@@ -14,11 +14,12 @@
  * @param _id 
  * @param _decision_probability 
  */
-ILet::ILet(Type_ILet _type, int _id, float _decision_probability)
+ILet::ILet(Type_ILet _type, int _id, float _decision_probability, int _id_Program)
 {
 	this->type = _type;
 	this->state = WAITING;
 	this->id_ilet = _id;
+	this->id_program = _id_Program;
 	this->resources = new std::vector<coordinate>();
 	this->current_operation = NULL;
 	this->distribution = std::bernoulli_distribution(_decision_probability);

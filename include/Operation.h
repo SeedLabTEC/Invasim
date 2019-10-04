@@ -50,6 +50,7 @@ class Operation
 		int get_parameter();
 
 		std::string get_codeOperation(int sub, int inst);
+		std::vector<subProcess> get_subProcess();
 
 	private:
 		/**

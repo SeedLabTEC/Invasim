@@ -1,5 +1,3 @@
-
-
 <?xml version="1.0" encoding="UTF-8"?>
 <Blocks>
    <block id="main">
@@ -32,14 +30,14 @@
          <instruction>li	a5,2</instruction>
          <instruction>sw	a5,-32(s0)</instruction>
          <instruction>lw	a4,-20(s0)</instruction>
+      </ilet>
+      <ilet id="2">
          <instruction>lw	a5,-24(s0)</instruction>
          <instruction>mul	a4,a4,a5</instruction>
          <instruction>lw	a5,-28(s0)</instruction>
          <instruction>mul	a4,a4,a5</instruction>
          <instruction>lw	a5,-32(s0)</instruction>
          <instruction>mul	a5,a4,a5</instruction>
-      </ilet>
-      <ilet id="2">
          <instruction>mv	a0,a5</instruction>
          <instruction>lw	s0,28(sp)</instruction>
          <instruction>addi	sp,sp,32</instruction>
@@ -70,9 +68,9 @@
          <instruction>sw	a5,-28(s0)</instruction>
          <instruction>li	a5,0</instruction>
          <instruction>mv	a0,a5</instruction>
+         <instruction>lw	ra,28(sp)</instruction>
       </ilet>
       <ilet id="1">
-         <instruction>lw	ra,28(sp)</instruction>
          <instruction>lw	s0,24(sp)</instruction>
          <instruction>addi	sp,sp,32</instruction>
          <intersection>

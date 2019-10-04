@@ -109,17 +109,17 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
  * @param index 
  * @return ILet* 
  */
-ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow)
+ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog)
 {
     //Generate a iLet according to the parameters
-    ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability);
+    ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability, _id_Prog);
 
     // HERE WE NEED TO CHANGE THE
     int resources = rand() % (this->max_resources + 1) + 1;
     new_ilet->add_operation(INVADE, resources, codeFlow); // add operation invade
 
     //int load = rand() % (this->max_loads + 1) + 1;
-    int load = codeFlow.size();
+    int load = maxSubProcessWork(codeFlow);
     new_ilet->add_operation(INFECT, load, codeFlow); // add operation infect
 
     new_ilet->add_operation(RETREAT, 0, codeFlow); // add operation retreat
@@ -164,10 +164,17 @@ void *SequenceIlet::generate(void *obj)
     int clocks_control = 0;
 
     std::vector<std::vector<std::vector<subProcess>>> iletsCode = current->getPrograms();
-    std::vector<int> ilets_clocks_control_by_program = current->allProgramsWork(iletsCode);
+    std::vector<int> ilets_clocks_control_by_program; // to keep the control of ilet from program
+    std::vector<int> ilets_clocks_sum;                // to keep the control of ilet from program
+    ///////////////////EXPORT TO FUNCTIONS///////////////////////////////////
+    for (int p = 0; p < (int)iletsCode.size(); p++)
+    {
+        ilets_clocks_control_by_program.push_back(0);
+        ilets_clocks_sum.push_back(0);
+    }
+    //////////////////////////////////////////////////////
 
     std::cout << " TO START " << std::endl;
-
     while (1)
     {
         //Await clock signal
@@ -175,16 +182,28 @@ void *SequenceIlet::generate(void *obj)
 
         for (int progCount = 0; progCount < (int)iletsCode.size(); progCount++) // run over programs
         {
+
             for (int iletsProgCount = 0; iletsProgCount < (int)iletsCode[progCount].size(); iletsProgCount++) // run over ilets on program separated by branch
             {
 
-                if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (clocks_control))
+                if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (clocks_control > ilets_clocks_sum[progCount]) && (ilets_clocks_control_by_program[progCount] < (int)iletsCode[progCount].size()))
                 {
+                    std::cout << "################################################# " << progCount << " ##############################################################" << std::endl;
+                    std::cout << " ilets_clocks_control_by_program[progCount] " << ilets_clocks_control_by_program[progCount] << std::endl;
+                    std::cout << " ilets_clocks_sum[progCount] " << ilets_clocks_sum[progCount] << std::endl;
+                    std::cout << " i " << i << std::endl;
+                    std::cout << "###############################################################################################################" << std::endl;
+                    std::cout << " " << std::endl;
                     //Create an iLet and invade in manycore
                     // ID: {prog, ilet, sub}
-                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][iletsProgCount]); // change here
+                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][iletsProgCount], progCount); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
+
+                    ilets_clocks_control_by_program[progCount] = ilets_clocks_control_by_program[progCount] + 1;
+                    ilets_clocks_sum[progCount] = ilets_clocks_sum[progCount] + current->calcWorkIlet(iletsCode[progCount][iletsProgCount]);
+
+                    ++i;
                 }
             }
         }
@@ -288,6 +307,8 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             temporalSubCode.state = false;
             temporalSubCode.puWork = subCode.size();
             temporalSubCode.code = subCode;
+            temporalSubCode.SPxPU.x = 0;
+            temporalSubCode.SPxPU.y = 0;
 
             temporalBlock.push_back(temporalSubCode);
         }
@@ -306,7 +327,7 @@ int SequenceIlet::calcWorkIlet(std::vector<subProcess> calcIlet)
     {
         total = total + calcIlet[i].code.size();
     }
-    
+
     return total;
 }
 
@@ -330,4 +351,19 @@ std::vector<int> SequenceIlet::allProgramsWork(std::vector<std::vector<std::vect
         total.push_back(calcWorkProgram(programs[i]));
     }
     return total;
+}
+
+int SequenceIlet::maxSubProcessWork(std::vector<subProcess> prog)
+{
+    int max = 0;
+    int onGo = prog.size();
+    for (int i = 0; i < onGo; ++i)
+    {
+        if (max <= (int)prog[i].code.size())
+        {
+            max = prog[i].code.size();
+        }
+    }
+
+    return max;
 }

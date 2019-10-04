@@ -112,10 +112,11 @@ class SequenceIlet
 		 */
 		bool ilet_check = false;
 
-		ILet * generate_ilet(int index, std::vector<subProcess> codeFlow);
+		ILet * generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog);
 		int calcWorkIlet(std::vector<subProcess> calcIlet);
 		int calcWorkProgram(std::vector<std::vector<subProcess>> calcProgram);
 		std::vector<int> allProgramsWork(std::vector<std::vector<std::vector<subProcess>>> programs);
+		int maxSubProcessWork(std::vector<subProcess>);
 
 		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		static void *generate(void *obj);

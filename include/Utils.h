@@ -45,6 +45,7 @@ struct coordinate
 struct subProcess
 {
 	bool state;
+	coordinate SPxPU;
 	int puWork;
 	std::vector<std::string> code;
 };
