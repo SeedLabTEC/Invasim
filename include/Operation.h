@@ -41,7 +41,7 @@ class Operation
 {
 	public: 
 		
-		//Operation::Operation(Invasive_Operation _operation, int _parameter);
+		Operation(Invasive_Operation _operation, int _parameter);
 	
 		Operation(Invasive_Operation _operation, int _parameter, std::vector<subProcess> _codeOperation);
 		

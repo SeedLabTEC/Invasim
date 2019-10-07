@@ -132,21 +132,21 @@ void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resour
 	{
 		for (int j = 0; j < this->y_dim; j++)
 		{
-            if(this->pu_array_ptr[i][j]->get_state() == FREE)
-            {
+			if (this->pu_array_ptr[i][j]->get_state() == FREE)
+			{
 				//When a resource is found it the coordinate is assigned
-                coordinate new_pu = this->pu_array_ptr[i][j]->get_coodinate();
-                //Vector thta has to be filled with coodinates
+				coordinate new_pu = this->pu_array_ptr[i][j]->get_coodinate();
+				//Vector thta has to be filled with coodinates
 				resources->push_back(new_pu);
-                this->pu_array_ptr[i][j]->invade(ilet);
-                invaded_resources++;
+				this->pu_array_ptr[i][j]->invade(ilet);
+				invaded_resources++;
 				//Finish when assignment is done
-                if (invaded_resources == resources_amount)
-                {
-                    found = true;
-                    break;
-                }
-            }
+				if (invaded_resources == resources_amount)
+				{
+					found = true;
+					break;
+				}
+			}
 		}
 		if (found)
 		{
@@ -205,12 +205,23 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
 	{
 		coordinate position = ilet->get_resources()->at(i);
 		//If a processing unit is infected the iLet is not done
+
 		if (this->pu_array_ptr[position.x][position.y]->get_state() == INFECTED)
 		{
 			is_done = false;
 			break;
 		}
 	}
+
+	for (int spi = 0; spi < (int)ilet->get_current_operation()->get_subProcess().size(); spi++)
+	{
+		if (!ilet->get_current_operation()->get_subProcess()[spi].state)
+		{
+			is_done = false;
+			break;
+		}
+	}
+
 	return is_done;
 }
 
@@ -220,13 +231,13 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
  * @param obj 
  * @return std::vector<ILet *>
  */
-std::vector<ILet *> ResourceAdmin::get_invaded(){
+std::vector<ILet *> ResourceAdmin::get_invaded()
+{
 	//std::cout << "lsReAd " << this->invaded_ilets.size() << std::endl;
 	//std::cout << "lsReAd " << this->execute_ilets.size() << std::endl;
-	
+
 	return this->execute_ilets;
 }
-
 
 /**
  * @brief Execution thread function that handles all requests with its resources
@@ -247,7 +258,7 @@ void *ResourceAdmin::managing(void *obj)
 		//Await to clock signal
 		pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
 		dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump().c_str());
-		
+
 		ILet *current_ilet = NULL;
 
 		//Verify if there is any incomming iLet
@@ -313,7 +324,7 @@ void *ResourceAdmin::managing(void *obj)
 					{
 						dprintf("ResourceAdmin: Ilet = %d to be terminated.\n", current_ilet->get_id());
 						current_ilet->set_state(DONE);
-					}//If not terminated verify if it is done
+					} //If not terminated verify if it is done
 					else if (current_ilet->get_current_operation()->get_operation() == INFECT)
 					{
 						bool is_done = current->verify_ilet(current_ilet);
@@ -321,6 +332,19 @@ void *ResourceAdmin::managing(void *obj)
 						{
 							dprintf("ResourceAdmin: Ilet = %d is done.\n", current_ilet->get_id());
 							current_ilet->set_state(DONE);
+						}
+						else // free units with completation subprocess
+						{
+							for (int spi = 0; spi < (int)current_ilet->get_current_operation()->get_subProcess().size(); spi++)
+							{
+								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork == 0))
+								{
+									current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
+									coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;
+									current->pu_array_ptr[position.x][position.y]->retreat();
+									current->available += 1;
+								}
+							}
 						}
 					}
 				}
@@ -342,7 +366,7 @@ void *ResourceAdmin::managing(void *obj)
 						if (current_ilet->get_current_operation()->get_operation() == RETREAT)
 						{
 							current_ilet->set_state(DONE);
-						}//If operation is invade then is has to be queued
+						} //If operation is invade then is has to be queued
 						else if (current_ilet->get_current_operation()->get_operation() == INVADE)
 						{
 							current_ilet->set_state(WAITING);
@@ -363,7 +387,7 @@ void *ResourceAdmin::managing(void *obj)
 				}
 			}
 		}
-		
+
 		//Verify if there are iLet that has to invade
 		if (current->invaded_ilets.size() > 0)
 		{
@@ -387,7 +411,6 @@ void *ResourceAdmin::managing(void *obj)
 				}
 			}
 		}
-		
 	}
 	return NULL;
 }

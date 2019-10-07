@@ -13,6 +13,7 @@
  * @param _type 
  * @param _id 
  * @param _decision_probability 
+ * @param _id_Program 
  */
 ILet::ILet(Type_ILet _type, int _id, float _decision_probability, int _id_Program)
 {
@@ -62,12 +63,12 @@ int ILet::get_id()
  * 
  * @param _operation 
  * @param _parameter 
- 
+ */
 void ILet::add_operation(Invasive_Operation _operation, int _parameter)
 {
 	Operation *tmp_op = new Operation(_operation, _parameter);
 	this->pending_operations.push(tmp_op);
-}*/
+}
 
 /**
  * @brief Add operation in iLet

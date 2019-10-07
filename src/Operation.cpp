@@ -12,12 +12,13 @@
  * 
  * @param _operation 
  * @param _parameter 
- 
+ */
+
 Operation::Operation(Invasive_Operation _operation, int _parameter)
 {
     this->operation = _operation;
     this->parameter = _parameter;
-}*/
+}
 
 /**
  * @brief Construct a new Operation:: Operation object

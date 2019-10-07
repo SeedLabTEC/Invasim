@@ -116,13 +116,13 @@ ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, i
 
     // HERE WE NEED TO CHANGE THE
     int resources = rand() % (this->max_resources + 1) + 1;
-    new_ilet->add_operation(INVADE, resources, codeFlow); // add operation invade
+    new_ilet->add_operation(INVADE, resources); // add operation invade
 
-    int load = rand() % (this->max_loads + 1) + 1;
-    //int load = maxSubProcessWork(codeFlow);
+    //int load = rand() % (this->max_loads + 1) + 1;
+    int load = codeFlow.size();
     new_ilet->add_operation(INFECT, load, codeFlow); // add operation infect
 
-    new_ilet->add_operation(RETREAT, 0, codeFlow); // add operation retreat
+    new_ilet->add_operation(RETREAT, 0); // add operation retreat
 
     //Store in info json
     JSON ilet_info = {
@@ -151,26 +151,14 @@ void *SequenceIlet::generate(void *obj)
     pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
     //Counter to assign identifier
     int i = 0;
-    //Assign await clocks for generation
-    //int await_clocks = 0;
-    //Assign await clocks for generation of blocks
-    //int await_clocks_between_blocks = 0;
-    //int iletsCount = 0; // temporal code where number of blocks == ilets
-
-    // to manipulate the ilets
-    //int go_block_ilets = -1;
-    //int go_block_ilets_count = 0;
-
     int clocks_control = 0;
 
     std::vector<std::vector<std::vector<subProcess>>> iletsCode = current->getPrograms();
-    std::vector<int> ilets_clocks_control_by_program; // to keep the control of ilet from program
-    std::vector<int> ilets_clocks_sum;                // to keep the control of ilet from program
+    std::vector<int> ilets_control_sum; // to keep the control of ilet from program
     ///////////////////EXPORT TO FUNCTIONS///////////////////////////////////
     for (int p = 0; p < (int)iletsCode.size(); p++)
     {
-        ilets_clocks_control_by_program.push_back(0);
-        ilets_clocks_sum.push_back(0);
+        ilets_control_sum.push_back(0);
     }
 
     //////////////////////////////////////////////////////
@@ -187,82 +175,25 @@ void *SequenceIlet::generate(void *obj)
             //std::cout << "!!! " << current->checkTerminated(progCount, current->manycore_ptr->get_invaded()) << " !!!" << std::endl;
             for (int iletsProgCount = 0; iletsProgCount < (int)iletsCode[progCount].size(); iletsProgCount++) // run over ilets on program separated by branch
             {
-
-                //if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (clocks_control > ilets_clocks_sum[progCount]) && (ilets_clocks_control_by_program[progCount] < (int)iletsCode[progCount].size()) )
-                if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (clocks_control > ilets_clocks_sum[progCount]) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded()) ) )
+                if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
                 {
                     /**std::cout << "################################################# " << progCount << " ##############################################################" << std::endl;
-                    std::cout << " ilets_clocks_control_by_program[progCount] " << ilets_clocks_control_by_program[progCount] << std::endl;
-                    std::cout << " ilets_clocks_sum[progCount] " << ilets_clocks_sum[progCount] << std::endl;
+                    std::cout << " ilets_clocks_sum[progCount] " << ilets_control_sum[progCount] << std::endl;
                     std::cout << " i " << i << std::endl;
                     std::cout << "###############################################################################################################" << std::endl;
                     std::cout << " " << std::endl;*/
+
                     //Create an iLet and invade in manycore
-                    // ID: {prog, ilet, sub}
-                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][iletsProgCount], progCount); // change here
+                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
+                    ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
 
-                    ilets_clocks_control_by_program[progCount] = ilets_clocks_control_by_program[progCount] + 1;
-                    ilets_clocks_sum[progCount] = ilets_clocks_sum[progCount] + current->calcWorkIlet(iletsCode[progCount][iletsProgCount]);
-                    //ilets_clocks_sum[progCount] = ilets_clocks_sum[progCount] + current->maxSubProcessWork(iletsCode[progCount][iletsProgCount]);
                     ++i;
                 }
             }
         }
         ++clocks_control;
-
-        //std::cout << " await_clocks " << await_clocks << std::endl;
-        //std::cout << " await_clocks_between_blocks " << await_clocks_between_blocks << std::endl;
-        //Verify if there are no clocks to wait
-        /**if (await_clocks == 0)
-        {
-            if (await_clocks_between_blocks == 0)
-            {
-                if (go_block_ilets < (int)iletsCode.size() - 1)
-                {
-                    go_block_ilets++; // go to next block of ilets
-                    await_clocks_between_blocks = current->calcBlocks(iletsCode[go_block_ilets]);
-                    iletsCount = iletsCode[go_block_ilets].size();
-                    go_block_ilets_count = 0;
-                }
-                else
-                {
-                    await_clocks_between_blocks = 0;
-                    iletsCount = 0;
-                    go_block_ilets_count = 0;
-                }
-            }
-            else
-            {
-                await_clocks_between_blocks--;
-            }
-
-            //Verify if max amount of iLet in manycore
-            //if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (go_block_ilets_count < iletsCount) )
-            if ( (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) )
-            {
-                //Create an iLet and invade in manycore
-                //ILet *new_ilet = current->generate_ilet(i, iletsCode[go_block_ilets][go_block_ilets_count]); // change here
-                
-                //current->created_ilets.push_back(new_ilet);
-                //current->manycore_ptr->invade(new_ilet);
-                i++;
-                //go_block_ilets_count++;
-
-                //generate await clocks
-                await_clocks = rand() % (current->max_clocks + 1);
-                //std::cout << " INSIDE ADD " << await_clocks << std::endl;
-                // add the await clocks between two ilets
-                //await_clocks_between_blocks = await_clocks_between_blocks + await_clocks;
-            }
-        }
-        else
-        {
-            //Discount clock
-            await_clocks--;
-            //await_clocks_between_blocks--;
-        }*/
     }
     return NULL;
 }
