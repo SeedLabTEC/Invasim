@@ -69,6 +69,8 @@ class ILet
 
 		int get_program_id();
 
+		void pop_one_resource(coordinate popPU);
+
 	private:
 		/**
 		 * @brief Current operation of an iLet.

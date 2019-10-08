@@ -99,7 +99,8 @@ void ILet::pop_operation()
  */
 int ILet::execute_operation()
 {
-	int is_exe = this->distribution(this->generator);
+	//int is_exe = this->distribution(this->generator);
+	int is_exe = 1;
 	return is_exe;
 }
 
@@ -162,4 +163,22 @@ void ILet::set_state(State_ILet new_state)
 int ILet::get_program_id()
 {
 	return this->id_program;
+}
+
+/**
+ * @brief Pop an specific resourse
+ * 
+ * @return void
+ */
+void ILet::pop_one_resource(coordinate popPU)
+{
+	for (int i = 0; i < (int)(*this->resources).size(); i++)
+	{
+		coordinate it = (*this->resources)[i];
+		if ((it.x == popPU.x) && (it.y == popPU.y))
+		{
+			(*this->resources).erase((*this->resources).begin() + i);
+			break;
+		}
+	}
 }

@@ -188,8 +188,8 @@ void *SequenceIlet::generate(void *obj)
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
-
                     ++i;
+                    break;
                 }
             }
         }

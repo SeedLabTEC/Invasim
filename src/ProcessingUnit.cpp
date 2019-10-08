@@ -170,7 +170,7 @@ void *ProcessingUnit::executing(void *obj)
 			pthread_mutex_lock(&current->pu_mutex);
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			if (current->current_used == -1)
+			if ( (current->current_used == -1) )
 			{
 				for (int spi = 0; spi < (int)current->iLet_ptr->get_current_operation()->get_subProcess().size(); spi++)
 				{
@@ -205,7 +205,7 @@ void *ProcessingUnit::executing(void *obj)
 						current->pu_coordenate.y,
 						current->iLet_ptr->get_id());
 				current->pu_state = INVADED;
-				std::cout << (int)current->iLet_ptr->get_current_operation()->get_subProcess().size() << " ON FINISHED ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_program_id() << " PROCESS " << current->current_used << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
+				//std::cout << (int)current->iLet_ptr->get_current_operation()->get_subProcess().size() << " ON FINISHED ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_program_id() << " PROCESS " << current->current_used << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load << std::endl; // execute code
 																																																																																																																							 // set finished
 			}
 

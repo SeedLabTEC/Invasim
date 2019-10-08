@@ -110,3 +110,17 @@ void Operation::reduce_WorkOfProcess(int sub)
         this->codeOperation[sub].puWork = this->codeOperation[sub].puWork-1;
     }
 }
+
+/**
+ * @brief Getter state by PU
+ * 
+ * @return std::string
+ 
+std::vector<subProcess> Operation::get_stateByPU(coordinate PU)
+{
+    int 
+    for(){
+
+    }
+    return this->codeOperation;
+}*/

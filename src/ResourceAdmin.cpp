@@ -199,8 +199,10 @@ void ResourceAdmin::retreat(ILet *ilet)
 bool ResourceAdmin::verify_ilet(ILet *ilet)
 {
 	bool is_done = true;
+
 	unsigned int resources = ilet->get_resources()->size();
 	//Iterate resources in iLet
+
 	for (unsigned int i = 0; i < resources; i++)
 	{
 		coordinate position = ilet->get_resources()->at(i);
@@ -212,12 +214,14 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
 			break;
 		}
 	}
+	//std::cout << " VALUE HERE "<< is_done << std::endl;
 
 	for (int spi = 0; spi < (int)ilet->get_current_operation()->get_subProcess().size(); spi++)
 	{
 		if (!ilet->get_current_operation()->get_subProcess()[spi].state)
 		{
 			is_done = false;
+			//std::cout << " VALUE FALSE HERE "<< is_done << std::endl;
 			break;
 		}
 	}
@@ -331,9 +335,10 @@ void *ResourceAdmin::managing(void *obj)
 						if (is_done)
 						{
 							dprintf("ResourceAdmin: Ilet = %d is done.\n", current_ilet->get_id());
+							std::cout << "DONE ILET " << current_ilet->get_id() << std::endl;
 							current_ilet->set_state(DONE);
 						}
-						else // free units with completation subprocess
+						else // free units with completation subprocess and infect if is neccesary
 						{
 							for (int spi = 0; spi < (int)current_ilet->get_current_operation()->get_subProcess().size(); spi++)
 							{
@@ -341,10 +346,16 @@ void *ResourceAdmin::managing(void *obj)
 								{
 									current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
 									coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;
+									//current_ilet->pop_one_resource(position); // pop resurce
 									current->pu_array_ptr[position.x][position.y]->retreat();
-									current->available += 1;
+									//current->available += 1;
+
+									current->pu_array_ptr[position.x][position.y]->invade(current_ilet);
+									current->pu_array_ptr[position.x][position.y]->infect();
 								}
 							}
+
+							//current->invade(1, current_ilet->get_resources(), current_ilet);
 						}
 					}
 				}
