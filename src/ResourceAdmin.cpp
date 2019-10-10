@@ -239,8 +239,20 @@ std::vector<ILet *> ResourceAdmin::get_invaded()
 {
 	//std::cout << "lsReAd " << this->invaded_ilets.size() << std::endl;
 	//std::cout << "lsReAd " << this->execute_ilets.size() << std::endl;
+	//a.insert(a.end(), b.begin(), b.end());
 
-	return this->execute_ilets;
+	std::queue<ILet *> qc = this->incomming_ilets;
+	std::vector<ILet *> r;
+
+	for (int q = 0; q < (int)this->incomming_ilets.size(); q++)
+	{
+		r.push_back(qc.front());
+		qc.pop();
+	}
+
+	r.insert(r.end(), this->execute_ilets.begin(), this->execute_ilets.end());
+
+	return r;
 }
 
 /**

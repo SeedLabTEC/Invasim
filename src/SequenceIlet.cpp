@@ -180,6 +180,7 @@ void *SequenceIlet::generate(void *obj)
                     /**std::cout << "################################################# " << progCount << " ##############################################################" << std::endl;
                     std::cout << " ilets_clocks_sum[progCount] " << ilets_control_sum[progCount] << std::endl;
                     std::cout << " i " << i << std::endl;
+                    std::cout << "checkTerminated " << current->checkTerminated(progCount, current->manycore_ptr->get_invaded()) << std::endl;
                     std::cout << "###############################################################################################################" << std::endl;
                     std::cout << " " << std::endl;*/
 
