@@ -45,7 +45,7 @@ enum State_ILet
 class ILet 
 {
 	public: 
-		ILet(Type_ILet _type, int _id, float _decision_probability, int idProgram);
+		ILet(Type_ILet _type, int _id, float _decision_probability, int idProgram, int priority_ilet);
 		~ILet();
 
 		int get_id();
@@ -67,7 +67,8 @@ class ILet
 		
 		void set_state(State_ILet new_state);
 
-		int get_program_id();
+		int get_id_program();
+		int get_priority();
 
 		void pop_one_resource(coordinate popPU);
 
@@ -121,6 +122,11 @@ class ILet
 		 * 
 		 */
 		int id_program;
+		/**
+		 * @brief ilet priority
+		 * 
+		 */
+		int priority_ilet;
 };
 
 #endif

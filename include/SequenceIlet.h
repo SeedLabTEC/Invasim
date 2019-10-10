@@ -112,15 +112,10 @@ class SequenceIlet
 		 */
 		bool ilet_check = false;
 
-		ILet * generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog);
-		int calcWorkIlet(std::vector<subProcess> calcIlet);
-		int calcWorkProgram(std::vector<std::vector<subProcess>> calcProgram);
-		std::vector<int> allProgramsWork(std::vector<std::vector<std::vector<subProcess>>> programs);
-		int maxSubProcessWork(std::vector<subProcess>);
-		bool checkTerminated(int prog, std::vector<ILet *> iletsList);
-
+		ILet * generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog, int _priority);
 		void init(Clock * _clk_instance, ManyCoreArch * _manycore_ptr, float _decision_probability, int _seed);
 		static void *generate(void *obj);
+		bool checkTerminated(int prog, std::vector<ILet *> iletsList);
 		std::vector<std::vector<subProcess>> getBlocksCode(std::string programID);
 		std::vector<std::vector<std::vector<subProcess>>> getPrograms();
 };

@@ -256,6 +256,17 @@ std::vector<ILet *> ResourceAdmin::get_invaded()
 }
 
 /**
+ * @brief Create a variable priority for one ilet
+ * 
+ * @param iletID ID of ilet if we want to keep a control 
+ * @param programID ID of program if we want to keep a control 
+ * @return int Between 0-4
+ */
+int ResourceAdmin::getPriority(int iletID, int programID)
+{
+	return (rand() % 4);
+}
+/**
  * @brief Execution thread function that handles all requests with its resources
  * 
  * @param obj 

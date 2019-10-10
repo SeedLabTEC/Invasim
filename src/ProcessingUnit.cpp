@@ -190,12 +190,11 @@ void *ProcessingUnit::executing(void *obj)
 
 			if ((current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork >= 0) && (current->current_used != -1))
 			{
-				//std::cout << "current->current_load "<<current->current_load << std::endl;
-				//std::cout << "current->current_used  "<<current->current_used << std::endl;
-				//std::cout << (int)current->iLet_ptr->get_current_operation()->get_subProcess().size() << " ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_program_id() << " PROCESS " << current->current_used << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
-				std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_program_id() << " PROCESS " << current->current_used << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
+				std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
 				current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
-				//std::cout<<"ON ILET "<< current->iLet_ptr->get_id()<<" ON UNIT "<< current->get_coodinate().x << std::endl;
+
+				
+
 				current->current_load--;
 			}
 			else

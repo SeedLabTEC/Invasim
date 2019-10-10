@@ -39,6 +39,8 @@ class ResourceAdmin
 		JSON * monitoring();
 
 		std::vector<ILet *> get_invaded();
+		int getPriority(int iletID, int programID);
+		
 	private:
 		pthread_t pu_exe_thread;
 		/**

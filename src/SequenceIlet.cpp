@@ -109,10 +109,10 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
  * @param index 
  * @return ILet* 
  */
-ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog)
+ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog, int _priority)
 {
     //Generate a iLet according to the parameters
-    ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability, _id_Prog);
+    ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability, _id_Prog, _priority);
 
     // HERE WE NEED TO CHANGE THE
     int resources = rand() % (this->max_resources + 1) + 1;
@@ -185,7 +185,7 @@ void *SequenceIlet::generate(void *obj)
                     std::cout << " " << std::endl;*/
 
                     //Create an iLet and invade in manycore
-                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount); // change here
+                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount)); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
@@ -254,54 +254,6 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
     return iletsFromCode;
 }
 
-int SequenceIlet::calcWorkIlet(std::vector<subProcess> calcIlet)
-{
-    int total = 0;
-    int onGo = calcIlet.size();
-    for (int i = 0; i < onGo; ++i)
-    {
-        total = total + calcIlet[i].code.size();
-    }
-
-    return total;
-}
-
-int SequenceIlet::calcWorkProgram(std::vector<std::vector<subProcess>> calcProgram)
-{
-    int total = 0;
-    int onGo = calcProgram.size();
-    for (int i = 0; i < onGo; ++i)
-    {
-        total = total + calcWorkIlet(calcProgram[i]);
-    }
-    return total;
-}
-
-std::vector<int> SequenceIlet::allProgramsWork(std::vector<std::vector<std::vector<subProcess>>> programs)
-{
-    std::vector<int> total;
-    int onGo = programs.size();
-    for (int i = 0; i < onGo; ++i)
-    {
-        total.push_back(calcWorkProgram(programs[i]));
-    }
-    return total;
-}
-
-int SequenceIlet::maxSubProcessWork(std::vector<subProcess> prog)
-{
-    int max = 0;
-    int onGo = prog.size();
-    for (int i = 0; i < onGo; ++i)
-    {
-        if (max <= (int)prog[i].code.size())
-        {
-            max = prog[i].code.size();
-        }
-    }
-
-    return max;
-}
 
 bool SequenceIlet::checkTerminated(int prog, std::vector<ILet *> iletsList)
 {
@@ -309,7 +261,7 @@ bool SequenceIlet::checkTerminated(int prog, std::vector<ILet *> iletsList)
     //std::cout << "lsSeq " << goOn << std::endl;
     for (int i = 0; i < goOn; i++)
     {
-        if (prog == iletsList[i]->get_program_id())
+        if (prog == iletsList[i]->get_id_program())
         {
             return true;
         }

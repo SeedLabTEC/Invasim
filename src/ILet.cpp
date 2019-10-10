@@ -15,12 +15,13 @@
  * @param _decision_probability 
  * @param _id_Program 
  */
-ILet::ILet(Type_ILet _type, int _id, float _decision_probability, int _id_Program)
+ILet::ILet(Type_ILet _type, int _id, float _decision_probability, int _id_Program, int _priority_ilet)
 {
 	this->type = _type;
 	this->state = WAITING;
 	this->id_ilet = _id;
 	this->id_program = _id_Program;
+	this->priority_ilet = _priority_ilet;
 	this->resources = new std::vector<coordinate>();
 	this->current_operation = NULL;
 	this->distribution = std::bernoulli_distribution(_decision_probability);
@@ -56,6 +57,17 @@ ILet::~ILet()
 int ILet::get_id()
 {
 	return this->id_ilet;
+}
+
+
+/**
+ * @brief Priority getter
+ * 
+ * @return int 
+ */
+int ILet::get_priority()
+{
+	return this->priority_ilet;
 }
 
 /**
@@ -160,7 +172,7 @@ void ILet::set_state(State_ILet new_state)
  * 
  * @return Id of program 
  */
-int ILet::get_program_id()
+int ILet::get_id_program()
 {
 	return this->id_program;
 }

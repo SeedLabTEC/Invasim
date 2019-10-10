@@ -149,3 +149,15 @@ void ManyCoreArch::init(int _x_dim, int _y_dim, Clock *_clk_instance)
 std::vector<ILet *> ManyCoreArch::get_invaded(){
 	return this->resource_manager->get_invaded();
 }
+
+/**
+ * @brief Request a variable priority for one ilet
+ * 
+ * @param iletID ID of ilet if we want to keep a control 
+ * @param programID ID of program if we want to keep a control 
+ * @return int Between 0-4
+ */
+int ManyCoreArch::getPriority(int iletID, int programID)
+{
+	return this->resource_manager->getPriority(iletID, programID);
+}

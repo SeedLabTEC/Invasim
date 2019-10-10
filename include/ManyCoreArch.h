@@ -43,6 +43,7 @@ class ManyCoreArch
 		JSON * monitoring();
 
 		std::vector<ILet *> get_invaded();
+		int getPriority(int iletID, int programID);
 
 	private:
 		/**
