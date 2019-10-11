@@ -201,21 +201,24 @@ void *SequenceIlet::generate(void *obj)
 
 std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
-
     std::vector<std::vector<std::vector<subProcess>>> programs;
-    int quantity = 2;
+    std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
 
-    for (int i = 0; i < quantity; ++i)
+    //programs.push_back(getBlocksCode(std::to_string(i)));
+    std::ifstream file(loadFlow);
+    std::string str;
+    while (std::getline(file, str))
     {
-        programs.push_back(getBlocksCode(std::to_string(i)));
+        std::cout << str << std::endl;
+        programs.push_back(getBlocksCode(str));
     }
 
     return programs;
 }
-std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string programID)
+std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string program)
 {
-    std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow/flow" + programID + ".xml";
-    const char *cstr = loadFlow.c_str();
+    //std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow/flow" + programID + ".xml";
+    const char *cstr = program.c_str();
     pugi::xml_document doc;
     doc.load_file(cstr);
     pugi::xml_node blocks = doc.child("Blocks");
@@ -253,7 +256,6 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
 
     return iletsFromCode;
 }
-
 
 bool SequenceIlet::checkTerminated(int prog, std::vector<ILet *> iletsList)
 {
