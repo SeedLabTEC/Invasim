@@ -209,7 +209,6 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
     std::string str;
     while (std::getline(file, str))
     {
-        std::cout << str << std::endl;
         programs.push_back(getBlocksCode(str));
     }
 

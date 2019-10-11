@@ -190,7 +190,7 @@ void *ProcessingUnit::executing(void *obj)
 
 			if ((current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork >= 0) && (current->current_used != -1))
 			{
-				//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
+				std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
 
 				std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
 

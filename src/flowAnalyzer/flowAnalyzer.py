@@ -236,11 +236,18 @@ def main():
 
     index = 0
     files = ["/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s", "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s"]
+    readyToProcess = open("./src/flowAnalyzer/analyzerResults/files.txt", "w+")
+    
     for ele in files:
-        #print(ele)
+        readyToProcess.write(ele+"\n")
+
         crateBlocks(ele, "./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index)+".xml")
         createLogicFlow("./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index)+".xml", "./src/flowAnalyzer/analyzerResults/flow/flow"+str(index)+".xml")
         index = index+1
         blocksRootFirstAnalisis = ET.Element('Blocks') # new
+
+        
+    
+    readyToProcess.close()
 
 main()
