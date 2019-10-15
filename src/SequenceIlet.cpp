@@ -203,12 +203,13 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
     std::vector<std::vector<std::vector<subProcess>>> programs;
     std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
-
+    
     //programs.push_back(getBlocksCode(std::to_string(i)));
     std::ifstream file(loadFlow);
     std::string str;
     while (std::getline(file, str))
     {
+        std::cout<< str << std::endl;
         programs.push_back(getBlocksCode(str));
     }
 

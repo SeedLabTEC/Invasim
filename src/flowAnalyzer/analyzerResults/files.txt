@@ -1,2 +1,2 @@
-/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s
-/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s
+/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow/flow0.xml
+/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow/flow1.xml

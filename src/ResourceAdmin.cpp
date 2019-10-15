@@ -365,7 +365,7 @@ void *ResourceAdmin::managing(void *obj)
 						{
 							for (int spi = 0; spi < (int)current_ilet->get_current_operation()->get_subProcess().size(); spi++)
 							{
-								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork == 0))
+								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork <= 0))
 								{
 									current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
 									coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;

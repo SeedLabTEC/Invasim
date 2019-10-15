@@ -30,7 +30,7 @@
 			<instruction>blt	a4,a5,.L3</instruction>
 			<condition1>.L3</condition1>
 			<condition2>19</condition2>
-			<probability>1</probability>
+			<probability>0</probability>
 		</intersection>
 	</block>
 	<block id="Line21">

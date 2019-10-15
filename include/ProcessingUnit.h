@@ -83,6 +83,12 @@ class ProcessingUnit
 	 */
 	Clock *clk_instance;
 
+	/**
+	 * @brief Registers instance
+	 * 
+	 */
+	JSON registers;
+
 	static void *executing(void *obj);
 };
 
