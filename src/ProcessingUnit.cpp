@@ -25,11 +25,7 @@ ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
 	this->current_used = -1;
 	this->clk_instance = _clk_instance;
 	// full registers
-	this->registers = {{"zero", 0}, {"ra", 0}, {"sp", 2}, {"gp", 0}, {"tp", 0}, {"t0", 0}, {"t1", 0}, {"t2", 0},
-						{"s0", 0}, {"fp", 0}, 
-						{"s1", 0}, {"a0", 0}, {"a1", 0}, {"a2", 0}, {"a3", 0}, {"a4", 0}, {"a5", 0}, {"a6", 0}, {"a7", 0},
-						{"s2", 0}, {"s3", 0}, {"s4", 0}, {"s5", 0}, {"s6", 0}, {"s7", 0}, {"s8", 0}, {"s9", 0}, {"s10", 0}, {"s11", 0},
-						{"t3", 0}, {"t4", 0}, {"t5", 0}, {"t6", 0}};
+	this->registers = {{"zero", 0}, {"ra", 0}, {"sp", 0}, {"gp", 0}, {"tp", 0}, {"t0", 0}, {"t1", 0}, {"t2", 0}, {"s0", 0}, {"fp", 0}, {"s1", 0}, {"a0", 0}, {"a1", 0}, {"a2", 0}, {"a3", 0}, {"a4", 0}, {"a5", 0}, {"a6", 0}, {"a7", 0}, {"s2", 0}, {"s3", 0}, {"s4", 0}, {"s5", 0}, {"s6", 0}, {"s7", 0}, {"s8", 0}, {"s9", 0}, {"s10", 0}, {"s11", 0}, {"t3", 0}, {"t4", 0}, {"t5", 0}, {"t6", 0}};
 
 	//Memory features
 	this->cache_mem = new CacheMemory(this->pu_coordenate.x, this->pu_coordenate.y);
@@ -196,42 +192,61 @@ void *ProcessingUnit::executing(void *obj)
 
 			if ((current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork >= 0) && (current->current_used != -1))
 			{
-				//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
-				std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
-				//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " INST " << inst << std::endl;
-				// Parse the operations
-				//std::cout << "register " << current->registers["sp"] << std::endl;
-				if (inst.find("addi") != std::string::npos)
+				try
 				{
-					std::cout << "ADD" << std::endl;
-				}
-				else if (inst.find("sw") != std::string::npos)
-				{ // sw
-					std::cout << "SW" << std::endl;
-				}
-				else if (inst.find("lw") != std::string::npos)
-				{ // lw
-					std::cout << "LW" << std::endl;
-				}
-				else if (inst.find("li") != std::string::npos)
-				{ // li
-					std::cout << "LI" << std::endl;
-				}
-				else if (inst.find("mv") != std::string::npos)
-				{ // mv
-					std::cout << "MV" << std::endl;
-				}
-				else if (inst.find("mul") != std::string::npos)
-				{ // mul
-					std::cout << "MUL" << std::endl;
-				}
-				else
-				{
-					std::cout << "DONT KNOW" << std::endl;
-				}
+					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
+					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
+					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " INST " << inst << std::endl;
+					// Parse the operations
+					//std::cout << "register " << current->registers["sp"] << std::endl;
 
-				current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
-				current->current_load--;
+					std::stringstream ss(inst);
+					std::string token;
+					std::vector<std::string> process;
+					while (getline(ss, token, ','))
+					{
+						process.push_back(token);
+					}
+
+					if (process[0] == "addi")
+					{
+						//std::cout << "Keep on register the add " << process[1] << " the value of " << ((int)current->registers[process[2]] + std::stoi(process[3])) << std::endl;
+						current->registers[process[1]] = ((int)current->registers[process[2]] + std::stoi(process[3]));
+					}
+					else if (process[0] == "sw")
+					{ // sw
+						//std::cout << "Save the register " << process[1] << " the address " << (std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]) << std::endl; // zero,-24(s0)
+						current->cache_mem->writeData((std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]), current->registers[process[1]], current->iLet_ptr->get_priority());
+					}
+					else if (process[0] == "lw")
+					{ // lw
+						//std::cout << "Load to the register " << process[1] << " the address " << (std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]) << std::endl; // zero,-24(s0)
+						current->registers[process[1]] = current->cache_mem->readData((std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]), current->iLet_ptr->get_priority());
+					}
+					else if (process[0] == "li")
+					{ // li
+						current->registers[process[1]] = std::stoi(process[2]);
+					}
+					else if (process[0] == "mv")
+					{ // mv
+						current->registers[process[1]] = current->registers[process[2]];
+					}
+					else if (process[0] == "mul")
+					{ // mul
+						current->registers[process[1]] = ((int)current->registers[process[2]] * (int)current->registers[process[3]]);
+					}
+					else
+					{
+						std::cout << "DONT KNOW " << process[0] << std::endl;
+					}
+
+					current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
+					current->current_load--;
+				}
+				catch (std::exception &e)
+				{
+					std::cout << " a standard exception was caught, with message '" << e.what() << "'\n";
+				}
 			}
 			else
 			{

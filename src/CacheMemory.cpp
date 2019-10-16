@@ -20,3 +20,13 @@ CacheMemory::CacheMemory(int _x, int _y)
     this->blocks = NULL;
     this->clk_intance = NULL;
 }
+
+int CacheMemory::readData(int address, int priority)
+{
+    //std::cout << "READ MEMORY ON ADDRESS " << address << " PRIORITY " << priority << std::endl;
+    return 2;
+}
+void CacheMemory::writeData(int address, int data, int priority)
+{
+    //std::cout << "WRITE TO MEMORY ON ADDRESS " << address << " VALUE OF " << data << " PRIORITY " << priority << std::endl;
+}

@@ -10,7 +10,7 @@
 
 #include <pthread.h>
 #include "Utils.h"
-
+#include <sstream>
 #include "json.hpp"
 using JSON = nlohmann::json;
 

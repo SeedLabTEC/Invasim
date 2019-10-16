@@ -32,6 +32,9 @@ class CacheMemory
 	public: 
 		CacheMemory(int _x, int _y);
 
+		int readData(int address, int priority);
+		void writeData(int address, int data, int priority);
+
 	private:
 		/**
 		 * @brief Coordinate of cache
