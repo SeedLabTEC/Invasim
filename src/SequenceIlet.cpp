@@ -115,7 +115,8 @@ ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, i
     ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability, _id_Prog, _priority);
 
     // HERE WE NEED TO CHANGE THE
-    int resources = rand() % (this->max_resources + 1) + 1;
+    //int resources = rand() % (this->max_resources + 1) + 1;
+    int resources = 1;
     new_ilet->add_operation(INVADE, resources); // add operation invade
 
     //int load = rand() % (this->max_loads + 1) + 1;
@@ -171,18 +172,10 @@ void *SequenceIlet::generate(void *obj)
 
         for (int progCount = 0; progCount < (int)iletsCode.size(); progCount++) // run over programs
         {
-            //bool newIlet = current->checkTerminated(progCount, current->manycore_ptr->get_invaded());
-            //std::cout << "!!! " << current->checkTerminated(progCount, current->manycore_ptr->get_invaded()) << " !!!" << std::endl;
             for (int iletsProgCount = 0; iletsProgCount < (int)iletsCode[progCount].size(); iletsProgCount++) // run over ilets on program separated by branch
             {
                 if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
                 {
-                    /**std::cout << "################################################# " << progCount << " ##############################################################" << std::endl;
-                    std::cout << " ilets_clocks_sum[progCount] " << ilets_control_sum[progCount] << std::endl;
-                    std::cout << " i " << i << std::endl;
-                    std::cout << "checkTerminated " << current->checkTerminated(progCount, current->manycore_ptr->get_invaded()) << std::endl;
-                    std::cout << "###############################################################################################################" << std::endl;
-                    std::cout << " " << std::endl;*/
 
                     //Create an iLet and invade in manycore
                     ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount)); // change here
@@ -191,6 +184,12 @@ void *SequenceIlet::generate(void *obj)
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
                     ++i;
                     break;
+                }
+
+                if ((ilets_control_sum[progCount] == (int)iletsCode[progCount].size()))
+                {
+                    std::cout << "progCount " << progCount << " current->clk_instance->get_cycle() " << current->clk_instance->get_cycle() << std::endl;
+                    ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
                 }
             }
         }
@@ -203,7 +202,7 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
     std::vector<std::vector<std::vector<subProcess>>> programs;
     std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
-    
+
     //programs.push_back(getBlocksCode(std::to_string(i)));
     std::ifstream file(loadFlow);
     std::string str;
@@ -217,7 +216,6 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 }
 std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string program)
 {
-    //std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/flow/flow" + programID + ".xml";
     const char *cstr = program.c_str();
     pugi::xml_document doc;
     doc.load_file(cstr);

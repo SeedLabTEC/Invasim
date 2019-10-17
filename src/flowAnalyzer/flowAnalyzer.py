@@ -7,16 +7,35 @@ from xml.etree import ElementTree as ET
 import xml.dom.minidom
 import numpy as np
 
-blocksRootFirstAnalisis = ET.Element('Blocks')  # root of blocks flow
 cutBlockValues = ["beq", "bnez", "bge", "blt", "j", "jr",
                   "jal", "jalr", "call"]  # BNEZ-J-JR-JAL-JALR-EBREAK
 
 
-def dependenciesSearch():
-    print("Deps")
+def dependenciesSearch(instructionList):
+    posInst = 0
+    returnListDivided = []
+    tempList = []
+    for val in instructionList:
+        temp = val.split()
+
+        nextVal = instructionList[posInst+1].split()
+        temp[1] = temp[1].replace("(", ",").replace(")", "")
+        print(temp)
+
+        if(len(temp[1].split(",")) == 1):
+        
+        if(len(temp[1].split(",")) == 2):
+        
+        if(len(temp[1].split(",")) == 3):
 
 
-def blocksCreation(instructionList, idBlock, actualLine):
+        posInst = posInst + 1
+
+
+def blocksCreation(blocksRootFirstAnalisis, instructionList, idBlock, actualLine):
+
+    dependenciesSearch(instructionList)
+
     block = ET.SubElement(blocksRootFirstAnalisis, "block")
     block.set("id", idBlock)
 
@@ -52,12 +71,15 @@ def blocksCreation(instructionList, idBlock, actualLine):
                 condition2.text = str(actualLine)
                 probability.text = str(1)
         else:
+            instDo = val.split()
             instruction = ET.SubElement(block, "instruction")
-            instruction.text = val
+
+            instruction.text = instDo[0]+","+instDo[1]
         posInst = posInst + 1
 
 
 def crateBlocks(readFile, writeFile):
+    blocksRootFirstAnalisis = ET.Element('Blocks')  # root of blocks flow
     readLine = 0
     f = open(readFile, "r+")
     line = f.readline()
@@ -74,9 +96,10 @@ def crateBlocks(readFile, writeFile):
 
                 # Logic of block ID to save on flow
                 if(blocksID != ""):
-                    blocksCreation(temporalBlock, blocksID, readLine)
+                    blocksCreation(blocksRootFirstAnalisis,
+                                   temporalBlock, blocksID, readLine)
                 else:
-                    blocksCreation(temporalBlock, "Line" +
+                    blocksCreation(blocksRootFirstAnalisis, temporalBlock, "Line" +
                                    str(readLine-blockLines+1), readLine)
 
                 # clear variables
@@ -88,9 +111,10 @@ def crateBlocks(readFile, writeFile):
 
                 if(temporalBlock != []):
                     if(blocksID != ""):
-                        blocksCreation(temporalBlock, blocksID, readLine)
+                        blocksCreation(blocksRootFirstAnalisis,
+                                       temporalBlock, blocksID, readLine)
                     else:
-                        blocksCreation(temporalBlock, "Line" +
+                        blocksCreation(blocksRootFirstAnalisis, temporalBlock, "Line" +
                                        str(readLine-blockLines+1), readLine)
 
                 blocksID = line.replace(":", "").rstrip()
@@ -107,7 +131,8 @@ def crateBlocks(readFile, writeFile):
         line = f.readline()  # next line
 
     if(temporalBlock != []):
-        blocksCreation(temporalBlock, "EndBlock", readLine)
+        blocksCreation(blocksRootFirstAnalisis,
+                       temporalBlock, "EndBlock", readLine)
         # clear variables
         blockLines = 0
         temporalBlock = []
@@ -119,6 +144,7 @@ def crateBlocks(readFile, writeFile):
 
     fw.close()
     f.close()
+    print("\n")
 
 # Get position of name tag on xml
 
@@ -151,8 +177,8 @@ def checkPendingBlocks(blocks):
 
 
 def createLogicFlow(readFile, writeFile):
-    print(readFile)
-    print(writeFile)
+    # print(readFile)
+    # print(writeFile)
     tree = ET.parse(readFile)  # get xml from file
     root = tree.getroot()  # create the object
 
@@ -171,11 +197,12 @@ def createLogicFlow(readFile, writeFile):
         onFlowListBlocks[findIdOnXml(root, tempBlock.get("id"))][1] = 1
         # main is the firts block that we read
         orderFlowBlocks.append(tempBlock)
-        #print(tempBlock.get("id"))
+        # print(tempBlock.get("id"))
         # search last instruction of block to break the while
         if(tempBlock[-1].tag != "intersection"):
-            if(checkPendingBlocks(onFlowListBlocks) != -1): # check if finished all or there are something pending
-                #print("Pending")
+            # check if finished all or there are something pending
+            if(checkPendingBlocks(onFlowListBlocks) != -1):
+                # print("Pending")
                 tempBlock = root[checkPendingBlocks(onFlowListBlocks)]
             else:
                 #print("Break flow")
@@ -193,7 +220,7 @@ def createLogicFlow(readFile, writeFile):
 
                 # change intersection value to known
                 #orderFlowBlocks[-1][-1][1].text = tempBlock.get("id")
-                #print(orderFlowBlocks[-1][-1][1].text)
+                # print(orderFlowBlocks[-1][-1][1].text)
             else:
                 instDo = tempBlock[-1][0].text.split()
                 if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge")):
@@ -219,8 +246,7 @@ def createLogicFlow(readFile, writeFile):
     stringReadyKeep = ""
     for bl in orderFlowBlocks:
         stringReadyKeep = stringReadyKeep + ET.tostring(bl, encoding='unicode')
-    print(stringReadyKeep)
-    print("\n")
+
     readyToProcess = open(writeFile, "w+")
     stringReadyKeep = "<?xml version='1.0' ?>\n<Blocks>\n"+stringReadyKeep+"\n</Blocks>"
     readyToProcess.write(stringReadyKeep)
@@ -235,19 +261,21 @@ def main():
     #filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"),("all files","*.*")), multiple=True)
 
     index = 0
-    files = ["/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s", "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s"]
+    files = [
+        "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s"]
+
     readyToProcess = open("./src/flowAnalyzer/analyzerResults/files.txt", "w+")
-    
+
     for ele in files:
-        readyToProcess.write(ele+"\n")
-
-        crateBlocks(ele, "./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index)+".xml")
-        createLogicFlow("./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index)+".xml", "./src/flowAnalyzer/analyzerResults/flow/flow"+str(index)+".xml")
+        readyToProcess.write(os.path.dirname(os.path.realpath(
+            __file__)) + "/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
+        crateBlocks(
+            ele, "./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index)+".xml")
+        createLogicFlow("./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index) +
+                        ".xml", "./src/flowAnalyzer/analyzerResults/flow/flow"+str(index)+".xml")
         index = index+1
-        blocksRootFirstAnalisis = ET.Element('Blocks') # new
 
-        
-    
     readyToProcess.close()
+
 
 main()
