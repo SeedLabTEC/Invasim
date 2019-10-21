@@ -2,7 +2,7 @@
 from tkinter import filedialog
 from tkinter import *
 import os
-#from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+# from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.etree import ElementTree as ET
 import xml.dom.minidom
 import numpy as np
@@ -17,65 +17,123 @@ def dependenciesSearch(instructionList):
     tempList = []
     for val in instructionList:
         temp = val.split()
+        if(posInst+1 < len(instructionList)):
+            nextVal = instructionList[posInst+1].split()[1]
+            nextVal = nextVal.replace("(", ",").replace(")", "")
+            nextVal = nextVal.split(',')
+            temp[1] = temp[1].replace("(", ",").replace(")", "")
+            tempList.append(val)
 
-        nextVal = instructionList[posInst+1].split()
-        temp[1] = temp[1].replace("(", ",").replace(")", "")
-        print(temp)
+            checkReg = temp[1].split(",")
+            if((temp[0] == 'sw') and (temp[0] == instructionList[posInst+1].split()[0])):
+                returnListDivided.append(tempList)
+                tempList = []
+            elif((temp[0] == 'lw') and (temp[0] == instructionList[posInst+1].split()[0])):
+                returnListDivided.append(tempList)
+                tempList = []
+            else:
+                if((temp[0] == 'sw') and (instructionList[posInst+1].split()[0] == 'lw')):
+                    returnListDivided.append(tempList)
+                    tempList = []
 
-        if(len(temp[1].split(",")) == 1):
-        
-        if(len(temp[1].split(",")) == 2):
-        
-        if(len(temp[1].split(",")) == 3):
+                if(len(checkReg) == 1):
+                    print('here1')
 
+                if(len(checkReg) == 2):
+
+                    if(len(nextVal) == 3):
+                        if((checkReg[0] != nextVal[0]) and (checkReg[0] != nextVal[1]) and (checkReg[0] != nextVal[2])):
+                            returnListDivided.append(tempList)
+                            tempList = []
+
+                    elif(len(nextVal) == 2):
+                        if((checkReg[0] != nextVal[0]) and (checkReg[0] != nextVal[1])):
+                            returnListDivided.append(tempList)
+                            tempList = []
+                    else:
+                        print("Finish?")
+
+                if(len(checkReg) == 3):
+                    if(len(nextVal) == 3):
+
+                        if((checkReg[0] != nextVal[0]) and (checkReg[0] != nextVal[1]) and (checkReg[0] != nextVal[2])):
+                            returnListDivided.append(tempList)
+                            tempList = []
+
+                    elif(len(nextVal) == 2):
+
+                        if((checkReg[0] != nextVal[0]) and (checkReg[0] != nextVal[1])):
+                            returnListDivided.append(tempList)
+                            tempList = []
+                    else:
+                        tempList.append(instructionList[posInst+1])
+                        returnListDivided.append(tempList)
+                        tempList = []
+        else:
+            tempList.append(val)
+            tempList = []
 
         posInst = posInst + 1
 
+    if(len(tempList) != 0):
+        returnListDivided.append(tempList)
+        tempList = []
 
-def blocksCreation(blocksRootFirstAnalisis, instructionList, idBlock, actualLine):
+    return returnListDivided
 
-    dependenciesSearch(instructionList)
+
+def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLine):
+    print('\n')
+    subprocess = dependenciesSearch(instructionListIn)
 
     block = ET.SubElement(blocksRootFirstAnalisis, "block")
     block.set("id", idBlock)
+    indexSub = 0
+    for instructionList in subprocess:
 
-    posInst = 0
-    for val in instructionList:
-        if((posInst == len(instructionList)-1) and (val.split()[0] in cutBlockValues)):
-            instDo = val.split()
-            # create xml objects
-            intersection = ET.SubElement(block, "intersection")
-            instruction = ET.SubElement(intersection, "instruction")
-            condition1 = ET.SubElement(intersection, "condition1")
-            condition2 = ET.SubElement(intersection, "condition2")
-            probability = ET.SubElement(intersection, "probability")
+        subIlet = ET.SubElement(block, "subp")
+        subIlet.set("id", str(indexSub))
+        posInst = 0
+        for val in instructionList:
+            if((posInst == len(instructionList)-1) and (val.split()[0] in cutBlockValues)):
+                instDo = val.split()
+                # create xml objects
+                intersection = ET.SubElement(subIlet, "intersection")
+                instruction = ET.SubElement(intersection, "instruction")
+                condition1 = ET.SubElement(intersection, "condition1")
+                condition2 = ET.SubElement(intersection, "condition2")
+                probability = ET.SubElement(intersection, "probability")
 
-            instruction.text = val  # set instruction
+                instruction.text = val  # set instruction
 
-            if(instDo[0] == "call"):
-                condition1.text = instDo[1]
-                condition2.text = str(actualLine)
-                probability.text = str(1)
-                # jr	ra
-            elif(instDo[0] == "jr"):
-                condition1.text = "N/A"
-                condition2.text = str(actualLine)
-                probability.text = str(1)
-            elif((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
-                condition1.text = instDo[-1].split(",")[-1]
-                condition2.text = str(actualLine)
-                probability.text = str(np.random.binomial(1, 0.5, 1)[0])
+                if(instDo[0] == "call"):
+                    condition1.text = instDo[1]
+                    condition2.text = str(actualLine)
+                    probability.text = str(1)
+                    # jr	ra
+                elif(instDo[0] == "jr"):
+                    condition1.text = "N/A"
+                    condition2.text = str(actualLine)
+                    probability.text = str(1)
+                elif((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
+                    condition1.text = instDo[-1].split(",")[-1]
+                    condition2.text = str(actualLine)
+                    probability.text = str(np.random.binomial(1, 0.5, 1)[0])
+                else:
+                    # condition1.text = "N/A"
+                    condition1.text = instDo[1]
+                    condition2.text = str(actualLine)
+                    probability.text = str(1)
             else:
-                #condition1.text = "N/A"
-                condition1.text = instDo[1]
-                condition2.text = str(actualLine)
-                probability.text = str(1)
-        else:
-            instDo = val.split()
-            instruction = ET.SubElement(block, "instruction")
+                instDo = val.split()
+                instruction = ET.SubElement(subIlet, "instruction")
 
-            instruction.text = instDo[0]+","+instDo[1]
-        posInst = posInst + 1
+                instruction.text = instDo[0]+","+instDo[1]
+            posInst = posInst + 1
+
+        indexSub = indexSub + 1
+        show = xml.dom.minidom.parseString(ET.tostring(block)).toprettyxml()
+        print(show)
 
 
 def crateBlocks(readFile, writeFile):
@@ -205,13 +263,15 @@ def createLogicFlow(readFile, writeFile):
                 # print("Pending")
                 tempBlock = root[checkPendingBlocks(onFlowListBlocks)]
             else:
-                #print("Break flow")
+                # print("Break flow")
                 break
         else:
             # if is necessary return to next block of called block
             if(tempBlock[-1][1].text == "N/A"):
                 # get the next block of which where was called
-                if(tempBlock.get("id") != "main"):
+                if((findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1) < len(root)):
+                    break
+                if((tempBlock.get("id") != "main")):
                     tempBlock = root[findIdOnXml(
                         root, orderFlowBlocks[-2].get("id"))+1]
                 else:
@@ -219,17 +279,17 @@ def createLogicFlow(readFile, writeFile):
                         root, tempBlock[-1][0].text.split()[-1])]
 
                 # change intersection value to known
-                #orderFlowBlocks[-1][-1][1].text = tempBlock.get("id")
+                # orderFlowBlocks[-1][-1][1].text = tempBlock.get("id")
                 # print(orderFlowBlocks[-1][-1][1].text)
             else:
                 instDo = tempBlock[-1][0].text.split()
-                if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge")):
+                if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
                     # change intersection value to known
                     orderFlowBlocks[-1][-1][2].text = root[findIdOnXml(
                         root, orderFlowBlocks[-1].get("id"))+1].get("id")
 
                     if(tempBlock[-1][-1].text == "1"):  # if the branch is taken
-                        #print("take branch")
+                        # print("take branch")
                         tempBlock = root[findIdOnXml(
                             root, tempBlock[-1][1].text)]  # next block
                     else:
@@ -257,12 +317,13 @@ def main():
     os.makedirs("./src/flowAnalyzer/analyzerResults/blocks", exist_ok=True)
     os.makedirs("./src/flowAnalyzer/analyzerResults/flow", exist_ok=True)
 
-    #root = Tk()
-    #filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"),("all files","*.*")), multiple=True)
+    # root = Tk()
+    # filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"),("all files","*.*")), multiple=True)
 
     index = 0
     files = [
-        "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s"]
+        "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s",
+        "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s"]
 
     readyToProcess = open("./src/flowAnalyzer/analyzerResults/files.txt", "w+")
 

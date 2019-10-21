@@ -1,48 +1,56 @@
 <?xml version="1.0" ?>
 <Blocks>
 	<block id="main">
-		<instruction>addi,sp,sp,-32</instruction>
-		<instruction>sw,s0,28(sp)</instruction>
-		<instruction>addi,s0,sp,32</instruction>
-		<instruction>li,a5,100</instruction>
-		<instruction>sw,a5,-28(s0)</instruction>
-		<instruction>sw,zero,-20(s0)</instruction>
-		<instruction>sw,zero,-24(s0)</instruction>
-		<intersection>
-			<instruction>j	.L2</instruction>
-			<condition1>.L2</condition1>
-			<condition2>8</condition2>
-			<probability>1</probability>
-		</intersection>
+		<subp id="0">
+			<instruction>addi,sp,sp,-32</instruction>
+			<instruction>sw,s0,28(sp)</instruction>
+			<instruction>addi,s0,sp,32</instruction>
+		</subp>
+		<subp id="1">
+			<instruction>li,a5,100</instruction>
+			<instruction>sw,a5,-28(s0)</instruction>
+		</subp>
+		<subp id="2">
+			<instruction>sw,zero,-20(s0)</instruction>
+		</subp>
+		<subp id="3">
+			<instruction>sw,zero,-24(s0)</instruction>
+			<intersection>
+				<instruction>j	.L2</instruction>
+				<condition1>.L2</condition1>
+				<condition2>8</condition2>
+				<probability>1</probability>
+			</intersection>
+		</subp>
 	</block>
 	<block id=".L3">
-		<instruction>lw,a5,-20(s0)</instruction>
-		<instruction>addi,a5,a5,1</instruction>
-		<instruction>sw,a5,-20(s0)</instruction>
-		<instruction>lw,a5,-24(s0)</instruction>
-		<instruction>addi,a5,a5,1</instruction>
-		<instruction>sw,a5,-24(s0)</instruction>
+		<subp id="0">
+			<instruction>lw,a5,-20(s0)</instruction>
+			<instruction>addi,a5,a5,1</instruction>
+			<instruction>sw,a5,-20(s0)</instruction>
+		</subp>
 	</block>
 	<block id=".L2">
-		<instruction>lw,a4,-24(s0)</instruction>
-		<instruction>lw,a5,-28(s0)</instruction>
-		<intersection>
-			<instruction>blt	a4,a5,.L3</instruction>
-			<condition1>.L3</condition1>
-			<condition2>19</condition2>
-			<probability>1</probability>
-		</intersection>
+		<subp id="0">
+			<instruction>lw,a4,-24(s0)</instruction>
+		</subp>
 	</block>
 	<block id="Line21">
-		<instruction>li,a5,0</instruction>
-		<instruction>mv,a0,a5</instruction>
-		<instruction>lw,s0,28(sp)</instruction>
-		<instruction>addi,sp,sp,32</instruction>
-		<intersection>
-			<instruction>jr	ra</instruction>
-			<condition1>N/A</condition1>
-			<condition2>24</condition2>
-			<probability>1</probability>
-		</intersection>
+		<subp id="0">
+			<instruction>li,a5,0</instruction>
+			<instruction>mv,a0,a5</instruction>
+		</subp>
+		<subp id="1">
+			<instruction>lw,s0,28(sp)</instruction>
+		</subp>
+		<subp id="2">
+			<instruction>addi,sp,sp,32</instruction>
+			<intersection>
+				<instruction>jr	ra</instruction>
+				<condition1>N/A</condition1>
+				<condition2>24</condition2>
+				<probability>1</probability>
+			</intersection>
+		</subp>
 	</block>
 </Blocks>

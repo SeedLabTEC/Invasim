@@ -197,9 +197,7 @@ void *ProcessingUnit::executing(void *obj)
 					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
 					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
 					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " INST " << inst << std::endl;
-					// Parse the operations
-					//std::cout << "register " << current->registers["sp"] << std::endl;
-
+					std::cout<< inst << std::endl;
 					std::stringstream ss(inst);
 					std::string token;
 					std::vector<std::string> process;
@@ -210,17 +208,14 @@ void *ProcessingUnit::executing(void *obj)
 
 					if (process[0] == "addi")
 					{
-						//std::cout << "Keep on register the add " << process[1] << " the value of " << ((int)current->registers[process[2]] + std::stoi(process[3])) << std::endl;
 						current->registers[process[1]] = ((int)current->registers[process[2]] + std::stoi(process[3]));
 					}
 					else if (process[0] == "sw")
 					{ // sw
-						//std::cout << "Save the register " << process[1] << " the address " << (std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]) << std::endl; // zero,-24(s0)
 						current->cache_mem->writeData((std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]), current->registers[process[1]], current->iLet_ptr->get_priority());
 					}
 					else if (process[0] == "lw")
 					{ // lw
-						//std::cout << "Load to the register " << process[1] << " the address " << (std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]) << std::endl; // zero,-24(s0)
 						current->registers[process[1]] = current->cache_mem->readData((std::stoi(process[2].substr(0, process[2].find("("))) + (int)current->registers[process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]), current->iLet_ptr->get_priority());
 					}
 					else if (process[0] == "li")
@@ -241,7 +236,9 @@ void *ProcessingUnit::executing(void *obj)
 					}
 
 					current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
+					
 					current->current_load--;
+					
 				}
 				catch (std::exception &e)
 				{
