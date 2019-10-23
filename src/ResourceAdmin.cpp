@@ -367,6 +367,7 @@ void *ResourceAdmin::managing(void *obj)
 							{
 								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork <= 0))
 								{
+									//std::cout << " AQUI " << spi << std::endl;
 									current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
 									coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;
 									//current_ilet->pop_one_resource(position); // pop resurce

@@ -197,7 +197,7 @@ void *ProcessingUnit::executing(void *obj)
 					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
 					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
 					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " INST " << inst << std::endl;
-					std::cout<< inst << std::endl;
+					//std::cout<< inst << std::endl;
 					std::stringstream ss(inst);
 					std::string token;
 					std::vector<std::string> process;

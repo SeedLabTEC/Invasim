@@ -10,6 +10,62 @@ cutBlockValues = ["beq", "bnez", "bge", "blt", "j", "jr",
                   "jal", "jalr", "call"]  # BNEZ-J-JR-JAL-JALR-EBREAK
 
 
+def findRegOnList(reg1, listIn):  # check the use of the register on the other subprocess
+    indexList = []
+    index = -1
+    
+    for listInDep in listIn: # check in every list
+        index = index+1
+        for elInst in listInDep: # check every instuction
+            if(not elInst.split()[0] in cutBlockValues): # check if isn't a intersection 
+                if(reg1 in elInst): # check if is in instruction
+                    indexList.append(index)
+                    break
+        
+    return indexList
+
+
+def dependenciesSearchDeep(listIn):
+    restartW = True
+    while(restartW):
+        restartF = False
+        posRev = 0
+        for subList in listIn:
+            for inst in subList:
+                reg = inst.split()[1].split(",")
+                if(len(reg) >= 2):
+                    # anything that could change register
+                    if(("addi" in inst) or ("li" in inst) or ("mv" in inst) or ("lw" in inst) or ("mul" in inst)):
+                        # go to search other blocks
+                        #print("Found "+inst)
+                        res = findRegOnList(reg[0], listIn)
+                        #print(res)
+                        res.remove(posRev)
+                        temp = []
+                        for union in res:
+                            restartF = True
+                            #print("UNIR EL "+str(posRev) + " CON "+str(union))
+                            if(posRev > union):
+                                listIn[union] = listIn[union]+ listIn[posRev]
+                                listIn.pop(posRev)
+                            else:
+                                listIn[posRev] = listIn[posRev]+ listIn[union]
+                                listIn.pop(union)
+                            
+                            
+                            break
+
+            if(restartF):
+                break;    
+
+            posRev = posRev + 1
+
+        if(posRev == len(listIn)):
+            restartW = False
+
+    return listIn
+
+
 def dependenciesSearch(instructionList):
     posInst = 0
     returnListDivided = []
@@ -32,6 +88,8 @@ def dependenciesSearch(instructionList):
                 tempList = []
             else:
                 if((temp[0] == 'sw') and (instructionList[posInst+1].split()[0] == 'lw') and (checkReg[0] != nextVal[0])):
+                    # print('gggg')
+                    # print(tempList)
                     returnListDivided.append(tempList)
                     tempList = []
 
@@ -67,7 +125,6 @@ def dependenciesSearch(instructionList):
                         tempList = []
         else:
             tempList.append(val)
-            
 
         posInst = posInst + 1
 
@@ -75,14 +132,13 @@ def dependenciesSearch(instructionList):
         returnListDivided.append(tempList)
         tempList = []
 
-    return returnListDivided
+    return (returnListDivided)
 
 
 def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLine):
-    #print(instructionListIn)
+    # print(instructionListIn)
+    #print(idBlock)
     subprocess = dependenciesSearch(instructionListIn)
-    print(idBlock)
-    #print(subprocess)
 
     block = ET.SubElement(blocksRootFirstAnalisis, "block")
     block.set("id", idBlock)
@@ -131,9 +187,10 @@ def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLi
 
         indexSub = indexSub + 1
 
+
 def crateBlocks(readFile, writeFile):
     blocksRootFirstAnalisis = ET.Element('Blocks')  # root of blocks flow
-    
+
     readLine = 0
     f = open(readFile, "r+")
     line = f.readline()
@@ -252,7 +309,7 @@ def createLogicFlow(readFile, writeFile):
         orderFlowBlocks.append(tempBlock)
         # print(tempBlock.get("id"))
         # search last instruction of block to break the while
-        
+
         if(tempBlock[-1][-1].tag != "intersection"):
             # check if finished all or there are something pending
             if(checkPendingBlocks(onFlowListBlocks) != -1):
@@ -264,8 +321,14 @@ def createLogicFlow(readFile, writeFile):
         else:
             # if is necessary return to next block of called block
             if(tempBlock[-1][-1][1].text == "N/A"):
+                print(tempBlock.get("id"))
+                
+
                 # get the next block of which where was called
                 if((findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1) < len(root)):
+                    print("Last?")
+                    print( findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1 )
+                    print(orderFlowBlocks[-2].get("id"))
                     break
                 if((tempBlock.get("id") != "main")):
                     tempBlock = root[findIdOnXml(
@@ -273,15 +336,11 @@ def createLogicFlow(readFile, writeFile):
                 else:
                     tempBlock = root[findIdOnXml(
                         root, tempBlock[-1][-1][0].text.split()[-1])]
-
-                # change intersection value to known
-                # orderFlowBlocks[-1][-1][1].text = tempBlock.get("id")
-                # print(orderFlowBlocks[-1][-1][1].text)
             else:
                 instDo = tempBlock[-1][-1][0].text.split()
                 if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
                     # change intersection value to known
-                    orderFlowBlocks[-1][-1][2].text = root[findIdOnXml(
+                    orderFlowBlocks[-1][-1][-1][2].text = root[findIdOnXml(
                         root, orderFlowBlocks[-1].get("id"))+1].get("id")
 
                     if(tempBlock[-1][-1][-1].text == "1"):  # if the branch is taken
@@ -317,9 +376,8 @@ def main():
     # filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"),("all files","*.*")), multiple=True)
 
     index = 0
-    files = [
- 
-        "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s"]
+    files = ["/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s",
+            "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s"]
 
     readyToProcess = open("./src/flowAnalyzer/analyzerResults/files.txt", "w+")
 

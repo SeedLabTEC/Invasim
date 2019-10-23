@@ -176,19 +176,20 @@ void *SequenceIlet::generate(void *obj)
             {
                 if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
                 {
-
                     //Create an iLet and invade in manycore
+                    
                     ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount)); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
                     ++i;
+                    
                     break;
                 }
 
                 if ((ilets_control_sum[progCount] == (int)iletsCode[progCount].size()))
                 {
-                    std::cout << "progCount " << progCount << " current->clk_instance->get_cycle() " << current->clk_instance->get_cycle() << std::endl;
+                    //std::cout << "progCount " << progCount << " current->clk_instance->get_cycle() " << current->clk_instance->get_cycle() << std::endl;
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
                 }
             }
@@ -235,6 +236,7 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
                 if (nodeName == "instruction")
                 {
                     std::string instStringPut = (std::string)instruction.first_child().value();
+                    //std::cout<< instStringPut << std::endl;
                     subCode.push_back(instStringPut); // push instruction to temporal list
                 }
             }
@@ -245,8 +247,11 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             temporalSubCode.code = subCode;
             temporalSubCode.SPxPU.x = -1;
             temporalSubCode.SPxPU.y = -1;
-
-            temporalBlock.push_back(temporalSubCode);
+            
+            if(temporalSubCode.puWork != 0){
+                temporalBlock.push_back(temporalSubCode);
+            }
+            
         }
 
         iletsFromCode.push_back(temporalBlock); // push the vector of charts to principal list
