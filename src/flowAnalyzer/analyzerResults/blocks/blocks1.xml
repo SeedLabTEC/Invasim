@@ -5,8 +5,7 @@
 			<instruction>addi,sp,sp,-32</instruction>
 			<instruction>sw,s0,28(sp)</instruction>
 			<instruction>addi,s0,sp,32</instruction>
-		</subp>
-		<subp id="1">
+			<instruction>lw,s0,28(sp)</instruction>
 			<instruction>li,a5,1000</instruction>
 			<instruction>sw,a5,-20(s0)</instruction>
 			<instruction>li,a5,3</instruction>
@@ -15,60 +14,24 @@
 			<instruction>sw,a5,-28(s0)</instruction>
 			<instruction>li,a5,2</instruction>
 			<instruction>sw,a5,-32(s0)</instruction>
-		</subp>
-		<subp id="2">
+			<instruction>addi,sp,sp,32</instruction>
+			<instruction>jr,ra</instruction>
 			<instruction>lw,a4,-20(s0)</instruction>
-		</subp>
-		<subp id="3">
 			<instruction>lw,a5,-24(s0)</instruction>
 			<instruction>mul,a4,a4,a5</instruction>
-		</subp>
-		<subp id="4">
 			<instruction>lw,a5,-28(s0)</instruction>
 			<instruction>mul,a4,a4,a5</instruction>
-		</subp>
-		<subp id="5">
 			<instruction>lw,a5,-32(s0)</instruction>
 			<instruction>mul,a5,a4,a5</instruction>
 			<instruction>mv,a0,a5</instruction>
-		</subp>
-		<subp id="6">
-			<instruction>lw,s0,28(sp)</instruction>
-		</subp>
-		<subp id="7">
-			<instruction>addi,sp,sp,32</instruction>
-			<intersection>
-				<instruction>jr	ra</instruction>
-				<condition1>N/A</condition1>
-				<condition2>22</condition2>
-				<probability>1</probability>
-			</intersection>
-		</subp>
-		<subp id="8">
-			<intersection>
-				<instruction>jr	ra</instruction>
-				<condition1>N/A</condition1>
-				<condition2>22</condition2>
-				<probability>1</probability>
-			</intersection>
 		</subp>
 	</block>
 	<block id="main">
 		<subp id="0">
 			<instruction>addi,sp,sp,-32</instruction>
 			<instruction>sw,ra,28(sp)</instruction>
-		</subp>
-		<subp id="1">
 			<instruction>sw,s0,24(sp)</instruction>
 			<instruction>addi,s0,sp,32</instruction>
-			<intersection>
-				<instruction>call	mult</instruction>
-				<condition1>mult</condition1>
-				<condition2>28</condition2>
-				<probability>1</probability>
-			</intersection>
-		</subp>
-		<subp id="2">
 			<intersection>
 				<instruction>call	mult</instruction>
 				<condition1>mult</condition1>
@@ -90,7 +53,7 @@
 				<instruction>beq	a5,zero,.L4</instruction>
 				<condition1>.L4</condition1>
 				<condition2>32</condition2>
-				<probability>1</probability>
+				<probability>0</probability>
 			</intersection>
 		</subp>
 	</block>
@@ -106,14 +69,7 @@
 			<instruction>sw,a5,-28(s0)</instruction>
 			<instruction>li,a5,0</instruction>
 			<instruction>mv,a0,a5</instruction>
-		</subp>
-		<subp id="1">
-			<instruction>lw,ra,28(sp)</instruction>
-		</subp>
-		<subp id="2">
 			<instruction>lw,s0,24(sp)</instruction>
-		</subp>
-		<subp id="3">
 			<instruction>addi,sp,sp,32</instruction>
 			<intersection>
 				<instruction>jr	ra</instruction>
@@ -122,13 +78,8 @@
 				<probability>1</probability>
 			</intersection>
 		</subp>
-		<subp id="4">
-			<intersection>
-				<instruction>jr	ra</instruction>
-				<condition1>N/A</condition1>
-				<condition2>43</condition2>
-				<probability>1</probability>
-			</intersection>
+		<subp id="1">
+			<instruction>lw,ra,28(sp)</instruction>
 		</subp>
 	</block>
 </Blocks>

@@ -104,8 +104,6 @@ def dependenciesSearch(instructionList):
                         if((checkReg[0] != nextVal[0]) and (checkReg[0] != nextVal[1])):
                             returnListDivided.append(tempList)
                             tempList = []
-                    else:
-                        print("Finish?")
 
                 elif(len(checkReg) == 3):
                     if(len(nextVal) == 3):
@@ -131,8 +129,11 @@ def dependenciesSearch(instructionList):
     if(len(tempList) != 0):
         returnListDivided.append(tempList)
         tempList = []
+    
+    if( (len(returnListDivided[-1])==1) and ( returnListDivided[-1][0].split()[0] in cutBlockValues) ):
+        returnListDivided.pop()
 
-    return (returnListDivided)
+    return dependenciesSearchDeep(returnListDivided)
 
 
 def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLine):
@@ -303,58 +304,64 @@ def createLogicFlow(readFile, writeFile):
     while(breakCount < breakAt):  # search on all blocks
         if(checkPendingBlocks(onFlowListBlocks) == -1):
             break
-        # read block on list and check if was done
-        onFlowListBlocks[findIdOnXml(root, tempBlock.get("id"))][1] = 1
-        # main is the firts block that we read
-        orderFlowBlocks.append(tempBlock)
-        # print(tempBlock.get("id"))
-        # search last instruction of block to break the while
+        if( onFlowListBlocks[findIdOnXml(root, tempBlock.get("id"))][1] != 1 ):
+            # read block on list and check if was done
+            onFlowListBlocks[findIdOnXml(root, tempBlock.get("id"))][1] = 1
+            #print("CHECK: "+tempBlock.get("id"))
+            # main is the firts block that we read
+            orderFlowBlocks.append(tempBlock)
+            # print(tempBlock.get("id"))
+            # search last instruction of block to break the while
 
-        if(tempBlock[-1][-1].tag != "intersection"):
-            # check if finished all or there are something pending
-            if(checkPendingBlocks(onFlowListBlocks) != -1):
-                # print("Pending")
-                tempBlock = root[checkPendingBlocks(onFlowListBlocks)]
-            else:
-                # print("Break flow")
-                break
-        else:
-            # if is necessary return to next block of called block
-            if(tempBlock[-1][-1][1].text == "N/A"):
-                print(tempBlock.get("id"))
-                
-
-                # get the next block of which where was called
-                if((findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1) < len(root)):
-                    print("Last?")
-                    print( findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1 )
-                    print(orderFlowBlocks[-2].get("id"))
-                    break
-                if((tempBlock.get("id") != "main")):
-                    tempBlock = root[findIdOnXml(
-                        root, orderFlowBlocks[-2].get("id"))+1]
+            if(tempBlock[-1][-1].tag != "intersection"):
+                # check if finished all or there are something pending
+                if(checkPendingBlocks(onFlowListBlocks) != -1):
+                    # print("Pending")
+                    tempBlock = root[checkPendingBlocks(onFlowListBlocks)]
                 else:
-                    tempBlock = root[findIdOnXml(
-                        root, tempBlock[-1][-1][0].text.split()[-1])]
+                    # print("Break flow")
+                    break
             else:
-                instDo = tempBlock[-1][-1][0].text.split()
-                if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
-                    # change intersection value to known
-                    orderFlowBlocks[-1][-1][-1][2].text = root[findIdOnXml(
-                        root, orderFlowBlocks[-1].get("id"))+1].get("id")
+                # if is necessary return to next block of called block
+                if(tempBlock[-1][-1][1].text == "N/A"):
+                    #print(tempBlock.get("id"))
+                    # get the next block of which where was called
 
-                    if(tempBlock[-1][-1][-1].text == "1"):  # if the branch is taken
-                        # print("take branch")
+                    if((tempBlock.get("id") != "main")):
+                        if( (findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1) >= len(root)): #finish 
+                            break
+                        else:
+                            #print(tempBlock.get("id"))
+                            #print(orderFlowBlocks[-2].get("id"))
+                            tempBlock = root[findIdOnXml(
+                                root, orderFlowBlocks[-2].get("id"))+1]
+                            #print(tempBlock.get("id"))
+                    else:
+                        tempBlock = root[findIdOnXml(
+                            root, tempBlock[-1][-1][0].text.split()[-1])]
+                else:
+                    instDo = tempBlock[-1][-1][0].text.split()
+                    if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
+                        # change intersection value to known
+                        orderFlowBlocks[-1][-1][-1][2].text = root[findIdOnXml(
+                            root, orderFlowBlocks[-1].get("id"))+1].get("id")
+
+                        if(tempBlock[-1][-1][-1].text == "1"):  # if the branch is taken
+                            # print("take branch")
+                            tempBlock = root[findIdOnXml(
+                                root, tempBlock[-1][-1][1].text)]  # next block
+                        else:
+                            # get the next block of which where was called
+                            # change to check the block didn't take
+                            onFlowListBlocks[findIdOnXml(root, tempBlock[-1][-1][1].text)][1] = 1
+                            tempBlock = root[findIdOnXml(
+                                root, tempBlock[-1][-1][2].text)]
+
+                    else:
                         tempBlock = root[findIdOnXml(
                             root, tempBlock[-1][-1][1].text)]  # next block
-                    else:
-                        # get the next block of which where was called
-                        tempBlock = root[findIdOnXml(
-                            root, tempBlock[-1][-1][2].text)]
-
-                else:
-                    tempBlock = root[findIdOnXml(
-                        root, tempBlock[-1][-1][1].text)]  # next block
+        else:
+            tempBlock = root[checkPendingBlocks(onFlowListBlocks)]
 
         breakCount = breakCount + 1
 
@@ -384,10 +391,9 @@ def main():
     for ele in files:
         readyToProcess.write(os.path.dirname(os.path.realpath(
             __file__)) + "/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
-        crateBlocks(
-            ele, "./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index)+".xml")
-        createLogicFlow("./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index) +
-                        ".xml", "./src/flowAnalyzer/analyzerResults/flow/flow"+str(index)+".xml")
+        
+        crateBlocks(ele, "./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index)+".xml")
+        createLogicFlow("./src/flowAnalyzer/analyzerResults/blocks/blocks"+str(index) + ".xml", "./src/flowAnalyzer/analyzerResults/flow/flow"+str(index)+".xml")
         index = index+1
 
     readyToProcess.close()
