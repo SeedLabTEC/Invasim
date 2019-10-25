@@ -58,7 +58,7 @@
 				<instruction>beq	a5,zero,.L4</instruction>
 				<condition1>.L4</condition1>
 				<condition2>32</condition2>
-				<probability>0</probability>
+				<probability>1</probability>
 			</intersection>
 		</subp>
 	</block>

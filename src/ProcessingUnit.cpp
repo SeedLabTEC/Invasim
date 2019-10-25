@@ -205,8 +205,15 @@ void *ProcessingUnit::executing(void *obj)
 					{
 						process.push_back(token);
 					}
-
-					if (process[0] == "addi")
+					if (process[0] == "add")
+					{
+						current->registers[process[1]] = ((int)current->registers[process[2]] + (int)current->registers[process[3]]);
+					}
+					else if (process[0] == "sub")
+					{
+						current->registers[process[1]] = ((int)current->registers[process[2]] - (int)current->registers[process[3]]);
+					}
+					else if (process[0] == "addi")
 					{
 						current->registers[process[1]] = ((int)current->registers[process[2]] + std::stoi(process[3]));
 					}
@@ -229,6 +236,14 @@ void *ProcessingUnit::executing(void *obj)
 					else if (process[0] == "mul")
 					{ // mul
 						current->registers[process[1]] = ((int)current->registers[process[2]] * (int)current->registers[process[3]]);
+					}
+					else if (process[0] == "slli")
+					{
+						current->registers[process[1]] = ((int)current->registers[process[2]] << std::stoi(process[3]));
+					}
+					else if (process[0] == "srli")
+					{
+						current->registers[process[1]] = ((int)current->registers[process[2]] >> std::stoi(process[3]));
 					}
 					else
 					{

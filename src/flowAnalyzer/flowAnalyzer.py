@@ -27,6 +27,7 @@ def findRegOnList(reg1, listIn):  # check the use of the register on the other s
 def dependenciesSearchDeep(listIn): #
     restW = True
     control = 0
+    joinList = []
     while(restW):
         joinList = []
         posRev = 0
@@ -36,7 +37,7 @@ def dependenciesSearchDeep(listIn): #
                 reg = inst.split()[1].split(",")
                 if(len(reg) >= 2):
                         # anything that could change register
-                    if(("addi" in inst) or ("li" in inst) or ("mv" in inst) or ("lw" in inst) or ("mul" in inst)):
+                    if(("addi" in inst) or ("li" in inst) or ("mv" in inst) or ("lw" in inst) or ("mul" in inst) or ("slli" in inst) or ("srli" in inst)):
                             # go to search other blocks
                         
                         res = findRegOnList(reg[0], listIn)
@@ -81,9 +82,15 @@ def dependenciesSearchDeep(listIn): #
         
 
         if(control > 100):
+            print("OUT OF CONTROL")
             restW = False
 
         control = control +1
+    
+    for eleJoin in joinList:
+        if(eleJoin != []):
+            print("CHECK")
+
     return listIn
 
 def dependenciesSearchDeep2(listIn): #sorted(list(set()))
