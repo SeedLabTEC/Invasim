@@ -27,8 +27,18 @@
 				<instruction>blt	a4,a5,.L3</instruction>
 				<condition1>.L3</condition1>
 				<condition2>Line21</condition2>
-				<probability>0</probability>
+				<probability>1</probability>
 			</intersection>
+		</subp>
+	</block>
+	<block id=".L3">
+		<subp id="0">
+			<instruction>lw,a5,-20(s0)</instruction>
+			<instruction>addi,a5,a5,1</instruction>
+			<instruction>sw,a5,-20(s0)</instruction>
+			<instruction>lw,a5,-24(s0)</instruction>
+			<instruction>addi,a5,a5,1</instruction>
+			<instruction>sw,a5,-24(s0)</instruction>
 		</subp>
 	</block>
 	<block id="Line21">

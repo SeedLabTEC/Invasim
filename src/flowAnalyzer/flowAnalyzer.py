@@ -6,7 +6,7 @@ from xml.etree import ElementTree as ET
 import xml.dom.minidom
 import numpy as np
 
-cutBlockValues = ["beq", "bnez", "bge", "blt", "j", "jr",
+cutBlockValues = ["beq", "bnez", "bge", "blt", "ble", "j", "jr",
                   "jal", "jalr", "call"]  # BNEZ-J-JR-JAL-JALR-EBREAK
 
 
@@ -24,13 +24,75 @@ def findRegOnList(reg1, listIn):  # check the use of the register on the other s
         
     return indexList
 
+def dependenciesSearchDeep(listIn): #
+    restW = True
+    control = 0
+    while(restW):
+        joinList = []
+        posRev = 0
+        for subList in listIn:
+            tempJoin = []
+            for inst in subList:
+                reg = inst.split()[1].split(",")
+                if(len(reg) >= 2):
+                        # anything that could change register
+                    if(("addi" in inst) or ("li" in inst) or ("mv" in inst) or ("lw" in inst) or ("mul" in inst)):
+                            # go to search other blocks
+                        
+                        res = findRegOnList(reg[0], listIn)
+                        if(posRev in res):
+                                res.remove(posRev)
+                        tempJoin = tempJoin + res
 
-def dependenciesSearchDeep(listIn):
+            posRev = posRev+1
+            joinList.append(sorted(list(set(tempJoin))))
+
+        posJ = 0
+        #print(joinList)
+        for eleJoin in joinList:
+            restW = False
+            if(posJ+1 < len(joinList)):
+                if((posJ-1) in eleJoin):
+                    # unir y break y volver a revisar
+                    listIn[posJ-1] = listIn[posJ-1] + listIn[posJ]
+                    listIn.pop(posJ)
+                    restW = True
+                    break
+                if((posJ+1) in eleJoin):
+                    # unir y break y volver a revisar
+                    listIn[posJ] = listIn[posJ] + listIn[posJ+1]
+                    
+                    listIn.pop(posJ+1)
+                    restW = True
+                    break
+                if(posJ in joinList[posJ+1]):
+                    # unir y break y volver a revisar
+                    listIn[posJ] = listIn[posJ] + listIn[posJ+1]
+                    listIn.pop(posJ+1)
+                    restW = True
+                    break
+                if(eleJoin != []):
+                    # revisar q tiene
+                    restW = True
+                    print("CHECK THIS")
+            else:
+                restW = False
+            posJ = posJ + 1
+        
+
+        if(control > 100):
+            restW = False
+
+        control = control +1
+    return listIn
+
+def dependenciesSearchDeep2(listIn): #sorted(list(set()))
     restartW = True
     while(restartW):
         restartF = False
         posRev = 0
         for subList in listIn:
+            
             for inst in subList:
                 reg = inst.split()[1].split(",")
                 if(len(reg) >= 2):
@@ -39,9 +101,10 @@ def dependenciesSearchDeep(listIn):
                         # go to search other blocks
                         #print("Found "+inst)
                         res = findRegOnList(reg[0], listIn)
-                        #print(res)
-                        res.remove(posRev)
-                        temp = []
+                        
+                        if(posRev in res):
+                            res.remove(posRev)
+
                         for union in res:
                             restartF = True
                             #print("UNIR EL "+str(posRev) + " CON "+str(union))
@@ -51,10 +114,10 @@ def dependenciesSearchDeep(listIn):
                             else:
                                 listIn[posRev] = listIn[posRev]+ listIn[union]
                                 listIn.pop(union)
-                            
-                            
-                            break
 
+
+                            break
+                        
             if(restartF):
                 break;    
 
@@ -137,8 +200,6 @@ def dependenciesSearch(instructionList):
 
 
 def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLine):
-    # print(instructionListIn)
-    #print(idBlock)
     subprocess = dependenciesSearch(instructionListIn)
 
     block = ET.SubElement(blocksRootFirstAnalisis, "block")
@@ -170,7 +231,7 @@ def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLi
                     condition1.text = "N/A"
                     condition2.text = str(actualLine)
                     probability.text = str(1)
-                elif((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
+                elif((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt") or (instDo[0] == "ble")):
                     condition1.text = instDo[-1].split(",")[-1]
                     condition2.text = str(actualLine)
                     probability.text = str(np.random.binomial(1, 0.5, 1)[0])
@@ -341,13 +402,12 @@ def createLogicFlow(readFile, writeFile):
                             root, tempBlock[-1][-1][0].text.split()[-1])]
                 else:
                     instDo = tempBlock[-1][-1][0].text.split()
-                    if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt")):
+                    if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt") or (instDo[0] == "ble")):
                         # change intersection value to known
                         orderFlowBlocks[-1][-1][-1][2].text = root[findIdOnXml(
                             root, orderFlowBlocks[-1].get("id"))+1].get("id")
 
                         if(tempBlock[-1][-1][-1].text == "1"):  # if the branch is taken
-                            # print("take branch")
                             tempBlock = root[findIdOnXml(
                                 root, tempBlock[-1][-1][1].text)]  # next block
                         else:
@@ -383,8 +443,11 @@ def main():
     # filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"),("all files","*.*")), multiple=True)
 
     index = 0
-    files = ["/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s",
-            "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s"]
+    files = [
+            "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test0.s",
+            "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test1.s",
+            "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/codes/test2.s"
+            ]
 
     readyToProcess = open("./src/flowAnalyzer/analyzerResults/files.txt", "w+")
 

@@ -19,7 +19,6 @@
 			<instruction>addi,sp,sp,-32</instruction>
 			<instruction>sw,s0,28(sp)</instruction>
 			<instruction>addi,s0,sp,32</instruction>
-			<instruction>lw,s0,28(sp)</instruction>
 			<instruction>li,a5,1000</instruction>
 			<instruction>sw,a5,-20(s0)</instruction>
 			<instruction>li,a5,3</instruction>
@@ -28,8 +27,6 @@
 			<instruction>sw,a5,-28(s0)</instruction>
 			<instruction>li,a5,2</instruction>
 			<instruction>sw,a5,-32(s0)</instruction>
-			<instruction>addi,sp,sp,32</instruction>
-			<instruction>jr,ra</instruction>
 			<instruction>lw,a4,-20(s0)</instruction>
 			<instruction>lw,a5,-24(s0)</instruction>
 			<instruction>mul,a4,a4,a5</instruction>
@@ -38,6 +35,14 @@
 			<instruction>lw,a5,-32(s0)</instruction>
 			<instruction>mul,a5,a4,a5</instruction>
 			<instruction>mv,a0,a5</instruction>
+			<instruction>lw,s0,28(sp)</instruction>
+			<instruction>addi,sp,sp,32</instruction>
+			<intersection>
+				<instruction>jr	ra</instruction>
+				<condition1>N/A</condition1>
+				<condition2>22</condition2>
+				<probability>1</probability>
+			</intersection>
 		</subp>
 	</block>
 	<block id="Line30">
