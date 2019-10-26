@@ -43,7 +43,7 @@ enum Sequence_Type
 class SequenceIlet
 {
 public:
-	SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);
+	SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed, std::string _working_dir);
 	SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);
 
 	void set_generation_parameters(int _max_clocks, int _max_loads, float _max_resources);
@@ -112,6 +112,8 @@ private:
 		 * 
 		 */
 	bool ilet_check = false;
+
+	std::string loadFlow;
 
 	ILet *generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog, int _priority);
 	void init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);

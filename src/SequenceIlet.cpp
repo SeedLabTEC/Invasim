@@ -15,10 +15,21 @@
  * @param _decision_probability 
  * @param _seed 
  */
-SequenceIlet::SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed)
+SequenceIlet::SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed, std::string _working_dir)
 {
     this->seq_type = RANDOM;
     this->init(_clk_instance, _manycore_ptr, _decision_probability, _seed);
+    if (_working_dir == ".")
+    {
+        char path_files[PATH_MAX];
+        getcwd(path_files, PATH_MAX);
+        this->loadFlow = path_files;
+        this->loadFlow = this->loadFlow + "/bin/analyzerResults/files.txt";
+    }
+    else
+    {
+        this->loadFlow = _working_dir + "/analyzerResults/files.txt";
+    }
 }
 
 /**
@@ -34,6 +45,7 @@ SequenceIlet::SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCo
 {
     this->seq_type = _seq_type;
     this->init(_clk_instance, _manycore_ptr, _decision_probability, _seed);
+    this->loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
 }
 
 /**
@@ -177,19 +189,19 @@ void *SequenceIlet::generate(void *obj)
                 if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
                 {
                     //Create an iLet and invade in manycore
-                    
+
                     ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount)); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
                     ++i;
-                    
+
                     break;
                 }
 
                 if ((ilets_control_sum[progCount] == (int)iletsCode[progCount].size()))
                 {
-                    //std::cout << "progCount " << progCount << " current->clk_instance->get_cycle() " << current->clk_instance->get_cycle() << std::endl;
+                    std::cout << "progCount " << progCount << " Terminated program on " << current->clk_instance->get_cycle() << std::endl;
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
                 }
             }
@@ -202,10 +214,10 @@ void *SequenceIlet::generate(void *obj)
 std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
     std::vector<std::vector<std::vector<subProcess>>> programs;
-    std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
-
+    //std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
+    std::cout<<this->loadFlow<<std::endl;
     //programs.push_back(getBlocksCode(std::to_string(i)));
-    std::ifstream file(loadFlow);
+    std::ifstream file(this->loadFlow);
     std::string str;
     while (std::getline(file, str))
     {
@@ -215,6 +227,7 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 
     return programs;
 }
+
 std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string program)
 {
     const char *cstr = program.c_str();
@@ -247,11 +260,11 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             temporalSubCode.code = subCode;
             temporalSubCode.SPxPU.x = -1;
             temporalSubCode.SPxPU.y = -1;
-            
-            if(temporalSubCode.puWork != 0){
+
+            if (temporalSubCode.puWork != 0)
+            {
                 temporalBlock.push_back(temporalSubCode);
             }
-            
         }
 
         iletsFromCode.push_back(temporalBlock); // push the vector of charts to principal list

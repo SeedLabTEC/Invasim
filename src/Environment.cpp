@@ -17,7 +17,11 @@ Environment::Environment()
     this->y_dim = DEFAULT_CORES;
     this->decision_probability = DEFAULT_PROBABILITY;
     this->seed = DEFAULT_SEED;
-    this->init();
+
+	char path_files[PATH_MAX];
+    getcwd(path_files, PATH_MAX);
+    this->init(path_files);
+
     this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet, this->clk_instance);
     this->write_params();
 }
@@ -39,12 +43,14 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
         std::cerr << "ERROR: Processing units can't exceed 1000." << std::endl;
         exit(EXIT_FAILURE);
     }
+
+    std::cout << "EN ENVIRONMENT"<< _working_dir << std::endl;
     
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;
     this->decision_probability = _decision_probability;
     this->seed = _seed;
-    this->init();
+    this->init(_working_dir);
     this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet , _working_dir, this->clk_instance);
     this->write_params();
 }
@@ -53,13 +59,13 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
  * @brief Function that initialize the components of environment.
  * 
  */
-void Environment::init()
+void Environment::init(std::string _working_dir)
 {
     dprintf("ENVIRONMENT: Instanciating environment clock.\n");
     this->clk_instance = new Clock();
     dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
     this->many_core_instance = new ManyCoreArch(this->x_dim, this->y_dim, this->clk_instance);
-    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability, this->seed);
+    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability, this->seed, _working_dir);
 }
 
 /**

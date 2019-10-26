@@ -86,7 +86,7 @@ class Environment
 	 */
 	Clock *clk_instance;
 
-	void init();
+	void init(std::string _working_dir);
 	void write_params();
 };
 

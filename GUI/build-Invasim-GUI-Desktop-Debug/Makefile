@@ -54,7 +54,6 @@ SOURCES       = ../Invasim-GUI/IletsView.cpp \
 		../../src/CacheMemory.cpp \
 		../../src/Clock.cpp \
 		../../src/Environment.cpp \
-		../../src/flowAnalyzer \
 		../../src/ILet.cpp \
 		../../src/ManyCoreArch.cpp \
 		../../src/Monitor.cpp \
@@ -80,7 +79,6 @@ OBJECTS       = IletsView.o \
 		CacheMemory.o \
 		Clock.o \
 		Environment.o \
-		flowAnalyzer.o \
 		ILet.o \
 		ManyCoreArch.o \
 		Monitor.o \
@@ -148,6 +146,7 @@ first: all
 ####### Build rules
 
 all: Makefile $(TARGET)
+	cp ../../src/flowAnalyzer/flowAnalyzer.py ./
 
 $(TARGET): ui_IletsView.h ui_ProcessorInfo.h ui_SimulationDialog.h ui_SimulationWindow.h ui_StartView.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
@@ -211,7 +210,7 @@ qmake:  FORCE
 
 dist: 
 	@$(CHK_DIR_EXISTS) .tmp/Invasim-GUI1.0.0 || $(MKDIR) .tmp/Invasim-GUI1.0.0 
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/IletsView.h ../Invasim-GUI/Processor.h ../Invasim-GUI/ProcessorInfo.h ../Invasim-GUI/ProcessorView.h ../Invasim-GUI/SimulationDialog.h ../Invasim-GUI/SimulationWindow.h ../Invasim-GUI/StartView.h ../../include/CacheMemory.h ../../include/Clock.h ../../include/Environment.h ../../include/ILet.h ../../include/json.hpp ../../include/ManyCoreArch.h ../../include/Monitor.h ../../include/Operation.h ../../include/ProcessingUnit.h ../../include/RandomAccessMemory.h ../../include/ResourceAdmin.h ../../include/SequenceIlet.h ../../include/Utils.h .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/processoricon.qrc .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/IletsView.cpp ../Invasim-GUI/Processor.cpp ../Invasim-GUI/ProcessorInfo.cpp ../Invasim-GUI/ProcessorsView.cpp ../Invasim-GUI/SimulationDialog.cpp ../Invasim-GUI/SimulationWindow.cpp ../Invasim-GUI/main.cpp ../Invasim-GUI/StartView.cpp ../../src/CacheMemory.cpp ../../src/Clock.cpp ../../src/Environment.cpp ../../src/flowAnalyzer ../../src/ILet.cpp ../../src/ManyCoreArch.cpp ../../src/Monitor.cpp ../../src/Operation.cpp ../../src/ProcessingUnit.cpp ../../src/RandomAccessMemory.cpp ../../src/ResourceAdmin.cpp ../../src/SequenceIlet.cpp .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/IletsView.ui ../Invasim-GUI/ProcessorInfo.ui ../Invasim-GUI/SimulationDialog.ui ../Invasim-GUI/SimulationWindow.ui ../Invasim-GUI/StartView.ui .tmp/Invasim-GUI1.0.0/ && (cd `dirname .tmp/Invasim-GUI1.0.0` && $(TAR) Invasim-GUI1.0.0.tar Invasim-GUI1.0.0 && $(COMPRESS) Invasim-GUI1.0.0.tar) && $(MOVE) `dirname .tmp/Invasim-GUI1.0.0`/Invasim-GUI1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/Invasim-GUI1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/IletsView.h ../Invasim-GUI/Processor.h ../Invasim-GUI/ProcessorInfo.h ../Invasim-GUI/ProcessorView.h ../Invasim-GUI/SimulationDialog.h ../Invasim-GUI/SimulationWindow.h ../Invasim-GUI/StartView.h ../../include/CacheMemory.h ../../include/Clock.h ../../include/Environment.h ../../include/ILet.h ../../include/json.hpp ../../include/ManyCoreArch.h ../../include/Monitor.h ../../include/Operation.h ../../include/ProcessingUnit.h ../../include/RandomAccessMemory.h ../../include/ResourceAdmin.h ../../include/SequenceIlet.h ../../include/Utils.h .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/processoricon.qrc .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/IletsView.cpp ../Invasim-GUI/Processor.cpp ../Invasim-GUI/ProcessorInfo.cpp ../Invasim-GUI/ProcessorsView.cpp ../Invasim-GUI/SimulationDialog.cpp ../Invasim-GUI/SimulationWindow.cpp ../Invasim-GUI/main.cpp ../Invasim-GUI/StartView.cpp ../../src/CacheMemory.cpp ../../src/Clock.cpp ../../src/Environment.cpp ../../src/ILet.cpp ../../src/ManyCoreArch.cpp ../../src/Monitor.cpp ../../src/Operation.cpp ../../src/ProcessingUnit.cpp ../../src/RandomAccessMemory.cpp ../../src/ResourceAdmin.cpp ../../src/SequenceIlet.cpp .tmp/Invasim-GUI1.0.0/ && $(COPY_FILE) --parents ../Invasim-GUI/IletsView.ui ../Invasim-GUI/ProcessorInfo.ui ../Invasim-GUI/SimulationDialog.ui ../Invasim-GUI/SimulationWindow.ui ../Invasim-GUI/StartView.ui .tmp/Invasim-GUI1.0.0/ && (cd `dirname .tmp/Invasim-GUI1.0.0` && $(TAR) Invasim-GUI1.0.0.tar Invasim-GUI1.0.0 && $(COMPRESS) Invasim-GUI1.0.0.tar) && $(MOVE) `dirname .tmp/Invasim-GUI1.0.0`/Invasim-GUI1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/Invasim-GUI1.0.0
 
 
 clean:compiler_clean 
@@ -481,9 +480,6 @@ Environment.o: ../../src/Environment.cpp ../../include/Environment.h \
 		../../libs/cpp/pugiconfig.hpp \
 		../../libs/cpp/pugixml.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Environment.o ../../src/Environment.cpp
-
-flowAnalyzer.o: ../../src/flowAnalyzer 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o flowAnalyzer.o ../../src/flowAnalyzer
 
 ILet.o: ../../src/ILet.cpp ../../include/ILet.h \
 		../../include/Utils.h \

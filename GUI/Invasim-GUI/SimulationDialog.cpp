@@ -7,6 +7,8 @@
 
 #include <QFileDialog>
 #include <QDir>
+#include <QProcess>
+#include <QDebug>
 
 SimulationDialog::SimulationDialog(QWidget *parent) :
     QDialog(parent),
@@ -83,9 +85,15 @@ void SimulationDialog::on_buttonBox_clicked(QAbstractButton *button)
 
 void SimulationDialog::on_pushButton_clicked()
 {
-    QString analysisPath = QDir::homePath();
-    QString filePath = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath());
-    QMessageBox::information(this, "..",filePath);
-    //QFile::copy(filePath, analysisPath);
+    QString path = QCoreApplication::applicationDirPath();
+
+    QMessageBox::information(this, "..","Wait to open the file chooser, first select the directory and after that the files");
+
+    QString  command("python3.6");
+    QStringList params = QStringList() << "flowAnalyzer.py";
+    QProcess *process = new QProcess();
+    process->startDetached(command, params, path);
+    process->waitForFinished();
+    process->close();
 
 }
