@@ -17,7 +17,7 @@
  */
 ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y_dim, Clock *_clk_instance)
 {
-	this->max_iLets = DEFAULT_MAX_ILETS;
+	this->max_iLets = _x_dim * _y_dim;
 	this->init(_pu_array_ptr, _x_dim, _y_dim, _clk_instance);
 }
 
@@ -32,7 +32,7 @@ ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y
  */
 ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y_dim, int _max_iLets, Clock *_clk_instance)
 {
-	this->max_iLets = _max_iLets;
+	this->max_iLets = _x_dim * _y_dim;
 	this->init(_pu_array_ptr, _x_dim, _y_dim, _clk_instance);
 }
 
@@ -165,6 +165,7 @@ void ResourceAdmin::invade(int resources_amount, std::vector<coordinate> *resour
 void ResourceAdmin::infect(ILet *ilet)
 {
 	unsigned int resources = ilet->get_resources()->size();
+
 	for (unsigned int i = 0; i < resources; i++)
 	{
 		coordinate position = ilet->get_resources()->at(i);
@@ -221,7 +222,6 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
 		if (!ilet->get_current_operation()->get_subProcess()[spi].state)
 		{
 			is_done = false;
-			//std::cout << " VALUE FALSE HERE "<< is_done << std::endl;
 			break;
 		}
 	}
@@ -237,10 +237,6 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
  */
 std::vector<ILet *> ResourceAdmin::get_invaded()
 {
-	//std::cout << "lsReAd " << this->invaded_ilets.size() << std::endl;
-	//std::cout << "lsReAd " << this->execute_ilets.size() << std::endl;
-	//a.insert(a.end(), b.begin(), b.end());
-
 	std::queue<ILet *> qc = this->incomming_ilets;
 	std::vector<ILet *> r;
 
@@ -303,7 +299,7 @@ void *ResourceAdmin::managing(void *obj)
 				current_ilet->pop_operation();
 			}
 			//Verify if there are resources to be assigned
-			if (current_ilet->get_current_operation()->get_parameter() <= current->available)
+			if ((current_ilet->get_current_operation()->get_parameter()) <= current->available)
 			{
 				dprintf("ResourceAdmin: Found resources to Ilet = %d.\n", current_ilet->get_id());
 				//Set state to waiting for resources and push to invaded vector
@@ -314,6 +310,7 @@ void *ResourceAdmin::managing(void *obj)
 			{
 				//If there are not enough resources, then is queued again
 				dprintf("ResourceAdmin: Not enough resources to Ilet = %d.\n", current_ilet->get_id());
+				std::cout << " ResourceAdmin: Not enough resources to Ilet = " << current_ilet->get_id() << std::endl;
 				pthread_mutex_lock(&current->ilet_mutex);
 				current_ilet->set_state(EXECUTING);
 				current->incomming_ilets.push(current_ilet);
@@ -367,7 +364,6 @@ void *ResourceAdmin::managing(void *obj)
 							{
 								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork <= 0))
 								{
-									//std::cout << " AQUI " << spi << std::endl;
 									current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
 									coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;
 									//current_ilet->pop_one_resource(position); // pop resurce

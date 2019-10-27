@@ -20,7 +20,7 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance)
     this->init(_x_dim, _y_dim, _clk_instance);
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
                                                this->y_dim, this->clk_instance);
-    this->max_ilets = DEFAULT_MAX_ILETS;
+    this->max_ilets = _x_dim * _y_dim;
 }
 
 /**
@@ -36,9 +36,9 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, int _ma
     dprintf("MANYCOREARCH: Manycore Architecture instance created.\n\t- Dimension: (%d, %d).\n", _x_dim, _y_dim);
     this->init(_x_dim, _y_dim, _clk_instance);
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
-                                               this->y_dim, _max_ilets, 
+                                               this->y_dim, _max_ilets,
                                                this->clk_instance);
-    this->max_ilets = _max_ilets;
+    this->max_ilets = _x_dim * _y_dim;
 }
 
 /**
@@ -97,10 +97,10 @@ JSON *ManyCoreArch::monitoring()
 {
     //New json for info
     JSON *arch_info = new JSON;
-    
+
     //Get resource admin and processing units info
     JSON *resources_info = this->resource_manager->monitoring();
-    
+
     //Json contruciton
     *arch_info = {
         {"System",
@@ -108,7 +108,7 @@ JSON *ManyCoreArch::monitoring()
            {{"x", this->x_dim}, {"y", this->y_dim}}},
           {"Cycle", this->clk_instance->get_cycle()}}},
         {"Components", *resources_info}};
-    //Deallocate useless memory 
+    //Deallocate useless memory
     delete resources_info;
     return arch_info;
 }
@@ -146,8 +146,9 @@ void ManyCoreArch::init(int _x_dim, int _y_dim, Clock *_clk_instance)
  * @param obj 
  * @return std::vector<ILet *>
  */
-std::vector<ILet *> ManyCoreArch::get_invaded(){
-	return this->resource_manager->get_invaded();
+std::vector<ILet *> ManyCoreArch::get_invaded()
+{
+    return this->resource_manager->get_invaded();
 }
 
 /**
@@ -159,5 +160,5 @@ std::vector<ILet *> ManyCoreArch::get_invaded(){
  */
 int ManyCoreArch::getPriority(int iletID, int programID)
 {
-	return this->resource_manager->getPriority(iletID, programID);
+    return this->resource_manager->getPriority(iletID, programID);
 }

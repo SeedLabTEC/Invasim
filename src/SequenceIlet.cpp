@@ -45,7 +45,10 @@ SequenceIlet::SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCo
 {
     this->seq_type = _seq_type;
     this->init(_clk_instance, _manycore_ptr, _decision_probability, _seed);
-    this->loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
+    char path_files[PATH_MAX];
+    getcwd(path_files, PATH_MAX);
+    this->loadFlow = path_files;
+    this->loadFlow = this->loadFlow + "/bin/analyzerResults/files.txt";
 }
 
 /**
@@ -128,19 +131,29 @@ ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, i
 
     // HERE WE NEED TO CHANGE THE
     //int resources = rand() % (this->max_resources + 1) + 1;
-    int resources = 1;
+    //int load = codeFlow.size();
+
+    int calcMax = (codeFlow.size() - this->manycore_ptr->get_max_ilets());
+    int resources = codeFlow.size();
+
+    if (calcMax > 0)
+    {
+        resources = resources - calcMax;
+    }
+
+    //std::cout<< "RESOURCES MAX TO USE "<< resources<<std::endl;
     new_ilet->add_operation(INVADE, resources); // add operation invade
 
     //int load = rand() % (this->max_loads + 1) + 1;
-    int load = codeFlow.size();
-    new_ilet->add_operation(INFECT, load, codeFlow); // add operation infect
+
+    new_ilet->add_operation(INFECT, resources, codeFlow); // add operation infect
 
     new_ilet->add_operation(RETREAT, 0); // add operation retreat
 
     //Store in info json
     JSON ilet_info = {
         {"Id", index},
-        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", load}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
+        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
     //Set data in pointer
     *this->ilets_info = ilet_info;
     //Set flag that an iLet has been created
@@ -186,10 +199,11 @@ void *SequenceIlet::generate(void *obj)
         {
             for (int iletsProgCount = 0; iletsProgCount < (int)iletsCode[progCount].size(); iletsProgCount++) // run over ilets on program separated by branch
             {
-                if ((current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
+                if ((ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
+                //if ( (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
                 {
                     //Create an iLet and invade in manycore
-
+                    std::cout << " SEND ILET= " << i << std::endl;
                     ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount)); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
@@ -215,7 +229,7 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
     std::vector<std::vector<std::vector<subProcess>>> programs;
     //std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
-    std::cout<<this->loadFlow<<std::endl;
+    std::cout << this->loadFlow << std::endl;
     //programs.push_back(getBlocksCode(std::to_string(i)));
     std::ifstream file(this->loadFlow);
     std::string str;
