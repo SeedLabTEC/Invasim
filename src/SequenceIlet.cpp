@@ -260,6 +260,7 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             for (pugi::xml_node instruction = ilet.first_child(); instruction; instruction = instruction.next_sibling()) // go over instructions of blocks
             {
                 std::string nodeName = instruction.name();
+                std::cout << "INSTRUCTION " << (std::string)instruction.name() << std::endl;
                 if (nodeName == "instruction")
                 {
                     std::string instStringPut = (std::string)instruction.first_child().value();
@@ -269,6 +270,7 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             }
             std::reverse(std::begin(subCode), std::end(subCode)); // reverse because processing unit go back on instructions
 
+            std::cout << "size " << subCode.size() << std::endl;
             temporalSubCode.state = false;
             temporalSubCode.puWork = subCode.size();
             temporalSubCode.code = subCode;
@@ -281,7 +283,10 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             }
         }
 
-        iletsFromCode.push_back(temporalBlock); // push the vector of charts to principal list
+        if (temporalBlock.size() != 0)
+        {
+            iletsFromCode.push_back(temporalBlock); // push the vector of charts to principal list
+        }
     }
 
     return iletsFromCode;
