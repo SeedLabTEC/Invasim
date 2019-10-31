@@ -162,3 +162,14 @@ int ManyCoreArch::getPriority(int iletID, int programID)
 {
     return this->resource_manager->getPriority(iletID, programID);
 }
+
+/**
+ * @brief Request for the resourses to use for Ilets
+ * 
+ * @param iletReq Quantity of resources required from ilet
+ * @return int Random between 1 to quantity of processors
+ */
+int ManyCoreArch::getResourcesFromAdmin(int iletReq)
+{
+    return this->resource_manager->assignResources(iletReq);
+}

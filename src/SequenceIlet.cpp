@@ -129,17 +129,7 @@ ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, i
     //Generate a iLet according to the parameters
     ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability, _id_Prog, _priority);
 
-    // HERE WE NEED TO CHANGE THE
-    //int resources = rand() % (this->max_resources + 1) + 1;
-    //int load = codeFlow.size();
-
-    int calcMax = (codeFlow.size() - this->manycore_ptr->get_max_ilets());
-    int resources = codeFlow.size();
-
-    if (calcMax > 0)
-    {
-        resources = resources - calcMax;
-    }
+    int resources = this->manycore_ptr->getResourcesFromAdmin(codeFlow.size());
 
     //std::cout<< "RESOURCES MAX TO USE "<< resources<<std::endl;
     new_ilet->add_operation(INVADE, resources); // add operation invade
@@ -181,13 +171,11 @@ void *SequenceIlet::generate(void *obj)
 
     std::vector<std::vector<std::vector<subProcess>>> iletsCode = current->getPrograms();
     std::vector<int> ilets_control_sum; // to keep the control of ilet from program
-    ///////////////////EXPORT TO FUNCTIONS///////////////////////////////////
+
     for (int p = 0; p < (int)iletsCode.size(); p++)
     {
         ilets_control_sum.push_back(0);
     }
-
-    //////////////////////////////////////////////////////
 
     std::cout << " TO START " << std::endl;
     while (1)
@@ -200,7 +188,6 @@ void *SequenceIlet::generate(void *obj)
             for (int iletsProgCount = 0; iletsProgCount < (int)iletsCode[progCount].size(); iletsProgCount++) // run over ilets on program separated by branch
             {
                 if ((ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
-                //if ( (current->created_ilets.size() <= current->manycore_ptr->get_max_ilets()) && (ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
                 {
                     //Create an iLet and invade in manycore
                     std::cout << " SEND ILET= " << i << std::endl;
@@ -228,9 +215,7 @@ void *SequenceIlet::generate(void *obj)
 std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
     std::vector<std::vector<std::vector<subProcess>>> programs;
-    //std::string loadFlow = "/home/gabriel/Documents/Proyectos/Invasim/src/flowAnalyzer/analyzerResults/files.txt";
-    std::cout << this->loadFlow << std::endl;
-    //programs.push_back(getBlocksCode(std::to_string(i)));
+    
     std::ifstream file(this->loadFlow);
     std::string str;
     while (std::getline(file, str))
@@ -260,7 +245,7 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             for (pugi::xml_node instruction = ilet.first_child(); instruction; instruction = instruction.next_sibling()) // go over instructions of blocks
             {
                 std::string nodeName = instruction.name();
-                std::cout << "INSTRUCTION " << (std::string)instruction.name() << std::endl;
+                
                 if (nodeName == "instruction")
                 {
                     std::string instStringPut = (std::string)instruction.first_child().value();
@@ -270,7 +255,6 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             }
             std::reverse(std::begin(subCode), std::end(subCode)); // reverse because processing unit go back on instructions
 
-            std::cout << "size " << subCode.size() << std::endl;
             temporalSubCode.state = false;
             temporalSubCode.puWork = subCode.size();
             temporalSubCode.code = subCode;

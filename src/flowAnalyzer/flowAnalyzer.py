@@ -2,6 +2,7 @@
 from tkinter import filedialog
 from tkinter import *
 import os
+from shutil import copyfile
 from xml.etree import ElementTree as ET
 import xml.dom.minidom
 import numpy as np
@@ -456,24 +457,35 @@ def main():
     os.makedirs("./bin/analyzerResults/blocks", exist_ok=True)
     os.makedirs("./bin/analyzerResults/flow", exist_ok=True)
 
-    # root = Tk()
-    # filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"),("all files","*.*")), multiple=True)
-
+    root = Tk()
+    filenames =  filedialog.askopenfilenames(initialdir = filedialog.askdirectory(),title = "Select files with ctrl",filetypes = (("Assembler files","*.s"), ("C files","*.c"), ("XML files","*.xml"), ("all files","*.*")), multiple=True)
     index = 0
-    files = [
-        "/home/gabriel/Documents/Proyectos/codes/test0.s",
-        # "/home/gabriel/Documents/Proyectos/codes/test1.s",
-        # "/home/gabriel/Documents/Proyectos/codes/test2.s"
-    ]
 
     readyToProcess = open("./bin/analyzerResults/files.txt", "w+")
-    for ele in files:
-        readyToProcess.write(
-            "./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
-        crateBlocks(ele, "./bin/analyzerResults/blocks/blocks" +
-                    str(index)+".xml")
-        createLogicFlow("./bin/analyzerResults/blocks/blocks"+str(index) +
-                        ".xml", "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+    for ele in filenames:
+        if(ele.endswith('.c')):
+            os.environ["PATH"] = "/opt/riscv32/bin/:$PATH"
+            eleo = ele[:-1]
+            eleo = eleo + "s"
+            os.system("riscv32-unknown-elf-gcc -O0 -S "+ele +" -o "+eleo )
+            ele = eleo
+
+            readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
+            crateBlocks(ele, "./bin/analyzerResults/blocks/blocks" + str(index)+".xml")
+            createLogicFlow("./bin/analyzerResults/blocks/blocks"+str(index) +".xml", "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+    
+        elif(ele.endswith('.s')):
+            readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
+            crateBlocks(ele, "./bin/analyzerResults/blocks/blocks" + str(index)+".xml")
+            createLogicFlow("./bin/analyzerResults/blocks/blocks"+str(index) +".xml", "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+        
+        elif(ele.endswith('.xml')):
+            copyfile(ele, "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+        
+        else:
+            print("Can't load this type of file: "+ele)
+            index = index-1    
+
         index = index+1
 
     readyToProcess.close()

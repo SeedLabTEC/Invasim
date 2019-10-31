@@ -262,6 +262,26 @@ int ResourceAdmin::getPriority(int iletID, int programID)
 {
 	return (rand() % 4);
 }
+
+/**
+ * @brief Assign resourses to use for Ilets
+ * 
+ * @param iletReq Quantity of resources required from ilet
+ * @return int Random between 1 to quantity of processors
+ */
+int ResourceAdmin::assignResources(int iletReq)
+{
+	int calcMax = (iletReq - this->max_iLets);
+	int resources = iletReq;
+
+	if (calcMax > 0)
+	{
+		resources = resources - calcMax;
+	}
+	
+	return ((rand() % resources) + 1);
+}
+
 /**
  * @brief Execution thread function that handles all requests with its resources
  * 

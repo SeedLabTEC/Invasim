@@ -13,21 +13,26 @@ cutBlockValues = ["beq", "bnez", "bge", "blt", "ble", "j", "jr",
 def findRegOnList(reg1, listIn):  # check the use of the register on the other subprocess
     indexList = []
     index = -1
-    
-    for listInDep in listIn: # check in every list
+
+    for listInDep in listIn:  # check in every list
         index = index+1
-        for elInst in listInDep: # check every instuction
-            if(not elInst.split()[0] in cutBlockValues): # check if isn't a intersection 
-                if(reg1 in elInst): # check if is in instruction
+        for elInst in listInDep:  # check every instuction
+            # check if isn't a intersection
+            if(not elInst.split()[0] in cutBlockValues):
+                if(reg1 in elInst):  # check if is in instruction
                     indexList.append(index)
                     break
-        
+
     return indexList
 
-def dependenciesSearchDeep(listIn): #
+
+def dependenciesSearchDeep(listIn):
     restW = True
     control = 0
     joinList = []
+    #print("Here deep")
+    #print(listIn)
+
     while(restW):
         joinList = []
         posRev = 0
@@ -39,17 +44,17 @@ def dependenciesSearchDeep(listIn): #
                         # anything that could change register
                     if(("addi" in inst) or ("li" in inst) or ("mv" in inst) or ("lw" in inst) or ("mul" in inst) or ("slli" in inst) or ("srli" in inst)):
                             # go to search other blocks
-                        
+
                         res = findRegOnList(reg[0], listIn)
                         if(posRev in res):
-                                res.remove(posRev)
+                            res.remove(posRev)
                         tempJoin = tempJoin + res
 
             posRev = posRev+1
             joinList.append(sorted(list(set(tempJoin))))
 
         posJ = 0
-        #print(joinList)
+        # print(joinList)
         for eleJoin in joinList:
             restW = False
             if(posJ+1 < len(joinList)):
@@ -62,7 +67,7 @@ def dependenciesSearchDeep(listIn): #
                 if((posJ+1) in eleJoin):
                     # unir y break y volver a revisar
                     listIn[posJ] = listIn[posJ] + listIn[posJ+1]
-                    
+
                     listIn.pop(posJ+1)
                     restW = True
                     break
@@ -79,27 +84,27 @@ def dependenciesSearchDeep(listIn): #
             else:
                 restW = False
             posJ = posJ + 1
-        
 
         if(control > 100):
             print("OUT OF CONTROL")
             restW = False
 
-        control = control +1
-    
+        control = control + 1
+
     for eleJoin in joinList:
         if(eleJoin != []):
             print("CHECK")
 
     return listIn
 
-def dependenciesSearchDeep2(listIn): #sorted(list(set()))
+
+def dependenciesSearchDeep2(listIn):  # sorted(list(set()))
     restartW = True
     while(restartW):
         restartF = False
         posRev = 0
         for subList in listIn:
-            
+
             for inst in subList:
                 reg = inst.split()[1].split(",")
                 if(len(reg) >= 2):
@@ -108,7 +113,7 @@ def dependenciesSearchDeep2(listIn): #sorted(list(set()))
                         # go to search other blocks
                         #print("Found "+inst)
                         res = findRegOnList(reg[0], listIn)
-                        
+
                         if(posRev in res):
                             res.remove(posRev)
 
@@ -116,17 +121,16 @@ def dependenciesSearchDeep2(listIn): #sorted(list(set()))
                             restartF = True
                             #print("UNIR EL "+str(posRev) + " CON "+str(union))
                             if(posRev > union):
-                                listIn[union] = listIn[union]+ listIn[posRev]
+                                listIn[union] = listIn[union] + listIn[posRev]
                                 listIn.pop(posRev)
                             else:
-                                listIn[posRev] = listIn[posRev]+ listIn[union]
+                                listIn[posRev] = listIn[posRev] + listIn[union]
                                 listIn.pop(union)
 
-
                             break
-                        
+
             if(restartF):
-                break;    
+                break
 
             posRev = posRev + 1
 
@@ -140,7 +144,10 @@ def dependenciesSearch(instructionList):
     posInst = 0
     returnListDivided = []
     tempList = []
-    for val in instructionList:
+    for val in instructionList:    
+        if(val == "nop"):
+            val = "addi	zero,zero,0"
+
         temp = val.split()
         if(posInst+1 < len(instructionList)):
             nextVal = instructionList[posInst+1].split()[1]
@@ -199,8 +206,8 @@ def dependenciesSearch(instructionList):
     if(len(tempList) != 0):
         returnListDivided.append(tempList)
         tempList = []
-    
-    if( (len(returnListDivided[-1])==1) and ( returnListDivided[-1][0].split()[0] in cutBlockValues) ):
+
+    if((len(returnListDivided[-1]) == 1) and (returnListDivided[-1][0].split()[0] in cutBlockValues) and (len(returnListDivided) !=1) ):
         returnListDivided.pop()
 
     return dependenciesSearchDeep(returnListDivided)
@@ -212,12 +219,14 @@ def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLi
     block = ET.SubElement(blocksRootFirstAnalisis, "block")
     block.set("id", idBlock)
     indexSub = 0
+
     for instructionList in subprocess:
 
         subIlet = ET.SubElement(block, "subp")
         subIlet.set("id", str(indexSub))
         posInst = 0
-        for val in instructionList:
+
+        for val in instructionList:  
             if((posInst == len(instructionList)-1) and (val.split()[0] in cutBlockValues)):
                 instDo = val.split()
                 # create xml objects
@@ -372,15 +381,14 @@ def createLogicFlow(readFile, writeFile):
     while(breakCount < breakAt):  # search on all blocks
         if(checkPendingBlocks(onFlowListBlocks) == -1):
             break
-        if( onFlowListBlocks[findIdOnXml(root, tempBlock.get("id"))][1] != 1 ):
+        if(onFlowListBlocks[findIdOnXml(root, tempBlock.get("id"))][1] != 1):
             # read block on list and check if was done
             onFlowListBlocks[findIdOnXml(root, tempBlock.get("id"))][1] = 1
-            #print("CHECK: "+tempBlock.get("id"))
             # main is the firts block that we read
             orderFlowBlocks.append(tempBlock)
             # print(tempBlock.get("id"))
             # search last instruction of block to break the while
-
+            
             if(tempBlock[-1][-1].tag != "intersection"):
                 # check if finished all or there are something pending
                 if(checkPendingBlocks(onFlowListBlocks) != -1):
@@ -392,18 +400,19 @@ def createLogicFlow(readFile, writeFile):
             else:
                 # if is necessary return to next block of called block
                 if(tempBlock[-1][-1][1].text == "N/A"):
-                    #print(tempBlock.get("id"))
+                    # print(tempBlock.get("id"))
                     # get the next block of which where was called
 
                     if((tempBlock.get("id") != "main")):
-                        if( (findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1) >= len(root)): #finish 
+                        # finish
+                        if((findIdOnXml(root, orderFlowBlocks[-2].get("id"))+1) >= len(root)):
                             break
                         else:
-                            #print(tempBlock.get("id"))
-                            #print(orderFlowBlocks[-2].get("id"))
+                            # print(tempBlock.get("id"))
+                            # print(orderFlowBlocks[-2].get("id"))
                             tempBlock = root[findIdOnXml(
                                 root, orderFlowBlocks[-2].get("id"))+1]
-                            #print(tempBlock.get("id"))
+                            # print(tempBlock.get("id"))
                     else:
                         tempBlock = root[findIdOnXml(
                             root, tempBlock[-1][-1][0].text.split()[-1])]
@@ -420,7 +429,8 @@ def createLogicFlow(readFile, writeFile):
                         else:
                             # get the next block of which where was called
                             # change to check the block didn't take
-                            onFlowListBlocks[findIdOnXml(root, tempBlock[-1][-1][1].text)][1] = 1
+                            onFlowListBlocks[findIdOnXml(
+                                root, tempBlock[-1][-1][1].text)][1] = 1
                             tempBlock = root[findIdOnXml(
                                 root, tempBlock[-1][-1][2].text)]
 
@@ -451,16 +461,19 @@ def main():
 
     index = 0
     files = [
-            "/home/gabriel/Documents/Proyectos/codes/test0.s",
-            "/home/gabriel/Documents/Proyectos/codes/test1.s",
-            "/home/gabriel/Documents/Proyectos/codes/test2.s"
-            ]
+        "/home/gabriel/Documents/Proyectos/codes/test0.s",
+        # "/home/gabriel/Documents/Proyectos/codes/test1.s",
+        # "/home/gabriel/Documents/Proyectos/codes/test2.s"
+    ]
 
     readyToProcess = open("./bin/analyzerResults/files.txt", "w+")
     for ele in files:
-        readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
-        crateBlocks(ele, "./bin/analyzerResults/blocks/blocks"+str(index)+".xml")
-        createLogicFlow("./bin/analyzerResults/blocks/blocks"+str(index) + ".xml", "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+        readyToProcess.write(
+            "./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
+        crateBlocks(ele, "./bin/analyzerResults/blocks/blocks" +
+                    str(index)+".xml")
+        createLogicFlow("./bin/analyzerResults/blocks/blocks"+str(index) +
+                        ".xml", "./bin/analyzerResults/flow/flow"+str(index)+".xml")
         index = index+1
 
     readyToProcess.close()

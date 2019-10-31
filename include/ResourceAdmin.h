@@ -39,7 +39,10 @@ class ResourceAdmin
 		JSON * monitoring();
 
 		std::vector<ILet *> get_invaded();
+
 		int getPriority(int iletID, int programID);
+
+		int assignResources(int iletReq);
 		
 	private:
 		pthread_t pu_exe_thread;
@@ -54,7 +57,7 @@ class ResourceAdmin
 		 */
 		Clock * clk_instance;
 		/**
-		 * @brief Max amount of iLets
+		 * @brief Max amount of iLets (x*y)
 		 * 
 		 */
 		unsigned int max_iLets;
