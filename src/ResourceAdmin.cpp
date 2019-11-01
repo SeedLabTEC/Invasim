@@ -278,7 +278,7 @@ int ResourceAdmin::assignResources(int iletReq)
 	{
 		resources = resources - calcMax;
 	}
-	
+
 	return ((rand() % resources) + 1);
 }
 

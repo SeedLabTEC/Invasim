@@ -14,6 +14,7 @@
  * @param _manycore_ptr 
  * @param _decision_probability 
  * @param _seed 
+ * @param _working_dir 
  */
 SequenceIlet::SequenceIlet(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed, std::string _working_dir)
 {
@@ -122,6 +123,9 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
  * @brief Function that generates a new iLet
  * 
  * @param index 
+ * @param codeFlow 
+ * @param _id_Prog
+ * @param _priority 
  * @return ILet* 
  */
 ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog, int _priority)
@@ -131,10 +135,7 @@ ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, i
 
     int resources = this->manycore_ptr->getResourcesFromAdmin(codeFlow.size());
 
-    //std::cout<< "RESOURCES MAX TO USE "<< resources<<std::endl;
     new_ilet->add_operation(INVADE, resources); // add operation invade
-
-    //int load = rand() % (this->max_loads + 1) + 1;
 
     new_ilet->add_operation(INFECT, resources, codeFlow); // add operation infect
 
@@ -212,6 +213,11 @@ void *SequenceIlet::generate(void *obj)
     return NULL;
 }
 
+/**
+ * @brief Run over the files of flows to load ilets
+ * 
+ * @return std::vector Return vector of programs with ilets and subprocess
+ */
 std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
     std::vector<std::vector<std::vector<subProcess>>> programs;
@@ -227,6 +233,11 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
     return programs;
 }
 
+/**
+ * @brief Run over specific flow to load ilets
+ * @param program Program path and name
+ * @return std::vector Return vector of ilets and subprocess
+ */
 std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string program)
 {
     const char *cstr = program.c_str();
@@ -276,6 +287,12 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
     return iletsFromCode;
 }
 
+/**
+ * @brief Check over the queues and list of ilets on execution and invade from resources admin
+ * @param prog Program number to search id on ilets
+ * @param iletsList Vector of ilets where is necessary search 
+ * @return Boolean True if is in the vector, false other case
+ */
 bool SequenceIlet::checkTerminated(int prog, std::vector<ILet *> iletsList)
 {
     int goOn = iletsList.size();

@@ -171,7 +171,6 @@ void *ProcessingUnit::executing(void *obj)
 					current->pu_coordenate.y,
 					current->iLet_ptr->get_id());
 			pthread_mutex_lock(&current->pu_mutex);
-			////////////////////////////////////////////////////////////////////////////////////////////////
 
 			if ((current->current_used == -1))
 			{
@@ -195,13 +194,13 @@ void *ProcessingUnit::executing(void *obj)
 			{
 				try
 				{
-					std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
+					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
 					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
-					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " INST " << inst << std::endl;
-					//std::cout<< inst << std::endl;
+					
 					std::stringstream ss(inst);
 					std::string token;
 					std::vector<std::string> process;
+					
 					while (getline(ss, token, ','))
 					{
 						process.push_back(token);
@@ -264,13 +263,12 @@ void *ProcessingUnit::executing(void *obj)
 			else
 			{
 				//End execution
-				//std::cout << "END EXECUTION " << goOn << std::endl;
+				
 				dprintf("PU = (%d, %d): Execution Done by ILet = %d.\n",
 						current->pu_coordenate.x,
 						current->pu_coordenate.y,
 						current->iLet_ptr->get_id());
 				current->pu_state = INVADED;
-				//std::cout << (int)current->iLet_ptr->get_current_operation()->get_subProcess().size() << " ON FINISHED ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_program_id() << " PROCESS " << current->current_used << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load << std::endl; // execute code
 				// set finished
 			}
 
