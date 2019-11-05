@@ -76,6 +76,11 @@ class ResourceAdmin
 		 * 
 		 */
 		int available;
+		/**
+		 * @brief Control of process on programs
+		 * 
+		 */
+		JSON resourcesUse;
 
 		/**
 		 * @brief Matrix of processing units pointer
@@ -110,6 +115,8 @@ class ResourceAdmin
 		bool verify_ilet(ILet * ilet);
 
 		static void * managing(void * obj);
+
+		void resourcesCalcByProgram(int prog, int clock, int add);
 
 };
 

@@ -25,6 +25,7 @@ ILet::ILet(Type_ILet _type, int _id, float _decision_probability, int _id_Progra
 	this->resources = new std::vector<coordinate>();
 	this->current_operation = NULL;
 	this->distribution = std::bernoulli_distribution(_decision_probability);
+	this->clocks_used_ilet = 0;
 }
 
 /**
@@ -193,4 +194,24 @@ void ILet::pop_one_resource(coordinate popPU)
 			break;
 		}
 	}
+}
+
+/**
+ * @brief Pop an specific resourse
+ * @param clocks 
+ * @return void
+ */
+int ILet::get_clocks_used()
+{
+	return this->clocks_used_ilet;
+}
+
+/**
+ * @brief Pop an specific resourse
+ * @param clocks 
+ * @return void
+ */
+void ILet::add_clocks_used(int clocks)
+{
+	this->clocks_used_ilet = this->clocks_used_ilet + clocks;
 }

@@ -69,6 +69,8 @@ class ILet
 
 		int get_id_program();
 		int get_priority();
+		void add_clocks_used(int clocks);
+		int get_clocks_used();
 
 		void pop_one_resource(coordinate popPU);
 
@@ -127,6 +129,11 @@ class ILet
 		 * 
 		 */
 		int priority_ilet;
+		/**
+		 * @brief ilet clocks used
+		 * 
+		 */
+		int clocks_used_ilet;
 };
 
 #endif

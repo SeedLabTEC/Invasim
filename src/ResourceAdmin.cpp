@@ -19,6 +19,7 @@ ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y
 {
 	this->max_iLets = _x_dim * _y_dim;
 	this->init(_pu_array_ptr, _x_dim, _y_dim, _clk_instance);
+	this->resourcesUse = {};
 }
 
 /**
@@ -34,6 +35,7 @@ ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y
 {
 	this->max_iLets = _x_dim * _y_dim;
 	this->init(_pu_array_ptr, _x_dim, _y_dim, _clk_instance);
+	this->resourcesUse = {};
 }
 
 /**
@@ -93,7 +95,8 @@ JSON *ResourceAdmin::monitoring()
 		{"Incomming_Ilets", this->incomming_ilets.size()},
 		{"Waiting_Ilets", this->invaded_ilets.size()},
 		{"Executing_Ilets", this->execute_ilets.size()},
-		{"Max_Ilets", this->max_iLets}};
+		{"Max_Ilets", this->max_iLets},
+		{"Programs", this->resourcesUse}};
 
 	//Push data
 	array_info->push_back(resource_admin_info);
@@ -109,7 +112,8 @@ JSON *ResourceAdmin::monitoring()
 			delete pu_info_ptr;
 		}
 	}
-
+	//array_info->push_back();
+	
 	return array_info;
 }
 
@@ -283,6 +287,29 @@ int ResourceAdmin::assignResources(int iletReq)
 }
 
 /**
+ * @brief Function that starts the component thread
+ * 
+ */
+void ResourceAdmin::resourcesCalcByProgram(int prog, int clock, int add)
+{
+	std::string search = std::to_string(prog);
+	auto subjectIdIter = this->resourcesUse.find(search);
+	if (subjectIdIter != this->resourcesUse.end())
+	{
+		//cout << "it is found" << endl;
+		int diffClock = clock - (int)this->resourcesUse[search]["clock"]; // calculate the difference between clocks
+		int diff = diffClock + add;										  // calculate the new weight using the difference between clocks and extra weight wanted
+		this->resourcesUse[search]["clock"] = clock;
+		this->resourcesUse[search]["val"] = (int)this->resourcesUse[search]["val"] + diff;
+	}
+	else
+	{
+		this->resourcesUse[search] = {{"clock", clock}, {"val", clock}};
+	}
+	//std::cout << " PROGRAM " + search + " " << this->resourcesUse[search] << std::endl;
+}
+
+/**
  * @brief Execution thread function that handles all requests with its resources
  * 
  * @param obj 
@@ -349,6 +376,7 @@ void *ResourceAdmin::managing(void *obj)
 				{
 				case WAITING:
 				{
+					//current->iLet_ptr->add_clocks_used(1);
 					//When waiting ask if it has to infect
 					int start = current_ilet->execute_operation();
 					if (start)
@@ -376,6 +404,7 @@ void *ResourceAdmin::managing(void *obj)
 						{
 							dprintf("ResourceAdmin: Ilet = %d is done.\n", current_ilet->get_id());
 							std::cout << "DONE ILET " << current_ilet->get_id() << std::endl;
+							current->resourcesCalcByProgram(current_ilet->get_id_program(), current->clk_instance->get_cycle(), current_ilet->get_clocks_used());
 							current_ilet->set_state(DONE);
 						}
 						else // free units with completation subprocess and infect if is neccesary

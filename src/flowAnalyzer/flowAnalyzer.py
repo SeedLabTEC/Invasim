@@ -470,17 +470,18 @@ def main():
             os.system("riscv32-unknown-elf-gcc -O0 -S "+ele +" -o "+eleo )
             ele = eleo
 
-            readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
             crateBlocks(ele, "./bin/analyzerResults/blocks/blocks" + str(index)+".xml")
             createLogicFlow("./bin/analyzerResults/blocks/blocks"+str(index) +".xml", "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+            readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
     
         elif(ele.endswith('.s')):
-            readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
             crateBlocks(ele, "./bin/analyzerResults/blocks/blocks" + str(index)+".xml")
             createLogicFlow("./bin/analyzerResults/blocks/blocks"+str(index) +".xml", "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+            readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
         
         elif(ele.endswith('.xml')):
             copyfile(ele, "./bin/analyzerResults/flow/flow"+str(index)+".xml")
+            readyToProcess.write("./bin/analyzerResults/flow/flow"+str(index)+".xml"+"\n")
         
         else:
             print("Can't load this type of file: "+ele)
