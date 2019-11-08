@@ -123,7 +123,14 @@ JSON *ProcessingUnit::monitoring()
 	if (this->iLet_ptr != NULL)
 	{
 		(*json_info)["ILet"] = this->iLet_ptr->get_id();
-		(*json_info)["ILetSub"] = this->current_used;
+		if (this->current_used != -1)
+		{
+			(*json_info)["ILetSub"] = this->iLet_ptr->get_current_operation()->get_codeOperation(this->current_used, this->current_load);
+		}
+		else
+		{
+			(*json_info)["ILetSub"] = this->current_used;
+		}
 	}
 	else
 	{
@@ -195,8 +202,9 @@ void *ProcessingUnit::executing(void *obj)
 			{
 				try
 				{
-					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1) << std::endl; // execute code
 					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
+					std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << inst << std::endl; // execute code
+					
 					//current->iLet_ptr->add_clocks_used(1);
 					std::stringstream ss(inst);
 					std::string token;

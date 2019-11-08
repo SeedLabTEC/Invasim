@@ -43,8 +43,6 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
         std::cerr << "ERROR: Processing units can't exceed 1000." << std::endl;
         exit(EXIT_FAILURE);
     }
-
-    std::cout << "EN ENVIRONMENT"<< _working_dir << std::endl;
     
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;

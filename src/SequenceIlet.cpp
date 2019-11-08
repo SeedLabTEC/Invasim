@@ -203,7 +203,6 @@ void *SequenceIlet::generate(void *obj)
 
                 if ((ilets_control_sum[progCount] == (int)iletsCode[progCount].size()))
                 {
-                    std::cout << "progCount " << progCount << " Terminated program on " << current->clk_instance->get_cycle() << std::endl;
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
                 }
             }
