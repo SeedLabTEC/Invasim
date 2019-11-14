@@ -225,8 +225,11 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
 	{
 		if (!ilet->get_current_operation()->get_subProcess()[spi].state)
 		{
-			is_done = false;
-			break;
+			if (ilet->get_current_operation()->get_subProcess()[spi].puWork > 0)
+			{
+				is_done = false;
+				break;
+			}
 		}
 	}
 
@@ -411,20 +414,21 @@ void *ResourceAdmin::managing(void *obj)
 						{
 							for (int spi = 0; spi < (int)current_ilet->get_current_operation()->get_subProcess().size(); spi++)
 							{
-								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork <= 0))
+								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork < 0))
 								{
-									current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
-									coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;
-									//current_ilet->pop_one_resource(position); // pop resurce
-									current->pu_array_ptr[position.x][position.y]->retreat();
-									//current->available += 1;
-
-									current->pu_array_ptr[position.x][position.y]->invade(current_ilet);
-									current->pu_array_ptr[position.x][position.y]->infect();
+									if (current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU.x != -1) // check if was a old subprocess
+									{
+										current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
+										coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;
+										//current_ilet->pop_one_resource(position); // pop resurce
+										current->pu_array_ptr[position.x][position.y]->retreat();
+										current_ilet->get_current_operation()->set_codeOperation(spi, {-1, -1});
+										//current->available += 1;
+										current->pu_array_ptr[position.x][position.y]->invade(current_ilet);
+										current->pu_array_ptr[position.x][position.y]->infect();
+									}
 								}
 							}
-
-							//current->invade(1, current_ilet->get_resources(), current_ilet);
 						}
 					}
 				}

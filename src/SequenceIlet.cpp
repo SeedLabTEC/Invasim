@@ -227,6 +227,7 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
     {
         //std::cout<< str << std::endl;
         programs.push_back(getBlocksCode(str));
+        this->manycore_ptr->newRegisterJson();
     }
 
     return programs;

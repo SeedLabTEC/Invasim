@@ -17,6 +17,10 @@
 ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance)
 {
     dprintf("MANYCOREARCH: Manycore Architecture instance created.\n\t- Dimension: (%d, %d).\n", _x_dim, _y_dim);
+
+    this->programs_registers = {};
+    this->ptr_registers = &this->programs_registers;
+
     this->init(_x_dim, _y_dim, _clk_instance);
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
                                                this->y_dim, this->clk_instance);
@@ -34,6 +38,9 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance)
 ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, int _max_ilets)
 {
     dprintf("MANYCOREARCH: Manycore Architecture instance created.\n\t- Dimension: (%d, %d).\n", _x_dim, _y_dim);
+    this->programs_registers = {};
+    this->ptr_registers = &this->programs_registers;
+
     this->init(_x_dim, _y_dim, _clk_instance);
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
                                                this->y_dim, _max_ilets,
@@ -56,6 +63,16 @@ void ManyCoreArch::start()
         }
     }
     this->resource_manager->start();
+}
+
+/**
+ * @brief Function that create a new JSON of registers for an program
+ * 
+ */
+void ManyCoreArch::newRegisterJson()
+{
+    JSON nr = {{"zero", 0}, {"ra", 0}, {"sp", 0}, {"gp", 0}, {"tp", 0}, {"t0", 0}, {"t1", 0}, {"t2", 0}, {"s0", 0}, {"fp", 0}, {"s1", 0}, {"a0", 0}, {"a1", 0}, {"a2", 0}, {"a3", 0}, {"a4", 0}, {"a5", 0}, {"a6", 0}, {"a7", 0}, {"s2", 0}, {"s3", 0}, {"s4", 0}, {"s5", 0}, {"s6", 0}, {"s7", 0}, {"s8", 0}, {"s9", 0}, {"s10", 0}, {"s11", 0}, {"t3", 0}, {"t4", 0}, {"t5", 0}, {"t6", 0}};
+    this->programs_registers.push_back(nr);
 }
 
 /**
@@ -130,7 +147,7 @@ void ManyCoreArch::init(int _x_dim, int _y_dim, Clock *_clk_instance)
         this->pu_array[i] = new ProcessingUnit *[_y_dim];
         for (int j = 0; j < _y_dim; j++)
         {
-            this->pu_array[i][j] = new ProcessingUnit(i, j, _clk_instance);
+            this->pu_array[i][j] = new ProcessingUnit(i, j, _clk_instance, this->ptr_registers);
         }
     }
 

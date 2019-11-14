@@ -26,7 +26,7 @@ using JSON = nlohmann::json;
 class ProcessingUnit
 {
   public:
-	ProcessingUnit(int _x, int _y, Clock *_clk_instance);
+	ProcessingUnit(int _x, int _y, Clock *_clk_instance, std::vector<JSON> *_regs);
 
 	void start();
 
@@ -87,7 +87,7 @@ class ProcessingUnit
 	 * @brief Registers instance
 	 * 
 	 */
-	JSON registers;
+	std::vector<JSON> *registers;
 
 	static void *executing(void *obj);
 };

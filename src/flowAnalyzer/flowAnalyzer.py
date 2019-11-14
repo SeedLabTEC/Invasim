@@ -213,6 +213,14 @@ def dependenciesSearch(instructionList):
 
     return dependenciesSearchDeep(returnListDivided)
 
+def toDir(val, nbits):
+    if(val<0):
+        a = ((val + (1 << nbits)) % (1 << nbits))
+        b = (bin(a)[22:])
+        return int(b, 2)
+    else:
+        return int(bin((val + (1 << nbits)) % (1 << nbits)),2)
+
 
 def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLine):
     subprocess = dependenciesSearch(instructionListIn)
@@ -258,6 +266,13 @@ def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLi
                     condition2.text = str(actualLine)
                     probability.text = str(1)
             else:
+                if( "-" in val):
+                    fv = val.find("-")
+                    offsetDir = toDir(int(val[fv:fv+3]), 32)-4064
+                    tempVal = val[0:fv] + str(offsetDir) + val[fv+3:]
+                    val = tempVal
+                    #print( val.split()[1].split(',')[1][0:-4] )
+
                 instDo = val.split()
                 instruction = ET.SubElement(subIlet, "instruction")
 
@@ -302,12 +317,12 @@ def crateBlocks(readFile, writeFile):
                 if(temporalBlock != []):
                     if(blocksID != ""):
                         blocksCreation(blocksRootFirstAnalisis,
-                                       temporalBlock, blocksID, readLine)
-                    else:
-                        blocksCreation(blocksRootFirstAnalisis, temporalBlock, "Line" +
-                                       str(readLine-blockLines+1), readLine)
-
-                blocksID = line.replace(":", "").rstrip()
+                                               temporalBlock, blocksID, readLine)
+                    else:        
+                        blocksCr        eation(blocksRootFirstAnalisis, temporalBlock, "Line" +
+                                               str(readLine-blockLines+1), readLine)
+        
+                blocksID = line.        replace(":", "").rstrip()
                 # clear variables
                 blockLines = 0
                 temporalBlock = []
@@ -490,6 +505,5 @@ def main():
         index = index+1
 
     readyToProcess.close()
-
 
 main()

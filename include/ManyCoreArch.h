@@ -48,6 +48,8 @@ class ManyCoreArch
 
 		int getResourcesFromAdmin(int iletReq);
 
+		void newRegisterJson();
+
 	private:
 		/**
 		 * @brief x dimension of manycore architrecture.
@@ -85,6 +87,18 @@ class ManyCoreArch
 		 * 
 		 */
 		ResourceAdmin * resource_manager;
+
+		/**
+		 * @brief Programs registers
+		 * 
+		 */
+		std::vector<JSON> programs_registers;
+
+		/**
+		 * @brief Pointer to Programs registers
+		 * 
+		 */
+		std::vector<JSON>* ptr_registers;
 
 		void init(int _x_dim, int _y_dim, Clock * _clk_instance);
 };
