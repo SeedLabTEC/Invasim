@@ -229,6 +229,10 @@ void *ProcessingUnit::executing(void *obj)
 					{
 						(*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] + std::stoi(process[3]));
 					}
+					else if (process[0] == "rem")
+					{
+						(*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] % (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[3]]);
+					}
 					else if (process[0] == "sw")
 					{ // sw
 						current->cache_mem->writeData((std::stoi(process[2].substr(0, process[2].find("("))) + (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]), (*current->registers)[current->iLet_ptr->get_id_program()][process[1]], current->iLet_ptr->get_priority());

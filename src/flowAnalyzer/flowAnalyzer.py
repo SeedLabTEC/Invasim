@@ -7,7 +7,7 @@ from xml.etree import ElementTree as ET
 import xml.dom.minidom
 import numpy as np
 
-cutBlockValues = ["beq", "bnez", "bge", "blt", "ble", "j", "jr",
+cutBlockValues = ["beq", "bne", "bnez", "bge", "blt", "ble", "j", "jr",
                   "jal", "jalr", "call"]  # BNEZ-J-JR-JAL-JALR-EBREAK
 
 
@@ -151,7 +151,11 @@ def dependenciesSearch(instructionList):
 
         temp = val.split()
         if(posInst+1 < len(instructionList)):
-            nextVal = instructionList[posInst+1].split()[1]
+            nextVal = instructionList[posInst+1]
+            if(nextVal == "nop"):
+                nextVal = "addi	zero,zero,0"
+            else:
+                nextVal = instructionList[posInst+1].split()[1]
             nextVal = nextVal.replace("(", ",").replace(")", "")
             nextVal = nextVal.split(',')
             temp[1] = temp[1].replace("(", ",").replace(")", "")
@@ -256,7 +260,7 @@ def blocksCreation(blocksRootFirstAnalisis, instructionListIn, idBlock, actualLi
                     condition1.text = "N/A"
                     condition2.text = str(actualLine)
                     probability.text = str(1)
-                elif((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt") or (instDo[0] == "ble")):
+                elif((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt") or (instDo[0] == "ble") or (instDo[0] == "bne")):
                     condition1.text = instDo[-1].split(",")[-1]
                     condition2.text = str(actualLine)
                     probability.text = str(np.random.binomial(1, 0.5, 1)[0])
@@ -319,7 +323,7 @@ def crateBlocks(readFile, writeFile):
                         blocksCreation(blocksRootFirstAnalisis,
                                                temporalBlock, blocksID, readLine)
                     else:        
-                        blocksCr        eation(blocksRootFirstAnalisis, temporalBlock, "Line" +
+                        blocksCreation(blocksRootFirstAnalisis, temporalBlock, "Line" +
                                                str(readLine-blockLines+1), readLine)
         
                 blocksID = line.        replace(":", "").rstrip()
@@ -434,7 +438,7 @@ def createLogicFlow(readFile, writeFile):
                             root, tempBlock[-1][-1][0].text.split()[-1])]
                 else:
                     instDo = tempBlock[-1][-1][0].text.split()
-                    if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt") or (instDo[0] == "ble")):
+                    if((instDo[0] == "beq") or (instDo[0] == "bnez") or (instDo[0] == "bge") or (instDo[0] == "blt") or (instDo[0] == "ble") or (instDo[0] == "bne")):
                         # change intersection value to known
                         orderFlowBlocks[-1][-1][-1][2].text = root[findIdOnXml(
                             root, orderFlowBlocks[-1].get("id"))+1].get("id")
