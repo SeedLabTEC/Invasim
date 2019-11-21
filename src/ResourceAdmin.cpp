@@ -219,13 +219,13 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
 			break;
 		}
 	}
-	//std::cout << " VALUE HERE "<< is_done << std::endl;
-
+	
+	// Check if the ilet has some subprocess that did not has been started 
 	for (int spi = 0; spi < (int)ilet->get_current_operation()->get_subProcess().size(); spi++)
 	{
-		if (!ilet->get_current_operation()->get_subProcess()[spi].state)
+		if (!ilet->get_current_operation()->get_subProcess()[spi].state) // verify states, false is that it is necessary to verify the pending work
 		{
-			if (ilet->get_current_operation()->get_subProcess()[spi].puWork > 0)
+			if (ilet->get_current_operation()->get_subProcess()[spi].puWork > 0) // if unit work is more than 0, is a pending subprocess
 			{
 				is_done = false;
 				break;
@@ -237,23 +237,21 @@ bool ResourceAdmin::verify_ilet(ILet *ilet)
 }
 
 /**
- * @brief Getter of list of ilets on invaded
- * 
- * @param obj 
- * @return std::vector<ILet *>
+ * @brief Getter of list of ilets on invaded and executing
+ * @return std::vector<ILet *> With all the ilets on incomming and execution
  */
 std::vector<ILet *> ResourceAdmin::get_invaded()
 {
 	std::queue<ILet *> qc = this->incomming_ilets;
 	std::vector<ILet *> r;
 
-	for (int q = 0; q < (int)this->incomming_ilets.size(); q++)
+	for (int q = 0; q < (int)this->incomming_ilets.size(); q++) // push to vector all the ilets on incomming queue
 	{
 		r.push_back(qc.front());
 		qc.pop();
 	}
 
-	r.insert(r.end(), this->execute_ilets.begin(), this->execute_ilets.end());
+	r.insert(r.end(), this->execute_ilets.begin(), this->execute_ilets.end()); // insert to return vector list
 
 	return r;
 }
@@ -278,15 +276,15 @@ int ResourceAdmin::getPriority(int iletID, int programID)
  */
 int ResourceAdmin::assignResources(int iletReq)
 {
-	int calcMax = (iletReq - this->max_iLets);
+	int calcMax = (iletReq - this->max_iLets); // calculation of the maximum number of processors that can be assigned
 	int resources = iletReq;
 
-	if (calcMax > 0)
+	if (calcMax > 0) // if result is positive
 	{
-		resources = resources - calcMax;
+		resources = resources - calcMax; // required quantity less max that could be assigned 
 	}
 
-	return ((rand() % resources) + 1);
+	return ((rand() % resources) + 1); // return rand
 }
 
 /**
@@ -295,21 +293,21 @@ int ResourceAdmin::assignResources(int iletReq)
  */
 void ResourceAdmin::resourcesCalcByProgram(int prog, int clock, int add)
 {
-	std::string search = std::to_string(prog);
-	auto subjectIdIter = this->resourcesUse.find(search);
-	if (subjectIdIter != this->resourcesUse.end())
+	std::string search = std::to_string(prog); // pass int to string and after that search on json
+	auto subjectIdIter = this->resourcesUse.find(search); // search on json the tag of program with the clock and val
+	if (subjectIdIter != this->resourcesUse.end()) // if the program is on the json
 	{
-		//cout << "it is found" << endl;
 		int diffClock = clock - (int)this->resourcesUse[search]["clock"]; // calculate the difference between clocks
 		int diff = diffClock + add;										  // calculate the new weight using the difference between clocks and extra weight wanted
+		// keep info
 		this->resourcesUse[search]["clock"] = clock;
 		this->resourcesUse[search]["val"] = (int)this->resourcesUse[search]["val"] + diff;
 	}
 	else
 	{
+		// keep info
 		this->resourcesUse[search] = {{"clock", clock}, {"val", clock}};
 	}
-	//std::cout << " PROGRAM " + search + " " << this->resourcesUse[search] << std::endl;
 }
 
 /**
@@ -360,7 +358,7 @@ void *ResourceAdmin::managing(void *obj)
 			{
 				//If there are not enough resources, then is queued again
 				dprintf("ResourceAdmin: Not enough resources to Ilet = %d.\n", current_ilet->get_id());
-				std::cout << " ResourceAdmin: Not enough resources to Ilet = " << current_ilet->get_id() << std::endl;
+				//std::cout << " ResourceAdmin: Not enough resources to Ilet = " << current_ilet->get_id() << std::endl;
 				pthread_mutex_lock(&current->ilet_mutex);
 				current_ilet->set_state(EXECUTING);
 				current->incomming_ilets.push(current_ilet);
@@ -407,25 +405,25 @@ void *ResourceAdmin::managing(void *obj)
 						{
 							dprintf("ResourceAdmin: Ilet = %d is done.\n", current_ilet->get_id());
 							std::cout << "DONE ILET " << current_ilet->get_id() << std::endl;
-							current->resourcesCalcByProgram(current_ilet->get_id_program(), current->clk_instance->get_cycle(), current_ilet->get_clocks_used());
+							current->resourcesCalcByProgram(current_ilet->get_id_program(), current->clk_instance->get_cycle(), current_ilet->get_clocks_used()); // keep the control of performance
 							current_ilet->set_state(DONE);
 						}
 						else // free units with completation subprocess and infect if is neccesary
 						{
-							for (int spi = 0; spi < (int)current_ilet->get_current_operation()->get_subProcess().size(); spi++)
+							for (int spi = 0; spi < (int)current_ilet->get_current_operation()->get_subProcess().size(); spi++) // on every subprocess of the ilet
 							{
-								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork < 0))
+								if ((current_ilet->get_current_operation()->get_subProcess()[spi].puWork < 0)) // check if the work on subprocess has finished
 								{
 									if (current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU.x != -1) // check if was a old subprocess
 									{
 										current_ilet->get_current_operation()->reduce_WorkOfProcess(spi); // reduce to avoid pass here again
 										coordinate position = current_ilet->get_current_operation()->get_subProcess()[spi].SPxPU;
 										//current_ilet->pop_one_resource(position); // pop resurce
-										current->pu_array_ptr[position.x][position.y]->retreat();
-										current_ilet->get_current_operation()->set_codeOperation(spi, {-1, -1});
+										current->pu_array_ptr[position.x][position.y]->retreat(); // call retreat
+										current_ilet->get_current_operation()->set_codeOperation(spi, {-1, -1}); // set a null and controled value of processor
 										//current->available += 1;
-										current->pu_array_ptr[position.x][position.y]->invade(current_ilet);
-										current->pu_array_ptr[position.x][position.y]->infect();
+										current->pu_array_ptr[position.x][position.y]->invade(current_ilet); // set to invade by same ilet
+										current->pu_array_ptr[position.x][position.y]->infect(); // call infect if there are more subprocess to do
 									}
 								}
 							}

@@ -48,8 +48,8 @@ SequenceIlet::SequenceIlet(Sequence_Type _seq_type, Clock *_clk_instance, ManyCo
     this->init(_clk_instance, _manycore_ptr, _decision_probability, _seed);
     char path_files[PATH_MAX];
     getcwd(path_files, PATH_MAX);
-    this->loadFlow = path_files;
-    this->loadFlow = this->loadFlow + "/bin/analyzerResults/files.txt";
+    this->loadFlow = path_files; // path of work
+    this->loadFlow = this->loadFlow + "/bin/analyzerResults/files.txt"; // path to files of flow
 }
 
 /**
@@ -167,18 +167,17 @@ void *SequenceIlet::generate(void *obj)
     pthread_mutex_t *clk_cycle_mutex = current->clk_instance->get_cycle_mutex_ptr();
     pthread_cond_t *clk_cycle_cond = current->clk_instance->get_cycle_cond_ptr();
     //Counter to assign identifier
-    int i = 0;
-    int clocks_control = 0;
+    int i = 0; // ilets count identifier
+    //int clocks_control = 0;
 
-    std::vector<std::vector<std::vector<subProcess>>> iletsCode = current->getPrograms();
+    std::vector<std::vector<std::vector<subProcess>>> iletsCode = current->getPrograms(); // create the list of ilets with subprocess
     std::vector<int> ilets_control_sum; // to keep the control of ilet from program
 
-    for (int p = 0; p < (int)iletsCode.size(); p++)
+    for (int p = 0; p < (int)iletsCode.size(); p++) // initialize the count control of ilets by every program
     {
-        ilets_control_sum.push_back(0);
+        ilets_control_sum.push_back(0); // initialize with 0
     }
-
-    std::cout << " TO START " << std::endl;
+//    std::cout << " TO START " << std::endl;
     while (1)
     {
         //Await clock signal
@@ -188,15 +187,17 @@ void *SequenceIlet::generate(void *obj)
         {
             for (int iletsProgCount = 0; iletsProgCount < (int)iletsCode[progCount].size(); iletsProgCount++) // run over ilets on program separated by branch
             {
+                // check if the ilet is less than size total of ilets of the program, also check if there are an ilet of the program on execution
                 if ((ilets_control_sum[progCount] < (int)iletsCode[progCount].size()) && (!current->checkTerminated(progCount, current->manycore_ptr->get_invaded())))
                 {
                     //Create an iLet and invade in manycore
                     std::cout << " SEND ILET= " << i << std::endl;
+                    // create a new ilet, send to cores and increase the control number
                     ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount)); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
-                    ++i;
+                    ++i; // increase control id ilet
 
                     break;
                 }
@@ -207,7 +208,7 @@ void *SequenceIlet::generate(void *obj)
                 }
             }
         }
-        ++clocks_control;
+        //++clocks_control;
     }
     return NULL;
 }
@@ -219,14 +220,14 @@ void *SequenceIlet::generate(void *obj)
  */
 std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
 {
-    std::vector<std::vector<std::vector<subProcess>>> programs;
+    std::vector<std::vector<std::vector<subProcess>>> programs; // variable where keep all data
     
-    std::ifstream file(this->loadFlow);
+    std::ifstream file(this->loadFlow); // file where are the paths of files to load
     std::string str;
-    while (std::getline(file, str))
+    while (std::getline(file, str)) // go over paths
     {
         //std::cout<< str << std::endl;
-        programs.push_back(getBlocksCode(str));
+        programs.push_back(getBlocksCode(str)); // get blocks
         this->manycore_ptr->newRegisterJson();
     }
 
@@ -240,16 +241,16 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
  */
 std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string program)
 {
-    const char *cstr = program.c_str();
+    const char *cstr = program.c_str(); // create char* path
     pugi::xml_document doc;
-    doc.load_file(cstr);
-    pugi::xml_node blocks = doc.child("Blocks");
-    std::vector<std::vector<subProcess>> iletsFromCode;
+    doc.load_file(cstr); // load yhe file
+    pugi::xml_node blocks = doc.child("Blocks"); // get blocks
+    std::vector<std::vector<subProcess>> iletsFromCode; // list of blocks to return
 
     for (pugi::xml_node block = blocks.first_child(); block; block = block.next_sibling()) // go over blocks
     {
         std::vector<subProcess> temporalBlock;
-        for (pugi::xml_node ilet = block.first_child(); ilet; ilet = ilet.next_sibling()) // go over instructions of blocks
+        for (pugi::xml_node ilet = block.first_child(); ilet; ilet = ilet.next_sibling()) // go over subprocess of blocks
         {
             subProcess temporalSubCode;
             std::vector<std::string> subCode;
@@ -257,7 +258,7 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             {
                 std::string nodeName = instruction.name();
                 
-                if (nodeName == "instruction")
+                if (nodeName == "instruction") // if is an instruction and is not an intersection push to list
                 {
                     std::string instStringPut = (std::string)instruction.first_child().value();
                     //std::cout<< instStringPut << std::endl;
@@ -272,13 +273,13 @@ std::vector<std::vector<subProcess>> SequenceIlet::getBlocksCode(std::string pro
             temporalSubCode.SPxPU.x = -1;
             temporalSubCode.SPxPU.y = -1;
 
-            if (temporalSubCode.puWork != 0)
+            if (temporalSubCode.puWork != 0) // if created subprocess is not empty keep data
             {
                 temporalBlock.push_back(temporalSubCode);
             }
         }
 
-        if (temporalBlock.size() != 0)
+        if (temporalBlock.size() != 0) // if created ilet is not empty keep data
         {
             iletsFromCode.push_back(temporalBlock); // push the vector of charts to principal list
         }
@@ -297,7 +298,7 @@ bool SequenceIlet::checkTerminated(int prog, std::vector<ILet *> iletsList)
 {
     int goOn = iletsList.size();
     //std::cout << "lsSeq " << goOn << std::endl;
-    for (int i = 0; i < goOn; i++)
+    for (int i = 0; i < goOn; i++) // go over ilets list and search an id
     {
         if (prog == iletsList[i]->get_id_program())
         {

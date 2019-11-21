@@ -24,7 +24,7 @@ ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance, std::vector
 	this->iLet_ptr = NULL;
 	this->current_used = -1;
 	this->clk_instance = _clk_instance;
-	this->registers = _regs;
+	this->registers = _regs; // pointer to registers
 	// full registers
 	//this->registers = {{"zero", 0}, {"ra", 0}, {"sp", 0}, {"gp", 0}, {"tp", 0}, {"t0", 0}, {"t1", 0}, {"t2", 0}, {"s0", 0}, {"fp", 0}, {"s1", 0}, {"a0", 0}, {"a1", 0}, {"a2", 0}, {"a3", 0}, {"a4", 0}, {"a5", 0}, {"a6", 0}, {"a7", 0}, {"s2", 0}, {"s3", 0}, {"s4", 0}, {"s5", 0}, {"s6", 0}, {"s7", 0}, {"s8", 0}, {"s9", 0}, {"s10", 0}, {"s11", 0}, {"t3", 0}, {"t4", 0}, {"t5", 0}, {"t6", 0}};
 
@@ -79,7 +79,7 @@ void ProcessingUnit::retreat()
 	pthread_mutex_lock(&this->pu_mutex);
 	this->pu_state = FREE;
 	this->iLet_ptr = NULL;
-	this->current_used = -1;
+	this->current_used = -1; // clean the variable of subprocess asigned
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
@@ -126,7 +126,7 @@ JSON *ProcessingUnit::monitoring()
 		(*json_info)["ILet"] = this->iLet_ptr->get_id();
 		if (this->current_used != -1)
 		{
-			(*json_info)["ILetSub"] = this->iLet_ptr->get_current_operation()->get_codeOperation(this->current_used, this->current_load);
+			(*json_info)["ILetSub"] = this->iLet_ptr->get_current_operation()->get_codeOperation(this->current_used, this->current_load); // set the control of resources used
 		}
 		else
 		{
@@ -181,42 +181,43 @@ void *ProcessingUnit::executing(void *obj)
 					current->iLet_ptr->get_id());
 			pthread_mutex_lock(&current->pu_mutex);
 
-			if ((current->current_used == -1))
+			if ((current->current_used == -1)) // if the processor does not have subprocess assigned
 			{
-				for (int spi = 0; spi < (int)current->iLet_ptr->get_current_operation()->get_subProcess().size(); spi++)
+				for (int spi = 0; spi < (int)current->iLet_ptr->get_current_operation()->get_subProcess().size(); spi++) // run over the subprocess of ilets 
 				{
-					if (!current->iLet_ptr->get_current_operation()->get_subProcess()[spi].state)
+					if (!current->iLet_ptr->get_current_operation()->get_subProcess()[spi].state) // find a subprocess not started
 					{
-						current->iLet_ptr->get_current_operation()->set_codeOperation(spi, current->get_coodinate());
-						current->current_used = spi;
-						current->current_load = current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork;
-						(*current->registers)[current->iLet_ptr->get_id_program()]["sp"] = 100;
+						current->iLet_ptr->get_current_operation()->set_codeOperation(spi, current->get_coodinate()); // set to the subprocess the identifier of processor that will do the work
+						current->current_used = spi; // assign the id of subprocess
+						current->current_load = current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork; // get load work
+						(*current->registers)[current->iLet_ptr->get_id_program()]["sp"] = 100; // assign the memory pointer
 						break;
 					}
 				}
 			}
 			else
 			{
-				//std::cout << "current->current_used "<<current->current_used<< std::endl;
-				current->current_load = current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork;
+				current->current_load = current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork; // assign the workload that the subprocess report
 			}
 
-			if ((current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork >= 0) && (current->current_used != -1))
+			if ((current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork >= 0) && (current->current_used != -1)) // if there are work to do and the processor has a subprocess assigned
 			{
 				try
 				{
-					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
-					std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << inst << std::endl; // execute code
+					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1); // get the instruction to operate
+					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << inst << std::endl; // execute code
 
 					//current->iLet_ptr->add_clocks_used(1);
 					std::stringstream ss(inst);
 					std::string token;
 					std::vector<std::string> process;
 
-					while (getline(ss, token, ','))
+					while (getline(ss, token, ',')) // divide the string on the type, registers and address
 					{
 						process.push_back(token);
 					}
+
+					// Next lines are used to manipulate and process the registers
 					if (process[0] == "add")
 					{
 						(*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] + (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[3]]);
@@ -270,9 +271,9 @@ void *ProcessingUnit::executing(void *obj)
 						std::cout << "DONT KNOW " << process[0] << std::endl;
 					}
 
-					current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
+					current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used); // reduce work of subprocess
 
-					current->current_load--;
+					current->current_load--; // reduce work of subprocess
 				}
 				catch (std::exception &e)
 				{
