@@ -14,7 +14,7 @@
  * @param _y 
  * @param _clk_instance 
  */
-ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
+ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance, InterconnectionNetwork*& _intNet, std::vector<JSON> *_regs)
 {
 	dprintf("PU = (%d, %d): New processing unit coordenate.\n", _x, _y);
 	this->pu_state = FREE;
@@ -22,10 +22,14 @@ ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance)
 	this->pu_coordenate.y = _y;
 	this->current_load = 0;
 	this->iLet_ptr = NULL;
+	this->current_used = -1;
 	this->clk_instance = _clk_instance;
+	// full registers
+	this->registers = _regs;
+	this->intNetw = _intNet;
+	this->cache_controller = new CacheController(_intNet, _x, _y);
+    this->intNetw->insertCC(this->cache_controller);
 
-	//Memory features
-	this->cache_mem = new CacheMemory(this->pu_coordenate.x, this->pu_coordenate.y);
 }
 
 /**
@@ -74,6 +78,7 @@ void ProcessingUnit::retreat()
 	pthread_mutex_lock(&this->pu_mutex);
 	this->pu_state = FREE;
 	this->iLet_ptr = NULL;
+	this->current_used = -1;
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
@@ -118,11 +123,20 @@ JSON *ProcessingUnit::monitoring()
 	if (this->iLet_ptr != NULL)
 	{
 		(*json_info)["ILet"] = this->iLet_ptr->get_id();
+		if (this->current_used != -1)
+		{
+			(*json_info)["ILetSub"] = this->iLet_ptr->get_current_operation()->get_codeOperation(this->current_used, this->current_load);
+		}
+		else
+		{
+			(*json_info)["ILetSub"] = this->current_used;
+		}
 	}
 	else
 	{
 		//When it has no ilet assigned
 		(*json_info)["ILet"] = -1;
+		(*json_info)["ILetSub"] = -1;
 	}
 	return json_info;
 }
@@ -165,19 +179,116 @@ void *ProcessingUnit::executing(void *obj)
 					current->pu_coordenate.y,
 					current->iLet_ptr->get_id());
 			pthread_mutex_lock(&current->pu_mutex);
-			if (current->current_load > 0)
+
+			if ((current->current_used == -1))
 			{
-				current->current_load--;
+				for (int spi = 0; spi < (int)current->iLet_ptr->get_current_operation()->get_subProcess().size(); spi++)
+				{
+					if (!current->iLet_ptr->get_current_operation()->get_subProcess()[spi].state)
+					{
+						current->iLet_ptr->get_current_operation()->set_codeOperation(spi, current->get_coodinate());
+						current->current_used = spi;
+						current->current_load = current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork;
+                        (*current->registers)[current->iLet_ptr->get_id_program()]["sp"] = current->iLet_ptr->get_id_program() * LIMIT_PROGRAM_MEM;
+						break;
+					}
+				}
+			}
+			else
+			{
+				current->current_load = current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork;
+			}
+
+			if ((current->iLet_ptr->get_current_operation()->get_subProcess()[current->current_used].puWork >= 0) && (current->current_used != -1))
+			{
+				try
+				{
+					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
+					std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << inst << std::endl; // execute code
+					
+					//current->iLet_ptr->add_clocks_used(1);
+					std::stringstream ss(inst);
+					std::string token;
+					std::vector<std::string> process;
+
+					while (getline(ss, token, ','))
+					{
+						process.push_back(token);
+					}
+					if (process[0] == "add")
+                    {
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] + (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[3]]);
+                    }
+                    else if (process[0] == "sub")
+                    {
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] - (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[3]]);
+                    }
+                    else if (process[0] == "addi")
+                    {
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] + std::stoi(process[3]));
+                    }
+					else if (process[0] == "sw")
+					{ // sw
+						dataMem dataFromMem;
+						dataFromMem = current->cache_controller->writeData((std::stoi(process[2].substr(0, process[2].find("("))) + (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]), (*current->registers)[current->iLet_ptr->get_id_program()][process[1]], current->iLet_ptr->get_priority());
+						int usedClocks = dataFromMem.AMAT;
+						//int usedClocks = 2;
+						current->iLet_ptr->add_clocks_used((usedClocks - 1));
+					}
+					else if (process[0] == "lw")
+					{ // lw
+						dataMem dataFromMem;
+						dataFromMem = current->cache_controller->readData((std::stoi(process[2].substr(0, process[2].find("("))) + (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2].substr(process[2].find("(") + 1, (process[2].find(")") - process[2].find("(") - 1))]), current->iLet_ptr->get_priority());
+						(*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = dataFromMem.data;
+						int usedClocks = dataFromMem.AMAT;
+						current->iLet_ptr->add_clocks_used((usedClocks - 1));
+					}
+					else if (process[0] == "li")
+                    { // li
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = std::stoi(process[2]);
+                    }
+                    else if (process[0] == "mv")
+                    { // mv
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = (*current->registers)[current->iLet_ptr->get_id_program()][process[2]];
+                    }
+                    else if (process[0] == "mul")
+                    { // mul
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] * (int)(*current->registers)[current->iLet_ptr->get_id_program()][process[3]]);
+                    }
+                    else if (process[0] == "slli")
+                    {
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] << std::stoi(process[3]));
+                    }
+                    else if (process[0] == "srli")
+                    {
+                        (*current->registers)[current->iLet_ptr->get_id_program()][process[1]] = ((int)(*current->registers)[current->iLet_ptr->get_id_program()][process[2]] >> std::stoi(process[3]));
+                    }
+                    else
+                    {
+                        std::cout << "DONT KNOW " << process[0] << std::endl;
+                    }
+					current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
+
+					current->current_load--;
+					//std::cout << "FINISHED " << current->current_load << std::endl;
+				}
+				catch (std::exception &e)
+				{
+					std::cout << " a standard exception was caught, with message '" << e.what() << "'\n";
+				}
 			}
 			else
 			{
 				//End execution
 				dprintf("PU = (%d, %d): Execution Done by ILet = %d.\n",
-					current->pu_coordenate.x,
-					current->pu_coordenate.y,
-					current->iLet_ptr->get_id());
+						current->pu_coordenate.x,
+						current->pu_coordenate.y,
+						current->iLet_ptr->get_id());
 				current->pu_state = INVADED;
+				// set finished
 			}
+
+			////////////////////////////////////////////////////////////////////////////////////////////////
 			pthread_mutex_unlock(&current->pu_mutex);
 			break;
 		case FREE:

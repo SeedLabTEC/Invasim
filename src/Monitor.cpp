@@ -14,10 +14,10 @@
  * @param _seq_ilet_ptr 
  * @param _clk_instance 
  */
-Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock *_clk_instance)
+Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock *_clk_instance, InterconnectionNetwork *& _intNet)
 {
 	getcwd(this->path_files, PATH_MAX);
-	this->init(_manycore_ptr, _seq_ilet_ptr, _clk_instance);
+	this->init(_manycore_ptr, _seq_ilet_ptr, _clk_instance, _intNet);
 }
 
 /**
@@ -28,10 +28,10 @@ Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock
  * @param _path_files 
  * @param _clk_instance 
  */
-Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::string _path_files, Clock *_clk_instance)
+Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::string _path_files, Clock *_clk_instance, InterconnectionNetwork *& _intNet)
 {
 	strcpy(this->path_files, _path_files.c_str());
-	this->init(_manycore_ptr, _seq_ilet_ptr, _clk_instance);
+	this->init(_manycore_ptr, _seq_ilet_ptr, _clk_instance, _intNet);
 }
 
 /**
@@ -41,11 +41,12 @@ Monitor::Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::
  * @param _seq_ilet_ptr 
  * @param _clk_instance 
  */
-void Monitor::init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock *_clk_instance)
+void Monitor::init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock *_clk_instance, InterconnectionNetwork*& _intNet)
 {
 	this->manycore_ptr = _manycore_ptr;
 	this->clk_instance = _clk_instance;
 	this->seq_ilet_ptr = _seq_ilet_ptr;
+	this->intNet = _intNet;
 	dprintf("MONITOR: Monitor created in directory %s\n", this->path_files);
 }
 
@@ -57,9 +58,9 @@ void Monitor::init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clo
 void Monitor::start()
 {
 	//create threads
-	pthread_create(&this->monitor_thread, NULL, Monitor::monitoring, (void *)this);
+    pthread_create(&this->monitor_thread, NULL, Monitor::monitoring, (void *)this);
 	//detach threads
-	pthread_detach(this->monitor_thread);
+    pthread_detach(this->monitor_thread);
 }
 /**
  * @brief Getter for working directory as std::string
@@ -173,6 +174,25 @@ void Monitor::write_ilets(JSON *info)
 	path.clear();
 }
 
+void Monitor::write_diskMem(JSON data)
+{
+    std::string path = "";
+
+    path.append(this->path_files);
+    path.append(MEM_FILE);
+    std::string data_w;
+    data_w = data.dump();
+
+    //Write in disk
+    std::ofstream resources_file(path.c_str());
+    resources_file << data_w << std::endl;
+    resources_file.close();
+
+    path.clear();
+
+}
+
+
 /**
  * @brief Funtion that writes a json in disk, with a flag that allows to append data
  * 
@@ -229,11 +249,12 @@ void *Monitor::monitoring(void *obj)
 		//Await clock signal
 		pthread_cond_wait(clk_monitor_cond, clk_monitor_mutex);
 
-		//Request components information
-		JSON *system_info = current->manycore_ptr->monitoring();
-		JSON *ilet_info = current->seq_ilet_ptr->monitoring();
-		
-		//Write data in disk
+        //Request components information
+        JSON *system_info = current->manycore_ptr->monitoring();
+        JSON *ilet_info = current->seq_ilet_ptr->monitoring();
+		JSON arrayMem = current->intNet->monitoring();
+        //Write data in disk
+		current->write_diskMem(arrayMem);
 		current->write_system(system_info);
 		current->write_components(system_info);
 		//Verify if there are new iLets to write
@@ -247,3 +268,5 @@ void *Monitor::monitoring(void *obj)
 	}
 	return NULL;
 }
+
+

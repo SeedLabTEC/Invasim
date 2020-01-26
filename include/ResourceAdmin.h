@@ -17,7 +17,6 @@
 using JSON = nlohmann::json;
 
 #include <pthread.h>
-#include <vector>
 #include <queue>
 #include "Utils.h"
 
@@ -38,6 +37,12 @@ class ResourceAdmin
 
 		JSON * monitoring();
 
+		std::vector<ILet *> get_invaded();
+
+		int getPriority(int iletID, int programID);
+
+		int assignResources(int iletReq);
+		
 	private:
 		pthread_t pu_exe_thread;
 		/**
@@ -51,7 +56,7 @@ class ResourceAdmin
 		 */
 		Clock * clk_instance;
 		/**
-		 * @brief Max amount of iLets
+		 * @brief Max amount of iLets (x*y)
 		 * 
 		 */
 		unsigned int max_iLets;
@@ -70,6 +75,11 @@ class ResourceAdmin
 		 * 
 		 */
 		int available;
+		/**
+		 * @brief Control of process on programs
+		 * 
+		 */
+		JSON resourcesUse;
 
 		/**
 		 * @brief Matrix of processing units pointer
@@ -104,6 +114,8 @@ class ResourceAdmin
 		bool verify_ilet(ILet * ilet);
 
 		static void * managing(void * obj);
+
+		void resourcesCalcByProgram(int prog, int clock, int add);
 
 };
 

@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QCloseEvent>
 #include "StartView.h"
+#include <stdio.h>
 
 SimulationWindow::SimulationWindow(QWidget *parent,
                                    simulation_data *_current_sim_data,
@@ -15,7 +16,7 @@ SimulationWindow::SimulationWindow(QWidget *parent,
 {
     ui->setupUi(this);
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_COLORS; i++)
     {
           this->create_color();
     }
@@ -27,6 +28,7 @@ SimulationWindow::SimulationWindow(QWidget *parent,
     this->ui->probability_label->setNum(this->current_sim_data->decision);
     this->ui->seed_num_label->setNum(this->current_sim_data->seed);
     this->ui->dir_label->setText(this->current_sim_data->work_dir.c_str());
+
 
     if (!is_loaded)
     {
@@ -145,4 +147,13 @@ void SimulationWindow::create_color()
     this->ilet_colors.push_back( QColor::fromHslF(current_hue, 1.0, 0.5) );
     current_hue += 0.618033988749895;
     current_hue = std::fmod(current_hue, 1.0);
+}
+
+void SimulationWindow::on_pushButton_3_released()
+{
+    MemoryView *diagMem = new MemoryView(this, this->current_sim_data->work_dir);
+    diagMem->setModal(true);
+    diagMem->exec();
+    delete diagMem;
+
 }

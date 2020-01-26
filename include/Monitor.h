@@ -12,6 +12,7 @@
 #define MANY_FILE "/manycore.json"
 #define RES_FILE "/resources.json"
 #define ILET_FILE "/ilets.json"
+#define MEM_FILE "/memory.json"
 
 #define PREFIX_PU "/unit_"
 #define SUFIX_PU ".json"
@@ -30,12 +31,13 @@
 class Monitor 
 {
 	public: 
-		Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock * _clk_instance);
-		Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::string  _path_files, Clock * _clk_instance);
+		Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock * _clk_instance, InterconnectionNetwork *& _intNet);
+		Monitor(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, std::string  _path_files, Clock * _clk_instance, InterconnectionNetwork *& _intNet);
 
 		void start();
 		void write_disk(std::string path, JSON data, bool append);
 		std::string get_working_dir();
+		void write_diskMem(JSON data);
 
 	private:
 		pthread_t monitor_thread;
@@ -72,13 +74,15 @@ class Monitor
 		 */
 		bool first_ilets = true;
 
-		void init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock * _clk_instance);
+		void init(ManyCoreArch *_manycore_ptr, SequenceIlet *_seq_ilet_ptr, Clock * _clk_instance, InterconnectionNetwork *& _intNet);
 
 		void write_components(JSON * info);
 		void write_system(JSON * info);
 		void write_ilets(JSON * info);
 
 		static void *monitoring(void *obj);
+
+		InterconnectionNetwork* intNet;
 
 
 };

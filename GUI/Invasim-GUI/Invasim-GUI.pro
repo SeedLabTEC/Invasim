@@ -34,7 +34,8 @@ SOURCES += \
         SimulationWindow.cpp \
         main.cpp \
         StartView.cpp \
-        ../../src/*
+        ../../src/* \
+        MemoryView.cpp
 
 HEADERS += \
         IletsView.h \
@@ -44,14 +45,16 @@ HEADERS += \
         SimulationDialog.h \
         SimulationWindow.h \
         StartView.h \
-        ../../include/*
+        ../../include/* \
+        MemoryView.h
 
 FORMS += \
         IletsView.ui \
         ProcessorInfo.ui \
         SimulationDialog.ui \
         SimulationWindow.ui \
-        StartView.ui
+        StartView.ui \
+        MemoryView.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -60,3 +63,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     processoricon.qrc
+

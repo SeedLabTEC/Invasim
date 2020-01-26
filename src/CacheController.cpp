@@ -7,136 +7,230 @@
 
 #include "../include/CacheController.h"
 
-
-CacheController::CacheController(ResourceAdmin * _admin, InterconnectionNetwork * _intNetw,  int _x, int _y)
+CacheController::CacheController(InterconnectionNetwork *&_intNetw, int _x, int _y)
 {
-    this->admin = _admin;
-    this->intNetw = _intNetw;
+    this->cache = new CacheMemory();
+    this->msio = new StateMachineMSIO();
     this->pu_coordinate.x = _x;
     this->pu_coordinate.y = _y;
-    this->cache = new CacheMemory();
-    this->msi = new StateMachineMSI();
     this->flagRead = false;
+    this->flagWrite = false;
     this->data = 0;
-    this->states = new cache_line_state [DEFAULT_BlOCKS];
-    for(int x = 0; x < DEFAULT_BlOCKS; x++){
-        this->states[x].tag = 0;
-        this->states[x].state = invalid; 
-
+    this->AMAT = 0;
+    this->states = new cache_line_state[DEFAULT_BlOCKS];
+    for (int iterator = 0; iterator < DEFAULT_BlOCKS; iterator++)
+    {
+        this->states[iterator].tag = 0;
+        this->states[iterator].state = invalid;
     }
-    this->event.cacheDir=pu_coordinate;
+    this->intNetw = _intNetw;
+    this->event.cacheDir = pu_coordinate;
+    this->dataToMem.cacheDir = pu_coordinate;
 }
 
-int CacheController::getData(int _addr){
-    return 0;
-}
-
-enum States CacheController::getBlocksState(int _ind){
-    return this->msi[_ind].getActualState();
-}
-
-int CacheController::readData(int _address){
-    if(this->states[(_address % DEFAULT_BlOCKS)].tag == _address){
-        if(this->states[(_address % DEFAULT_BlOCKS)].state != invalid) // read hit
-            return this->cache->read(_address % DEFAULT_BlOCKS);
-        else{
-            endEvent(_address, false, "miss"); //place RM
-            this->states[(_address % DEFAULT_BlOCKS)].tag=_address;
-            this->states[(_address % DEFAULT_BlOCKS)].state=this->msi->getState(readMissCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
-            return this->readDataAux();                        
+dataMem CacheController::readData(int _address, int _priority)
+{
+    dataMem memoryInfo;
+    dprintf("Read_data-> x: %d, y: %d.", this->pu_coordinate.x, this->pu_coordinate.y);
+    if (this->states[(_address % DEFAULT_BlOCKS)].tag == _address)
+    {
+        if (this->states[(_address % DEFAULT_BlOCKS)].state != invalid)
+        { // read hit
+            memoryInfo.data = this->cache->read(_address % DEFAULT_BlOCKS);
+            memoryInfo.AMAT = 1;
+            return memoryInfo;
+        }
+        else
+        {
+            sendEvent(_address, false, "miss", _priority); //place RM
+            this->states[(_address % DEFAULT_BlOCKS)].tag = _address;
+            this->states[(_address % DEFAULT_BlOCKS)].state = this->msio->getState(readMissCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
+            while (!(getFlagRead()))
+            {
+            }
+            setFlagRead(false);
+            this->cache->write((_address % DEFAULT_BlOCKS), _address, data);
+            memoryInfo.data = data;
+            memoryInfo.AMAT = AMAT + 1;
+            return memoryInfo;
         }
     }
-    else{
-        if((this->states[(_address % DEFAULT_BlOCKS)].state == invalid) || (this->states[(_address % DEFAULT_BlOCKS)].state == shared)){
-            sendEvent(_address, false, "miss");//place RM
+    else
+    {
+        if ((this->states[(_address % DEFAULT_BlOCKS)].state == invalid) ||
+            (this->states[(_address % DEFAULT_BlOCKS)].state == shared))
+        {
+            sendEvent(_address, false, "miss", _priority); //place RM
         }
-        else{
+        else
+        {
             this->dataToMem.data = this->cache->read(_address % DEFAULT_BlOCKS);
-            this->dataToMem.addr = _address;
-            this->intNetw->pushDataMem(dataToMem); //WB
-            sendEvent(_address, false, "miss"); //place RM
+            this->dataToMem.addr = this->cache->readTag(_address % DEFAULT_BlOCKS);
+            this->dataToMem.priority = _priority;
+            this->dataToMem.type = true;
+            this->intNetw->pushDataMem(dataToMem);         //WB
+            sendEvent(_address, false, "miss", _priority); //place RM
         }
-        this->states[(_address % DEFAULT_BlOCKS)].tag=_address;
-        this->states[(_address % DEFAULT_BlOCKS)].state=this->msi->getState(readMissCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
-        return this->readDataAux();
+        while (!(getFlagRead()))
+        {
+        }
+        setFlagRead(false);
+        this->cache->write((_address % DEFAULT_BlOCKS), _address, data);
+        memoryInfo.data = data;
+        memoryInfo.AMAT = AMAT + 1;
+        this->states[(_address % DEFAULT_BlOCKS)].tag = _address;
+        this->states[(_address % DEFAULT_BlOCKS)].state =
+            this->msio->getState(readMissCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
+        return memoryInfo;
     }
 }
 
-int CacheController::readDataAux(){
-    while (!flagRead);
-    flagRead = false;
-    return data;
-}
-
-
-void CacheController::writeData(int _address, int _data){
-    if(this->states[(_address % DEFAULT_BlOCKS)].tag == _address){
-        if(this->states[(_address % DEFAULT_BlOCKS)].state == modified){
-            this->cache->write((_address % DEFAULT_BlOCKS),_address, _data);
+dataMem CacheController::writeData(int _address, int _data, int _priority)
+{
+    dataMem memoryInfo;
+    dprintf("Write_data-> x: %d, y: %d.", this->pu_coordinate.x, this->pu_coordinate.y);
+    if (this->states[(_address % DEFAULT_BlOCKS)].tag == _address)
+    {
+        if (this->states[(_address % DEFAULT_BlOCKS)].state == modified)
+        {
+            this->cache->write((_address % DEFAULT_BlOCKS), _address, _data);
         }
-        else{
-            sendEvent(_address, true, "invalidate");
-            this->cache->write((_address % DEFAULT_BlOCKS),_address, _data);                        
+        else
+        {
+            this->cache->write((_address % DEFAULT_BlOCKS), _address, _data);
+            sendEvent(_address, true, "invalidate", _priority);
+            while (!(getFlagWrite()))
+            {
+            }
+            setFlagWrite(false);
         }
         this->states[(_address % DEFAULT_BlOCKS)].tag = _address;
-        this->states[(_address % DEFAULT_BlOCKS)].state = this->msi->getState(writeHitCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
-            
+        this->states[(_address % DEFAULT_BlOCKS)].state =
+            this->msio->getState(writeHitCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
+        memoryInfo.data = 0;
+        memoryInfo.AMAT = 1;
+        return memoryInfo;
     }
-    else{
-        if((this->states[(_address % DEFAULT_BlOCKS)].state == invalid) || (this->states[(_address % DEFAULT_BlOCKS)].state == shared)){
-            this->cache->write((_address % DEFAULT_BlOCKS),_address, _data);
+    else
+    {
+        if ((this->states[(_address % DEFAULT_BlOCKS)].state == invalid) ||
+            (this->states[(_address % DEFAULT_BlOCKS)].state == shared))
+        {
+            this->cache->write((_address % DEFAULT_BlOCKS), _address, _data);
+            this->states[(_address % DEFAULT_BlOCKS)].tag = _address;
+            this->states[(_address % DEFAULT_BlOCKS)].state =
+                this->msio->getState(writeMissCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
+            sendEvent(_address, true, "miss", _priority);
+            while (!(getFlagWrite()))
+            {
+            }
+            setFlagWrite(false);
+            memoryInfo.data = 0;
+            memoryInfo.AMAT = AMAT + 1;
+            return memoryInfo;
         }
-        else{
+        else
+        {
             this->dataToMem.data = this->cache->read(_address % DEFAULT_BlOCKS);
-            this->dataToMem.addr = _address;
+            this->dataToMem.addr = this->cache->readTag(_address % DEFAULT_BlOCKS);
+            ;
+            this->dataToMem.priority = _priority;
+            this->dataToMem.type = true;
             this->intNetw->pushDataMem(dataToMem); //WB
-
+            if (this->states[(_address % DEFAULT_BlOCKS)].state == owned)
+                sendEvent(_address, true, "invalidate", _priority); // Invalidate owner
+            else
+                sendEvent(_address, true, "miss", _priority);
+            while (!(getFlagWrite()))
+            {
+            }
+            setFlagWrite(false);
+            this->states[(_address % DEFAULT_BlOCKS)].tag = _address;
+            this->states[(_address % DEFAULT_BlOCKS)].state =
+                this->msio->getState(writeMissCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
+            memoryInfo.data = 0;
+            memoryInfo.AMAT = 1;
+            return memoryInfo;
         }
-        sendEvent(_address, true, "miss");
-        this->states[(_address % DEFAULT_BlOCKS)].tag =_address;
-        this->states[(_address % DEFAULT_BlOCKS)].state = this->msi->getState(writeMissCPU, this->states[(_address % DEFAULT_BlOCKS)].state);
     }
 }
 
-int CacheController::readDataEvent(event _event){
-    if(this->states[(_event.tag % DEFAULT_BlOCKS)].tag == _event.tag){
-        if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == modified){
-            this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(readMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+int CacheController::readDataEvent(msgEvent _event)
+{
+    dprintf("Read_data_bus-> x: %d, y: %d.", this->pu_coordinate.x, this->pu_coordinate.y);
+    if (this->states[(_event.tag % DEFAULT_BlOCKS)].tag == _event.tag)
+    {
+        if (this->states[(_event.tag % DEFAULT_BlOCKS)].state == modified)
+        {
+            this->states[(_event.tag % DEFAULT_BlOCKS)].state =
+                this->msio->getState(readMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
             return this->cache->read(_event.tag % DEFAULT_BlOCKS);
         }
-        else if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == shared)
+        else if (this->states[(_event.tag % DEFAULT_BlOCKS)].state == owned)
+        {
             return this->cache->read(_event.tag % DEFAULT_BlOCKS);
+        }
         else
             return -1;
     }
-    else{
+    else
+    {
         return -1;
     }
 }
 
-void CacheController::writeDataEvent(event _event){
-    if(this->states[(_event.tag % DEFAULT_BlOCKS)].tag == _event.tag){
-        if(_event.action == "invalidate"){
-            this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(invalidateBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+void CacheController::writeDataEvent(msgEvent _event)
+{
+    dprintf("Write_data_bus-> x: %d, y: %d.", this->pu_coordinate.x, this->pu_coordinate.y);
+    if (this->states[(_event.tag % DEFAULT_BlOCKS)].tag == _event.tag)
+    {
+        if (_event.action == "invalidate")
+        {
+            this->states[(_event.tag % DEFAULT_BlOCKS)].state =
+                this->msio->getState(invalidateBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
         }
-        else{
-            if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == shared){
-                this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(writeMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+        else
+        {
+            if (this->states[(_event.tag % DEFAULT_BlOCKS)].state == shared)
+            {
+                this->states[(_event.tag % DEFAULT_BlOCKS)].state =
+                    this->msio->getState(writeMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
             }
-            else if(this->states[(_event.tag % DEFAULT_BlOCKS)].state == modified){
-                this->states[(_event.tag % DEFAULT_BlOCKS)].state=this->msi->getState(writeMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
+            else if (this->states[(_event.tag % DEFAULT_BlOCKS)].state == owned)
+            {
+                this->states[(_event.tag % DEFAULT_BlOCKS)].state =
+                    this->msio->getState(writeMissBUS, this->states[(_event.tag % DEFAULT_BlOCKS)].state);
                 this->dataToMem.data = this->cache->read((_event.tag % DEFAULT_BlOCKS));
                 this->dataToMem.addr = _event.tag;
+                this->dataToMem.type = true;
                 this->intNetw->pushDataMem(dataToMem); //WB
             }
-
         }
     }
 }
 
-void CacheController::sendEvent(int paddress, bool ptype, std::string paction){
+void CacheController::sendEvent(int paddress, bool ptype, std::string paction, int _priority)
+{
     this->event.tag = paddress;
     this->event.type = ptype;
     this->event.action = paction;
+    this->event.priority = _priority;
     this->intNetw->pushEvent(event);
+}
+
+void CacheController::setFlagRead(bool _flagRead)
+{
+    this->flagRead = _flagRead;
+}
+bool CacheController::getFlagRead()
+{
+    return this->flagRead;
+}
+void CacheController::setFlagWrite(bool _flagWrite)
+{
+    this->flagWrite = _flagWrite;
+}
+bool CacheController::getFlagWrite()
+{
+    return this->flagWrite;
 }

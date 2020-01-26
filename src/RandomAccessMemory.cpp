@@ -1,18 +1,22 @@
 /**
 * @file RandomAccessMemory.cpp
-* @brief RAM source
-* @author Dennis Porras Barrantes
-* @date 29/03/19
+* @brief Memory class declaration
+* @author Jairo Ortega Calderon
+* @date 20/09/19
 **/
 
 #include "../include/RandomAccessMemory.h"
 
-/**
- * @brief Construct a new Random Access Memory:: Random Access Memory object
- * 
- */
+
 RandomAccessMemory::RandomAccessMemory()
 {
-    this->main_mem = NULL;
-    this->clk_instance = NULL;
+}
+
+int RandomAccessMemory::read_write_Mem(bool pRD, bool pWR, int pdirection, int pdata)
+{
+    if (pRD)
+        return this->chunk[pdirection];
+    else if (pWR)
+        this->chunk[pdirection] = pdata;
+    return 0;
 }

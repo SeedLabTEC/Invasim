@@ -5,6 +5,11 @@
 #include <QMessageBox>
 #include "StartView.h"
 
+#include <QFileDialog>
+#include <QDir>
+#include <QProcess>
+#include <QDebug>
+
 SimulationDialog::SimulationDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SimulationDialog)
@@ -76,4 +81,19 @@ void SimulationDialog::on_buttonBox_clicked(QAbstractButton *button)
                         "Changes were not applied");
         }
     }
+}
+
+void SimulationDialog::on_pushButton_clicked()
+{
+    QString path = QCoreApplication::applicationDirPath();
+
+    QMessageBox::information(this, "..","Wait to open the file chooser, first select the directory and after that the files");
+
+    QString  command("python3");
+    QStringList params = QStringList() << "flowAnalyzer.py";
+    QProcess *process = new QProcess();
+    process->startDetached(command, params, path);
+    process->waitForFinished();
+    process->close();
+
 }

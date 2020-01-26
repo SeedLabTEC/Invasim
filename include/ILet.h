@@ -45,12 +45,13 @@ enum State_ILet
 class ILet 
 {
 	public: 
-		ILet(Type_ILet _type, int _id, float _decision_probability);
+		ILet(Type_ILet _type, int _id, float _decision_probability, int idProgram, int priority_ilet);
 		~ILet();
 
 		int get_id();
 
 		void add_operation(Invasive_Operation _operation, int _parameter);
+		void add_operation(Invasive_Operation _operation, int _parameter, std::vector<subProcess> _codeOperation);
 
 		void pop_operation();
 
@@ -65,6 +66,13 @@ class ILet
 		State_ILet get_state();
 		
 		void set_state(State_ILet new_state);
+
+		int get_id_program();
+		int get_priority();
+		void add_clocks_used(int clocks);
+		int get_clocks_used();
+
+		void pop_one_resource(coordinate popPU);
 
 	private:
 		/**
@@ -111,6 +119,21 @@ class ILet
 		 * 
 		 */
 		int id_ilet;
+		/**
+		 * @brief Program identifier.
+		 * 
+		 */
+		int id_program;
+		/**
+		 * @brief ilet priority
+		 * 
+		 */
+		int priority_ilet;
+		/**
+		 * @brief ilet clocks used
+		 * 
+		 */
+		int clocks_used_ilet;
 };
 
 #endif

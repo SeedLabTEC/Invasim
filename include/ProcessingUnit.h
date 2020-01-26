@@ -10,14 +10,17 @@
 
 #include <pthread.h>
 #include "Utils.h"
-
+#include <sstream>
 #include "json.hpp"
 using JSON = nlohmann::json;
 
 //Components
 #include "Clock.h"
 #include "ILet.h"
-#include "CacheMemory.h"
+#include "CacheController.h"
+#include "InterconnectionNetwork.h"
+
+#define  LIMIT_PROGRAM_MEM	8
 
 /**
  * @brief Processing unit representation with the basic attributes, also supports the invasive computing operations 
@@ -26,7 +29,7 @@ using JSON = nlohmann::json;
 class ProcessingUnit
 {
   public:
-	ProcessingUnit(int _x, int _y, Clock *_clk_instance);
+	ProcessingUnit(int _x, int _y, Clock *_clk_instance, InterconnectionNetwork*& _intNet, std::vector<JSON> *_regs);
 
 	void start();
 
@@ -54,22 +57,24 @@ class ProcessingUnit
 	 */
 	coordinate pu_coordenate;
 
-	/**
-	 * @brief Cache memory instance
-	 * 
-	 */
-	CacheMemory * cache_mem;
-	
 
 	/**
 	 * @brief Workload
 	 * 
 	 */
 	int current_load;
+	
+	/**
+	 * @brief Used
+	 * 
+	 */
+	int current_used;
+	
 	/**
 	 * @brief Assigned iLet
 	 * 
 	 */
+	
 	ILet * iLet_ptr;
 
 	/**
@@ -78,7 +83,18 @@ class ProcessingUnit
 	 */
 	Clock *clk_instance;
 
+	/**
+	 * @brief Registers instance
+	 * 
+	 */
+	std::vector<JSON>* registers;
+
 	static void *executing(void *obj);
+
+	CacheController* cache_controller;
+
+	InterconnectionNetwork *intNetw;
+
 };
 
 #endif

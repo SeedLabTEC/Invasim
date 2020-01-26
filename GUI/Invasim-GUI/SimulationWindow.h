@@ -4,10 +4,12 @@
 #include <QWidget>
 #include <qmessagebox.h>
 #include <IletsView.h>
+#include <MemoryView.h>
 
 #include "ProcessorView.h"
 #include "../../include/Environment.h"
 
+#define MAX_COLORS 1024
 
 struct simulation_data {
     std::string work_dir;
@@ -47,6 +49,8 @@ private slots:
     void on_pushButton_released();
 
     void on_pushButton_2_released();
+
+    void on_pushButton_3_released();
 
 private:
     bool is_loaded;

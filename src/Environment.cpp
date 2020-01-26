@@ -17,8 +17,23 @@ Environment::Environment()
     this->y_dim = DEFAULT_CORES;
     this->decision_probability = DEFAULT_PROBABILITY;
     this->seed = DEFAULT_SEED;
-    this->init();
-    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet, this->clk_instance);
+    
+    this->intNet = new InterconnectionNetwork();
+    res_thread_requests=pthread_create(&thread_requests, NULL, (THREADFUNCPTR) &InterconnectionNetwork::consumeRequest, intNet);
+	if(res_thread_requests!=0){
+		perror("pthread_create error");
+		exit(1);
+	}
+
+	res_thread_events=pthread_create(&thread_events, NULL, (THREADFUNCPTR) &InterconnectionNetwork::consumeEvent, intNet);
+	if(res_thread_events!=0){
+		perror("pthread_create error");
+		exit(1);
+    }
+    char path_files[PATH_MAX];
+    getcwd(path_files, PATH_MAX);
+    this->init(path_files);
+    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet, this->clk_instance, this->intNet);
     this->write_params();
 }
 
@@ -44,8 +59,22 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
     this->y_dim = _y_dim;
     this->decision_probability = _decision_probability;
     this->seed = _seed;
-    this->init();
-    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet , _working_dir, this->clk_instance);
+    dprintf("ENVIRONMENT: Instanciating interconnection network.\n");
+    this->intNet = new InterconnectionNetwork();
+    res_thread_requests=pthread_create(&thread_requests, NULL, (THREADFUNCPTR) &InterconnectionNetwork::consumeRequest, intNet);
+    if(res_thread_requests!=0){
+        perror("pthread_create error");
+        exit(1);
+    }
+
+    res_thread_events=pthread_create(&thread_events, NULL, (THREADFUNCPTR) &InterconnectionNetwork::consumeEvent, intNet);
+    if(res_thread_events!=0){
+        perror("pthread_create error");
+        exit(1);
+    }
+
+    this->init(_working_dir);
+    this->env_monitor = new Monitor(this->many_core_instance, this->seq_ilet , _working_dir, this->clk_instance, this->intNet);
     this->write_params();
 }
 
@@ -53,13 +82,13 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
  * @brief Function that initialize the components of environment.
  * 
  */
-void Environment::init()
+void Environment::init(std::string _working_dir)
 {
     dprintf("ENVIRONMENT: Instanciating environment clock.\n");
     this->clk_instance = new Clock();
     dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
-    this->many_core_instance = new ManyCoreArch(this->x_dim, this->y_dim, this->clk_instance);
-    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability, this->seed);
+    this->many_core_instance = new ManyCoreArch(this->x_dim, this->y_dim, this->clk_instance, this->intNet);
+    this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability, this->seed, _working_dir);
 }
 
 /**
@@ -74,6 +103,7 @@ void Environment::start_environment()
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_SEC));
     this->seq_ilet->start();
     this->env_monitor->start();
+
 }
 
 /**

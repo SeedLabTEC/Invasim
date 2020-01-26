@@ -1,0 +1,10 @@
+To do:
+
+Cache controller:
+ - Change AMAT and data to private and make getters/setters.
+ - Change AMAT value to read and write.
+ - Change modularity of mapping, actual only supports direct access.
+
+InterconnectionNetwork:
+ - Check if its needed to add an AMAT "point"
+

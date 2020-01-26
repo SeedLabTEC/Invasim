@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <cassert>
 #include <iostream>
+#include <vector>
+#include <string>
 
 /**
  * @brief Verify if NDEBUG flag is set, to use debug funtions
@@ -37,6 +39,19 @@ struct coordinate
 };
 
 /**
+ * @brief Struct that represents a subprocess inside an ilet
+ * 
+ */
+struct subProcess
+{
+	bool state;
+	coordinate SPxPU;
+	int puWork;
+	std::vector<std::string> code;
+};
+
+
+/**
  * @brief Enum to define that differents states that a processing unit can have in invasive computing.
  * 
  */
@@ -51,11 +66,34 @@ enum Invasive_States
  * @brief Array asociated to Invasive_States enum.
  * 
  */
-static const std::string STRING_STATES[] = 
+static const std::string STRING_STATES[] =
+	{
+		"Invaded",
+		"Infected",
+		"Free"
+	};
+
+struct msgEvent
 {
-	"Invaded",
-	"Infected",
-	"Free"
+	int tag;			//address
+	bool type;			//false=read, true=write
+	std::string action; // miss, invalidate
+	coordinate cacheDir;
+	int priority;
+};
+
+struct msgMem
+{
+	int addr;
+	int data;
+	int priority;
+	coordinate cacheDir;
+	bool type; //false=read, true=write
+};
+
+struct dataMem {
+	int data;
+	int AMAT;
 };
 
 #endif

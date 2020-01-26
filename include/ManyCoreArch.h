@@ -13,6 +13,7 @@
 #include "ProcessingUnit.h"
 #include "RandomAccessMemory.h"
 #include "ResourceAdmin.h"
+#include "InterconnectionNetwork.h"
 
 //Json library include and declaration
 #include "json.hpp"
@@ -28,9 +29,9 @@ using JSON = nlohmann::json;
 class ManyCoreArch 
 {
 	public: 
-		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance);
+		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance, InterconnectionNetwork*& _intNet);
 
-		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance, int _max_ilets);
+		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance, int _max_ilets, InterconnectionNetwork*& _intNet);
 
 		void start();
 
@@ -41,6 +42,14 @@ class ManyCoreArch
 		unsigned int get_max_ilets();
 		
 		JSON * monitoring();
+
+		std::vector<ILet *> get_invaded();
+
+		int getPriority(int iletID, int programID);
+
+		int getResourcesFromAdmin(int iletReq);
+
+		void newRegisterJson();
 
 	private:
 		/**
@@ -69,18 +78,26 @@ class ManyCoreArch
 		 * 
 		 */
 		ProcessingUnit *** pu_array;
-		/**
-		 * @brief RAM instance
-		 * 
-		 */
-		RandomAccessMemory * ram;
+		
 		/**
 		 * @brief Resource administrator instance
 		 * 
 		 */
 		ResourceAdmin * resource_manager;
+		/**
+         * @brief Programs registers
+         * 
+         */
+        std::vector<JSON> programs_registers;
 
-		void init(int _x_dim, int _y_dim, Clock * _clk_instance);
+        /**
+         * @brief Pointer to Programs registers
+         * 
+         */
+        std::vector<JSON>* ptr_registers;
+
+
+		void init(int _x_dim, int _y_dim, Clock * _clk_instance, InterconnectionNetwork*& _intNet);
 };
 
 #endif

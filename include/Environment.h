@@ -15,6 +15,10 @@
 #include "Monitor.h"
 #include "SequenceIlet.h"
 #include "Clock.h"
+#include "CacheController.h"
+#include "InterconnectionNetwork.h"
+
+#include <pthread.h>
 
 #define DEFAULT_CORES 8
 #define DEFAULT_PROBABILITY 0.80
@@ -86,8 +90,14 @@ class Environment
 	 */
 	Clock *clk_instance;
 
-	void init();
+	void init(std::string _working_dir);
 	void write_params();
+
+	InterconnectionNetwork * intNet;
+	
+	typedef void * (*THREADFUNCPTR)(void *);
+	pthread_t thread_events, thread_requests;
+	int res_thread_events, res_thread_requests;
 };
 
 #endif

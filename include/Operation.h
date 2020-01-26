@@ -39,11 +39,19 @@ static const std::string STRING_OPERATIONS[] =
 class Operation 
 {
 	public: 
+		
 		Operation(Invasive_Operation _operation, int _parameter);
+	
+		Operation(Invasive_Operation _operation, int _parameter, std::vector<subProcess> _codeOperation);
 		
 		Invasive_Operation get_operation();
 
 		int get_parameter();
+
+		std::string get_codeOperation(int sub, int inst);
+		std::vector<subProcess> get_subProcess();
+		void set_codeOperation(int sub, coordinate pu);
+		void reduce_WorkOfProcess(int sub);
 
 	private:
 		/**
@@ -56,6 +64,11 @@ class Operation
 		 * 
 		 */
 		int parameter;
+		/**
+		 * @brief Parameter of all code of operation
+		 * 
+		 */
+		std::vector<subProcess> codeOperation;
 };
 
 #endif

@@ -1,32 +1,32 @@
+#ifndef INCLUDE_RandomAccessMemory_H_
+#define INCLUDE_RandomAccessMemory_H_
+
+#define SIZE 256
+
 /**
 * @file RandomAccessMemory.h
-* @brief RAM class declaration.
-* @author Dennis Porras Barrantes
-* @date 29/03/19
+* @brief Memory class declaration
+* @author Jairo Ortega Calderon
+* @date 20/09/19
 **/
-
-#ifndef INCLUDE_RANDOMACCESSMEMORY_H_
-#define INCLUDE_RANDOMACCESSMEMORY_H_
-
-#define DEFAULT_SIZE 16
-
-#include "Clock.h"
-
-#include "Utils.h"
-
-/**
- * @brief Random Access Memory class representation with a clock and chuck of memory.
- * 
- */
-class RandomAccessMemory 
-{
-	public: 
-		RandomAccessMemory();
-
-	private:
-		int * main_mem;
-		Clock * clk_instance;
-
+class RandomAccessMemory{
+    private:
+        int chunk[SIZE] = {};
+        
+    public:
+        /**
+         * @brief Construct a new Random Access Memory class
+         */
+        RandomAccessMemory();
+        /**
+         * @brief Read from memory and write it.
+         * @param pRD Flag for read
+         * @param pWR Flag for write
+         * @param pdirection Address to read/write
+         * @param pdata Data to write
+         * @return int value of memory
+         */
+        int read_write_Mem(bool pRD, bool pWR, int pdirection, int pdata);
 };
 
 #endif

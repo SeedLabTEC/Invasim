@@ -13,15 +13,19 @@
  * @param _type 
  * @param _id 
  * @param _decision_probability 
+ * @param _id_Program 
  */
-ILet::ILet(Type_ILet _type, int _id, float _decision_probability)
+ILet::ILet(Type_ILet _type, int _id, float _decision_probability, int _id_Program, int _priority_ilet)
 {
 	this->type = _type;
 	this->state = WAITING;
 	this->id_ilet = _id;
+	this->id_program = _id_Program;
+	this->priority_ilet = _priority_ilet;
 	this->resources = new std::vector<coordinate>();
 	this->current_operation = NULL;
 	this->distribution = std::bernoulli_distribution(_decision_probability);
+	this->clocks_used_ilet = 0;
 }
 
 /**
@@ -56,6 +60,17 @@ int ILet::get_id()
 	return this->id_ilet;
 }
 
+
+/**
+ * @brief Priority getter
+ * 
+ * @return int 
+ */
+int ILet::get_priority()
+{
+	return this->priority_ilet;
+}
+
 /**
  * @brief Add operation in iLet
  * 
@@ -65,6 +80,18 @@ int ILet::get_id()
 void ILet::add_operation(Invasive_Operation _operation, int _parameter)
 {
 	Operation *tmp_op = new Operation(_operation, _parameter);
+	this->pending_operations.push(tmp_op);
+}
+
+/**
+ * @brief Add operation in iLet
+ * 
+ * @param _operation 
+ * @param _parameter 
+ */
+void ILet::add_operation(Invasive_Operation _operation, int _parameter, std::vector<subProcess> _codeOperation)
+{
+	Operation *tmp_op = new Operation(_operation, _parameter, _codeOperation);
 	this->pending_operations.push(tmp_op);
 }
 
@@ -85,7 +112,8 @@ void ILet::pop_operation()
  */
 int ILet::execute_operation()
 {
-	int is_exe = this->distribution(this->generator);
+	//int is_exe = this->distribution(this->generator);
+	int is_exe = 1;
 	return is_exe;
 }
 
@@ -138,4 +166,52 @@ State_ILet ILet::get_state()
 void ILet::set_state(State_ILet new_state)
 {
 	this->state = new_state;
+}
+
+/**
+ * @brief Gettter of iLet program
+ * 
+ * @return Id of program 
+ */
+int ILet::get_id_program()
+{
+	return this->id_program;
+}
+
+/**
+ * @brief Pop an specific resourse
+ * 
+ * @return void
+ */
+void ILet::pop_one_resource(coordinate popPU)
+{
+	for (int i = 0; i < (int)(*this->resources).size(); i++)
+	{
+		coordinate it = (*this->resources)[i];
+		if ((it.x == popPU.x) && (it.y == popPU.y))
+		{
+			(*this->resources).erase((*this->resources).begin() + i);
+			break;
+		}
+	}
+}
+
+/**
+ * @brief Pop an specific resourse
+ * @param clocks 
+ * @return void
+ */
+int ILet::get_clocks_used()
+{
+	return this->clocks_used_ilet;
+}
+
+/**
+ * @brief Pop an specific resourse
+ * @param clocks 
+ * @return void
+ */
+void ILet::add_clocks_used(int clocks)
+{
+	this->clocks_used_ilet = this->clocks_used_ilet + clocks;
 }
