@@ -1,27 +1,27 @@
 /**
 * @file CacheMemory.h
 * @brief Cache memory class declaration
-* @author Dennis Porras Barrantes
-* @date 29/03/19
+* @author Jairo Ortega Calderon
+* @date 20/09/19
 **/
 
 #ifndef INCLUDE_CACHEMEMORY_H_
 #define INCLUDE_CACHEMEMORY_H_
 
-#define DEFAULT_BlOCKS 32
+#define DEFAULT_BlOCKS 64
 
 #include "Clock.h"
+#include "Utils.h"
 
 /**
  * @brief Struct cache line representation
  */
-struct cache_line 
-{
+struct cache_line{
+	int tag;
 	int data;
-	bool valid;
 };
 
-#include "Utils.h"
+
 
 /**
  * @brief Cache memory representation with a clock and a chunk of memory
@@ -30,25 +30,16 @@ struct cache_line
 class CacheMemory 
 {
 	public: 
-		CacheMemory(int _x, int _y);
+		CacheMemory();
+		void write (int _index, int _addr, int _data);
+		int read(int _index);
 
 	private:
 		/**
-		 * @brief Coordinate of cache
-		 * 
-		 */
-		coordinate pu_coordinate;
-		/**
 		 * @brief Chunck of memory
 		 * 
-		 */
+		 */ 
 		cache_line * blocks;
-
-		/**
-		 * @brief Clock instance
-		 * 
-		 */
-		Clock * clk_intance;
 };
 
 #endif
