@@ -10,3 +10,4 @@ GUI/build-Invasim-GUI-Desktop_Qt_5_12_3_GCC_64bit-Debug/compile_commands.json
 RI5CY/tb/core/cobj_dir/
 RI5CY/tb/core/fpnew/
 RI5CY/tb/core/testbench_verilator
+RI5CY/processor-model/fpnew/

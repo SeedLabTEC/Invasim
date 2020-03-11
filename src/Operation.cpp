@@ -54,3 +54,13 @@ std::vector<char> * Operation::get_program()
 {
     return this->buffer;
 }
+
+std::string Operation::get_program_name()
+{
+    return this->program_name;
+}
+
+void Operation::set_program_name(std::string _name)
+{
+    this->program_name = _name;
+}

@@ -50,6 +50,10 @@ class Operation
 
 		int get_parameter();
 
+		std::string get_program_name();
+
+		void set_program_name(std::string _name);
+
 
 	private:
 		/**
@@ -67,6 +71,11 @@ class Operation
 		 * 
 		 **/
 		std::vector<char> * buffer;
+		/**
+		 * @brief Name of the program that infection will copy
+		 **/
+		std::string program_name;
+
 };
 
 #endif

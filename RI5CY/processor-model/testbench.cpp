@@ -293,7 +293,6 @@ main (int    argc,
   cpu = new Vtop;
 
   char * bin_file_path = argv[1];
-  int cycles = atoi(argv[2]);
   
   ifstream ifd(bin_file_path, ios::binary | ios::ate);
   int size = ifd.tellg();
@@ -341,10 +340,10 @@ main (int    argc,
   int i = 0;
   while (cpu->program_exit != 1)
   {
-    clockSpin(1000);
+    clockSpin(1);
     i++;
   }
-  printf("Se terminó en %d\n", i);
+  printf("Program %s finished in %f ns\n", bin_file_path, sc_time_stamp());
   REGfilePrint();
   cout << endl;
  

@@ -12,7 +12,7 @@
 #include <string>
 
 //Wait miliseconds
-#define WAIT_SEC 250
+#define WAIT_SEC 1000
 
 #include <pthread.h>
 #include <unistd.h>

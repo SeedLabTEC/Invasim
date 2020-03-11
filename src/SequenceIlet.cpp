@@ -136,19 +136,30 @@ ILet *SequenceIlet::generate_ilet(int index)
     int resources = rand() % (this->max_resources + 1) + 1;
     new_ilet->add_operation(INVADE, resources);
     int program_index = rand() % this->programs.size();
-    new_ilet->add_operation(INFECT, this->programs.at(program_index));
+    new_ilet->add_operation(INFECT, this->programs.at(program_index), STRING_PROGRAMS[program_index]);
     new_ilet->add_operation(RETREAT, 0);
 
     //Store in info json
     JSON ilet_info = {
         {"Id", index},
+        {"Cycle", this->clk_instance->get_cycle()},
         {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", STRING_PROGRAMS[program_index]}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
     //Set data in pointer
     *this->ilets_info = ilet_info;
     //Set flag that an iLet has been created
     this->ilet_check = true;
-    std::cout << "New iLet: " << ilet_info.dump(4) << std::endl;
+    // std::cout << "New iLet: " << ilet_info.dump(4) << std::endl;
     return new_ilet;
+}
+
+void SequenceIlet::clean_iLets()
+{
+    for (unsigned int i = 0; i < this->created_ilets.size(); i++)
+    {
+        if (this->created_ilets.at(i)->get_state() == KILLABLE)
+            this->created_ilets.erase(this->created_ilets.begin() + i);
+    }
+    
 }
 
 /**
@@ -176,7 +187,7 @@ void *SequenceIlet::generate(void *obj)
         if (await_clocks == 0)
         {
             //Verify if max amount of iLet in manycore
-            if (current->created_ilets.size() < 1)
+            if (current->created_ilets.size() < current->manycore_ptr->get_max_ilets())
             {
                 //Create an iLet and invade in manycore
                 ILet *new_ilet = current->generate_ilet(i);
@@ -185,6 +196,7 @@ void *SequenceIlet::generate(void *obj)
                 i++;
                 //generate await clocks
                 await_clocks = rand() % (current->max_clocks + 1);
+                current->clean_iLets();
             }
         }
         else

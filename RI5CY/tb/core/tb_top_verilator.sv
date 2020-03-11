@@ -21,6 +21,10 @@ module tb_top_verilator
      output logic tests_passed_o,
      output logic tests_failed_o);
 
+
+    logic                   exit_valid;
+    logic [31:0]            exit_value;
+
     // we either load the provided firmware or execute a small test program that
     // doesn't do more than an infinite loop with some I/O
     initial begin: load_prog
@@ -49,6 +53,13 @@ module tb_top_verilator
             $display("TEST(S) FAILED!");
             $finish;
         end
+        if (exit_valid) begin
+            if (exit_value == 0)
+                $display("EXIT SUCCESS");
+            else
+                $display("EXIT FAILURE: %d", exit_value);
+            $finish;
+        end
     end
 
     // wrapper for riscv, the memory system and stdout peripheral
@@ -63,7 +74,9 @@ module tb_top_verilator
          .rst_ni         ( rst_ni         ),
          .fetch_enable_i ( fetch_enable_i ),
          .tests_passed_o ( tests_passed_o ),
-         .tests_failed_o ( tests_failed_o ));
+         .tests_failed_o ( tests_failed_o ),
+         .exit_value_o   ( exit_value     ),
+         .exit_valid_o   ( exit_valid     ));
 
 endmodule // tb_top_verilator
 

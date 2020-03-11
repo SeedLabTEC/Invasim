@@ -54,6 +54,7 @@ int main(int argc, char **argv, char **env)
 #ifdef VCD_TRACE
     tfp->close();
 #endif
+    std::cout << "Program completed in : " << t << std::endl;
     delete top;
     exit(0);
 }

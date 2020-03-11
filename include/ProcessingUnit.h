@@ -21,7 +21,7 @@ using JSON = nlohmann::json;
 
 #include "RI5CY.h"
 
-#define CYCLES 5
+#define CYCLES 3015
 
 
 /**
@@ -81,6 +81,11 @@ class ProcessingUnit
 	 * @brief RI5CY processor model
 	 * */
 	RI5CY * cpu;
+
+	/**
+	 * @brief  Name of program executing
+	**/
+	std::string program_name = "None";
 
 	static void *executing(void *obj);
 };

@@ -68,9 +68,10 @@ void ILet::add_operation(Invasive_Operation _operation, int _parameter)
 	this->pending_operations.push(tmp_op);
 }
 
-void ILet::add_operation(Invasive_Operation _operation, std::vector<char> * _parameter)
+void ILet::add_operation(Invasive_Operation _operation, std::vector<char> * _parameter, std::string _program_name)
 {
 	Operation *tmp_op = new Operation(_operation, _parameter);
+	tmp_op->set_program_name(_program_name);
 	this->pending_operations.push(tmp_op);
 }
 

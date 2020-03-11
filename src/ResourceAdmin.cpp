@@ -232,7 +232,7 @@ void *ResourceAdmin::managing(void *obj)
 	{
 		//Await to clock signal
 		pthread_cond_wait(clk_cycle_cond, clk_cycle_mutex);
-		dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump().c_str());
+		// dprintf("ResourceAdmin: %s.\n", current->monitoring()->dump().c_str());
 		
 		ILet *current_ilet = NULL;
 
@@ -294,7 +294,7 @@ void *ResourceAdmin::managing(void *obj)
 				case EXECUTING:
 				{
 					//When executing ask if it has to be terminted
-					int terminate = 1; //current_ilet->finish_operation();
+					int terminate = current_ilet->finish_operation();
 					if (!terminate)
 					{
 						dprintf("ResourceAdmin: Ilet = %d to be terminated.\n", current_ilet->get_id());
@@ -321,7 +321,8 @@ void *ResourceAdmin::managing(void *obj)
 						dprintf("ResourceAdmin: Ilet = %d terminated.\n", current_ilet->get_id());
 						current->retreat(current_ilet);
 						current->execute_ilets.erase(current->execute_ilets.begin() + i);
-						std::cout << "Retreat complete of i-Let " << current_ilet->get_id() << std::endl;
+						current_ilet->set_state(KILLABLE);
+						// std::cout << "Retreat complete of i-Let " << current_ilet->get_id() << std::endl;
 					}
 					else
 					{

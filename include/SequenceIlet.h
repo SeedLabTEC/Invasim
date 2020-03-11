@@ -121,6 +121,7 @@ private:
 
 	void init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);
 	void load_programs();
+	void clean_iLets();
 	static void *generate(void *obj);
 };
 

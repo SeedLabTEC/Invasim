@@ -70,6 +70,7 @@ void ProcessingUnit::infect()
 	//Load program in processor memory
 	this->cpu->reset_processor();
 	this->cpu->load_program(0, *this->iLet_ptr->get_current_operation()->get_program());
+	this->program_name = this->iLet_ptr->get_current_operation()->get_program_name();
 	this->cpu->start_fetching();
 
 	this->pu_state = INFECTED;
@@ -86,6 +87,7 @@ void ProcessingUnit::retreat()
 	this->pu_state = FREE;
 	this->iLet_ptr = NULL;
 	this->cpu->stop_fetching();
+	this->program_name = "None";
 	pthread_mutex_unlock(&this->pu_mutex);
 }
 
@@ -124,7 +126,7 @@ JSON *ProcessingUnit::monitoring()
 	*json_info = {
 		{"Coordenate_x", this->pu_coordenate.x},
 		{"Coordenate_y", this->pu_coordenate.y},
-		{"Load", 0},
+		{"Load", this->program_name},
 		{"State", STRING_STATES[this->pu_state]}};
 	//Set if in ilet;
 	if (this->iLet_ptr != NULL)
@@ -178,7 +180,7 @@ void *ProcessingUnit::executing(void *obj)
 			pthread_mutex_lock(&current->pu_mutex);
 			if (!current->cpu->is_done())
 			{
-				current->cpu->clock_spin(100);
+				current->cpu->clock_spin(CYCLES);
 			}
 			else
 			{
