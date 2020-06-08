@@ -133,7 +133,6 @@ dataMem CacheController::writeData(int _address, int _data, int _priority)
         {
             this->dataToMem.data = this->cache->read(_address % DEFAULT_BlOCKS);
             this->dataToMem.addr = this->cache->readTag(_address % DEFAULT_BlOCKS);
-            ;
             this->dataToMem.priority = _priority;
             this->dataToMem.type = true;
             this->intNetw->pushDataMem(dataToMem); //WB
