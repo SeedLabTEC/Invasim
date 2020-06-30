@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
     Environment *env_0 = new Environment(atoi(argv[1]),
                                          atoi(argv[2]),
                                          0.80,
-                                         "/home/jairo/Documents/Invasim/bin",
+                                         "/home/jerodso/Invasim_devmem/Invasim/bin",
                                          1);
     env_0->start_environment();
 

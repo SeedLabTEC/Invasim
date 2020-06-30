@@ -263,30 +263,36 @@ std::vector<ILet *> ResourceAdmin::get_invaded()
  * 
  * @param iletID ID of ilet if we want to keep a control 
  * @param programID ID of program if we want to keep a control 
- * @return int Between 0-4
+ * @param resourcesRequire Quantity of resources required from ilet
+ * @return int Between 1-5
  */
-int ResourceAdmin::getPriority(int iletID, int programID)
+int ResourceAdmin::getPriority(int iletID, int programID, int resourcesRequire)
 {
-	return (rand() % 4);
+	float iletReq_f = (float) resourcesRequire;
+	float available_f = (float) this->max_iLets;
+
+	int assign = this->assignPriority(iletReq_f, available_f);
+
+	return assign;
 }
 
 /**
  * @brief Assign resourses to use for Ilets
  * 
  * @param iletReq Quantity of resources required from ilet
- * @return int Random between 1 to quantity of processors
+ * @return int cores assigned by neural network
  */
 int ResourceAdmin::assignResources(int iletReq)
 {
-	int calcMax = (iletReq - this->max_iLets);
-	int resources = iletReq;
+	float iletReq_f = (float) iletReq;
+	float available_f = (float) this->available;
+	int core_assign = 0;
 
-	if (calcMax > 0)
-	{
-		resources = resources - calcMax;
-	}
+	if(this->available != 0) {
+    core_assign = this->assignCores(iletReq_f, available_f);
+  }
 
-	return ((rand() % resources) + 1);
+	return core_assign;
 }
 
 /**
@@ -497,4 +503,69 @@ void *ResourceAdmin::managing(void *obj)
 		}
 	}
 	return NULL;
+}
+
+/**
+ * @brief NN Mathematical model to Assign a certain amount of cores to an ILet.
+ * 
+ * @param core_require amount of cores require by the ILet
+ * @param core_Available amount of cores available right now
+ * @return cores assigned
+ */
+int ResourceAdmin::assignCores(float core_require, float core_available) 
+{
+  // Scale Layer
+  float scaled_core_require = 2*(core_require-1)/(50-1)-1;
+  float scaled_core_available = 2*(core_available-0)/(50-0)-1;
+  // Perceptron 1_1 (layer 1, neuron 1)
+  float y_1_1 = (float) (std::tanh(-0.870334-0.879223*scaled_core_require+0.869303*scaled_core_available));
+  // Perceptron 1_2 (layer 1, neuron 2)
+  float y_1_2 = (float) (std::tanh(0.00730768+0.0713884*scaled_core_require-0.44646*scaled_core_available));
+  // Perceptron 2_1 (Output)(layer 2, neuron 1)
+  float scaled_core_assign = (float) (-1.02428-0.833818*y_1_1-1.62438*y_1_2);
+  // Unscale Layer
+  float core_assign = (float) (0.5*(scaled_core_assign+1.0)*(44-0)+0);
+
+  // Bounding layer
+  float minimum = 1;
+  float maximum = core_require;
+  core_assign = std::max(minimum, core_assign);
+  core_assign = std::min(maximum, core_assign);
+
+  // Round output (This is because the regression model uses float numbers, and we need integers)
+  int core_assign_rounded = std::ceil(core_assign);
+
+  return core_assign_rounded;
+}
+
+/**
+ * @brief NN Mathematical model to Assign a memeory access priority.
+ * 
+ * @param core_require amount of cores require by the ILet
+ * @param core_Available amount of cores in the system
+ * @return priority assigned
+ */
+int ResourceAdmin::assignPriority(float core_require, float core_available) {
+  // Scale Layer
+  float scaled_resources_available = 2*(core_available-1)/(50-1)-1;
+  float scaled_resources_require = 2*(core_require-1)/(50-1)-1;
+  // Perceptron 1_1 (layer 1, neuron 1)
+  float y_1_1 = (float) (std::tanh(-3.61583+0.969469*scaled_resources_available-4.57267*scaled_resources_require));
+  // Perceptron 1_2 (layer 1, neuron 2)
+  float y_1_2 = (float) (std::tanh(2.01616-3.26919*scaled_resources_available+4.43776*scaled_resources_require));
+  // Perceptron 2_1 (Output)(layer 2, neuron 1)
+  float scaled_priority_assign = (float) (0.0542604+0.512467*y_1_1-0.556138*y_1_2);
+  // Unscale Layer
+  float priority_assign = (float) (0.5*(scaled_priority_assign+1.0)*(5-1)+1);
+
+  // Bounding layer
+  float minimum = 1;
+  float maximum = 5;
+  priority_assign = std::max(minimum, priority_assign);
+  priority_assign = std::min(maximum, priority_assign);
+
+  // Round output (This is because the regression model uses float numbers, and we need integers)
+  int priority_assign_rounded = (int) std::round(priority_assign);
+
+  return priority_assign_rounded;
 }

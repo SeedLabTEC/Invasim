@@ -28,8 +28,7 @@ ProcessingUnit::ProcessingUnit(int _x, int _y, Clock *_clk_instance, Interconnec
 	this->registers = _regs;
 	this->intNetw = _intNet;
 	this->cache_controller = new CacheController(_intNet, _x, _y);
-    this->intNetw->insertCC(this->cache_controller);
-
+  this->intNetw->insertCC(this->cache_controller);
 }
 
 /**
@@ -204,7 +203,7 @@ void *ProcessingUnit::executing(void *obj)
 				try
 				{
 					std::string inst = current->iLet_ptr->get_current_operation()->get_codeOperation(current->current_used, current->current_load - 1);
-					std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << inst << std::endl; // execute code
+					//std::cout << "ON ILET " << current->iLet_ptr->get_id() << " PROGRAM " << current->iLet_ptr->get_id_program() << " PROCESS " << current->current_used << " PRIORITY " << current->iLet_ptr->get_priority() << " ON UNIT " << current->get_coodinate().x << " CURRENT LOAD " << current->current_load - 1 << " " << inst << std::endl; // execute code
 					
 					//current->iLet_ptr->add_clocks_used(1);
 					std::stringstream ss(inst);
@@ -265,7 +264,7 @@ void *ProcessingUnit::executing(void *obj)
                     }
                     else
                     {
-                        std::cout << "DONT KNOW " << process[0] << std::endl;
+                        //std::cout << "DONT KNOW " << process[0] << std::endl;
                     }
 					current->iLet_ptr->get_current_operation()->reduce_WorkOfProcess(current->current_used);
 

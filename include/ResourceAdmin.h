@@ -16,6 +16,10 @@
 #include "json.hpp"
 using JSON = nlohmann::json;
 
+#include <math.h>       // tanh
+#include <algorithm>    // min, max
+#include <bits/stdc++.h>
+#include <sys/time.h>
 #include <pthread.h>
 #include <queue>
 #include "Utils.h"
@@ -39,7 +43,7 @@ class ResourceAdmin
 
 		std::vector<ILet *> get_invaded();
 
-		int getPriority(int iletID, int programID);
+		int getPriority(int iletID, int programID, int resourcesRequire);
 
 		int assignResources(int iletReq);
 		
@@ -102,7 +106,6 @@ class ResourceAdmin
 		 */
 		std::vector<ILet *> execute_ilets;
 		
-
 		void init(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, Clock * _clk_instance);
 
 		void invade(int resources_amount, std::vector<coordinate> *resources, ILet * ilet);
@@ -116,6 +119,10 @@ class ResourceAdmin
 		static void * managing(void * obj);
 
 		void resourcesCalcByProgram(int prog, int clock, int add);
+
+		int assignCores(float core_require, float core_available);
+
+		int assignPriority(float core_require, float core_available);
 
 };
 

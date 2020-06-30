@@ -192,7 +192,7 @@ void *SequenceIlet::generate(void *obj)
                 {
                     //Create an iLet and invade in manycore
                     std::cout << " SEND ILET= " << i << std::endl;
-                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount)); // change here
+                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount, iletsCode[progCount][ilets_control_sum[progCount]].size())); // change here
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;

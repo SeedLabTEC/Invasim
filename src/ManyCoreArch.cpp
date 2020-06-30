@@ -22,7 +22,7 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, Interco
     this->init(_x_dim, _y_dim, _clk_instance, _intNet);
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
                                                this->y_dim, this->clk_instance);
-    this->max_ilets = _x_dim * _y_dim;;
+    this->max_ilets = _x_dim * _y_dim;
 }
 
 /**
@@ -42,7 +42,7 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, int _ma
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
                                                this->y_dim, _max_ilets, 
                                                this->clk_instance);
-    this->max_ilets = _x_dim * _y_dim;;
+    this->max_ilets = _x_dim * _y_dim;
 }
 
 /**
@@ -170,19 +170,20 @@ std::vector<ILet *> ManyCoreArch::get_invaded()
  * @brief Request a variable priority for one ilet
  * 
  * @param iletID ID of ilet if we want to keep a control 
- * @param programID ID of program if we want to keep a control 
- * @return int Between 0-4
+ * @param programID ID of program if we want to keep a control
+ * @param resourcesRequest Quantity of resources required from ilet
+ * @return int Between 1-5
  */
-int ManyCoreArch::getPriority(int iletID, int programID)
+int ManyCoreArch::getPriority(int iletID, int programID, int resourcesRequire)
 {
-    return this->resource_manager->getPriority(iletID, programID);
+    return this->resource_manager->getPriority(iletID, programID, resourcesRequire);
 }
 
 /**
  * @brief Request for the resourses to use for Ilets
  * 
  * @param iletReq Quantity of resources required from ilet
- * @return int Random between 1 to quantity of processors
+ * @return int between 1 to quantity of processors
  */
 int ManyCoreArch::getResourcesFromAdmin(int iletReq)
 {

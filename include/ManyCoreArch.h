@@ -45,7 +45,7 @@ class ManyCoreArch
 
 		std::vector<ILet *> get_invaded();
 
-		int getPriority(int iletID, int programID);
+		int getPriority(int iletID, int programID, int resourcesRequire);
 
 		int getResourcesFromAdmin(int iletReq);
 
@@ -85,16 +85,16 @@ class ManyCoreArch
 		 */
 		ResourceAdmin * resource_manager;
 		/**
-         * @brief Programs registers
-         * 
-         */
-        std::vector<JSON> programs_registers;
+		 * @brief Programs registers
+		 * 
+		 */
+		std::vector<JSON> programs_registers;
 
-        /**
-         * @brief Pointer to Programs registers
-         * 
-         */
-        std::vector<JSON>* ptr_registers;
+		/**
+		 * @brief Pointer to Programs registers
+		 * 
+		 */
+		std::vector<JSON>* ptr_registers;
 
 
 		void init(int _x_dim, int _y_dim, Clock * _clk_instance, InterconnectionNetwork*& _intNet);
