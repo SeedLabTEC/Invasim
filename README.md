@@ -12,12 +12,13 @@ Open a terminal in the program folder and run the next commands:
 
   ```
 
-2- The binary is stored in **$PROGRAM_DIR/bin**, it takes two parameters 
+2- The binary is stored in **$PROGRAM_DIR/bin**, it takes three parameters 
     
     2.1- Processor cores (x and y).
     2.2- Amount of cycles to run.
+    2.3- Using Artificial Intelligence for resource allocation: this is a boolean value (1 or 0)
   ```console
-  user@Computer:~$ ./bin/invasive_simulator x_dimesion y_dimension cycles
+  user@Computer:~$ ./bin/invasive_simulator x_dimesion y_dimension cycles with_AI?
 
   ```
 
