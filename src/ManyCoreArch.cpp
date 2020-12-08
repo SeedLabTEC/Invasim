@@ -14,14 +14,14 @@
  * @param _y_dim 
  * @param _clk_instance 
  */
-ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, InterconnectionNetwork*& _intNet)
+ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, bool ai, Clock *_clk_instance, InterconnectionNetwork*& _intNet)
 {
     dprintf("MANYCOREARCH: Manycore Architecture instance created.\n\t- Dimension: (%d, %d).\n", _x_dim, _y_dim);
     this->programs_registers = {};
     this->ptr_registers = &this->programs_registers;
     this->init(_x_dim, _y_dim, _clk_instance, _intNet);
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
-                                               this->y_dim, this->clk_instance);
+                                               this->y_dim, this->clk_instance, ai);
     this->max_ilets = _x_dim * _y_dim;
 }
 
@@ -33,7 +33,7 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, Interco
  * @param _clk_instance 
  * @param _max_ilets 
  */
-ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, int _max_ilets, InterconnectionNetwork*& _intNet)
+ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, bool ai, Clock *_clk_instance, int _max_ilets, InterconnectionNetwork*& _intNet)
 {
     dprintf("MANYCOREARCH: Manycore Architecture instance created.\n\t- Dimension: (%d, %d).\n", _x_dim, _y_dim);
     this->programs_registers = {};
@@ -41,7 +41,7 @@ ManyCoreArch::ManyCoreArch(int _x_dim, int _y_dim, Clock *_clk_instance, int _ma
     this->init(_x_dim, _y_dim, _clk_instance, _intNet);
     this->resource_manager = new ResourceAdmin(this->pu_array, this->x_dim,
                                                this->y_dim, _max_ilets, 
-                                               this->clk_instance);
+                                               this->clk_instance, ai);
     this->max_ilets = _x_dim * _y_dim;
 }
 
@@ -174,18 +174,18 @@ std::vector<ILet *> ManyCoreArch::get_invaded()
  * @param resourcesRequest Quantity of resources required from ilet
  * @return int Between 1-5
  */
-int ManyCoreArch::getPriority(int iletID, int programID, int resourcesRequire)
+/*int ManyCoreArch::getPriority(int iletID, int programID, int resourcesRequire)
 {
-    return this->resource_manager->getPriority(iletID, programID, resourcesRequire);
-}
+    //return this->resource_manager->getPriority(iletID, programID, resourcesRequire);
+}*/
 
 /**
  * @brief Request for the resourses to use for Ilets
  * 
  * @param iletReq Quantity of resources required from ilet
- * @return int between 1 to quantity of processors
+ * @return vector with resources (cores, priority)
  */
-int ManyCoreArch::getResourcesFromAdmin(int iletReq)
+std::vector<int> ManyCoreArch::getResourcesFromAdmin(int iletID, int progID, int iletReq)
 {
-    return this->resource_manager->assignResources(iletReq);
+    return this->resource_manager->assignResources(iletID, progID, iletReq);
 }

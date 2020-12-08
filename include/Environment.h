@@ -35,13 +35,18 @@ class Environment
   public:
 	Environment();
 
-	Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir, int _seed);
+	Environment(int _x_dim, int _y_dim, float _decision_probability, int ai, std::string _working_dir, int _seed);
 
 	void start_environment();
 
 	void step(int steps);
 
   private:
+  /**
+	 * @brief using artificial intelligence to assign resources.
+	 * 
+	 */
+	bool ai;
 	/**
 	 * @brief x dimension of manycore architrecture.
 	 * 

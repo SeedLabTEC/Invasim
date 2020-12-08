@@ -15,8 +15,9 @@
  * @param _y_dim 
  * @param _clk_instance 
  */
-ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y_dim, Clock *_clk_instance)
+ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y_dim, Clock *_clk_instance, bool ai)
 {
+	this->ai = ai;
 	this->max_iLets = _x_dim * _y_dim;
 	this->init(_pu_array_ptr, _x_dim, _y_dim, _clk_instance);
 	this->resourcesUse = {};
@@ -31,8 +32,9 @@ ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y
  * @param _max_iLets 
  * @param _clk_instance 
  */
-ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y_dim, int _max_iLets, Clock *_clk_instance)
+ResourceAdmin::ResourceAdmin(ProcessingUnit ***_pu_array_ptr, int _x_dim, int _y_dim, int _max_iLets, Clock *_clk_instance, bool ai)
 {
+	this->ai = ai;
 	this->max_iLets = _x_dim * _y_dim;
 	this->init(_pu_array_ptr, _x_dim, _y_dim, _clk_instance);
 	this->resourcesUse = {};
@@ -266,33 +268,59 @@ std::vector<ILet *> ResourceAdmin::get_invaded()
  * @param resourcesRequire Quantity of resources required from ilet
  * @return int Between 1-5
  */
-int ResourceAdmin::getPriority(int iletID, int programID, int resourcesRequire)
+/*int ResourceAdmin::getPriority(int iletID, int programID, int resourcesRequire)
 {
 	float iletReq_f = (float) resourcesRequire;
 	float available_f = (float) this->max_iLets;
 
-	int assign = this->assignPriority(iletReq_f, available_f);
+	int assign = this->AIassignPriority(iletReq_f, available_f);
 
 	return assign;
-}
+}*/
 
 /**
  * @brief Assign resourses to use for Ilets
  * 
- * @param iletReq Quantity of resources required from ilet
- * @return int cores assigned by neural network
+ * @param iletReq Quantity of resources required from ilet (cores, priority)
+ * @return vector <int> with cores and priority assigned 
  */
-int ResourceAdmin::assignResources(int iletReq)
+std::vector<int> ResourceAdmin::assignResources(int iletID, int progID, int iletReq)
 {
+	std::chrono::_V2::system_clock::time_point t1;
+	std::chrono::_V2::system_clock::time_point t2;
+
+	t1 = std::chrono::high_resolution_clock::now();
+	
 	float iletReq_f = (float) iletReq;
 	float available_f = (float) this->available;
+
+	std::vector<int> result;
+
 	int core_assign = 0;
+	int priority_assign = 5;
+	// Check if the user is allowing to use artificial intelligence
+	if(this->ai) {
+		// Using AI
+		///////// Cores assign
+		if(this->available != 0) {
+			core_assign = this->AIassignCores(iletReq_f, available_f);
+		}
+		///////// Priority assign
+		priority_assign = this->AIassignPriority(iletReq_f, available_f);
 
-	if(this->available != 0) {
-    core_assign = this->assignCores(iletReq_f, available_f);
-  }
+		///////// Vector result building
+		result.push_back(core_assign);
+		result.push_back(priority_assign);
+	} else {
+		// Using Optimization
+		result = this->optAssignResources(iletReq_f, available_f, progID);
+	}
 
-	return core_assign;
+	t2 = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
+	std::cout << "PROGRAM: " << progID << " ; " << "ILET: " << iletID << " ; " << "DURATION: " << duration << "ms" << std::endl;
+
+	return result;
 }
 
 /**
@@ -326,6 +354,9 @@ void ResourceAdmin::resourcesCalcByProgram(int prog, int clock, int add)
  */
 void *ResourceAdmin::managing(void *obj)
 {
+	//std::chrono::_V2::system_clock::time_point t1;
+	//std::chrono::_V2::system_clock::time_point t2;
+
 	ResourceAdmin *current = (ResourceAdmin *)obj;
 	dprintf("ResourceAdmin: The resource administrator is started.\n");
 	//Get clock mutex and conditional variable
@@ -393,6 +424,7 @@ void *ResourceAdmin::managing(void *obj)
 
 						dprintf("ResourceAdmin: Infecting resources to Ilet = %d.\n", current_ilet->get_id());
 						current->infect(current_ilet);
+						//t1 = std::chrono::high_resolution_clock::now();
 					}
 				}
 				break;
@@ -412,6 +444,9 @@ void *ResourceAdmin::managing(void *obj)
 						if (is_done)
 						{
 							dprintf("ResourceAdmin: Ilet = %d is done.\n", current_ilet->get_id());
+							//t2 = std::chrono::high_resolution_clock::now();
+							//auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+							//std::cout << duration << " us" << std::endl;
 							std::cout << "DONE ILET " << current_ilet->get_id() << std::endl;
 							current->resourcesCalcByProgram(current_ilet->get_id_program(), current->clk_instance->get_cycle(), current_ilet->get_clocks_used());
 							current_ilet->set_state(DONE);
@@ -512,7 +547,7 @@ void *ResourceAdmin::managing(void *obj)
  * @param core_Available amount of cores available right now
  * @return cores assigned
  */
-int ResourceAdmin::assignCores(float core_require, float core_available) 
+int ResourceAdmin::AIassignCores(float core_require, float core_available) 
 {
   // Scale Layer
   float scaled_core_require = 2*(core_require-1)/(50-1)-1;
@@ -545,7 +580,7 @@ int ResourceAdmin::assignCores(float core_require, float core_available)
  * @param core_Available amount of cores in the system
  * @return priority assigned
  */
-int ResourceAdmin::assignPriority(float core_require, float core_available) {
+int ResourceAdmin::AIassignPriority(float core_require, float core_available) {
   // Scale Layer
   float scaled_resources_available = 2*(core_available-1)/(50-1)-1;
   float scaled_resources_require = 2*(core_require-1)/(50-1)-1;
@@ -568,4 +603,280 @@ int ResourceAdmin::assignPriority(float core_require, float core_available) {
   int priority_assign_rounded = (int) std::round(priority_assign);
 
   return priority_assign_rounded;
+}
+
+/**
+ * @brief Multiobjective optimization to calculate cores and priority values.
+ * 
+ * @param core_require amount of cores require by the ILet
+ * @param core_Available amount of available cores in the system
+ * @param progID Program ID
+ * @return vector with resources assigned [cores, priority]
+ */
+std::vector<int> ResourceAdmin::optAssignResources(float core_require, float core_available, int progID)
+{
+	int priority_level = 1; // Current priority level
+	const int MAX_PRIORITY_LEVEL = 3; // Max priority level to achieve
+
+	std::vector<int> result; // Result vector
+
+	// Cores Upper bound definition
+	float x_UB = (core_require > core_available) ? core_available : core_require;
+
+	// Priorities results
+	float x_result_1, y_result_1, x_result_2, y_result_2, x_result_3, y_result_3;
+	x_result_1 = y_result_1 = x_result_2 = y_result_2 = x_result_3 = y_result_3 = 0;
+
+	// deviation variables results
+	float dneg_3_result, dpos_3_result, dneg_2_result, dpos_2_result, dpos_1_result, dneg_1_result;
+	dneg_3_result = dpos_3_result = dneg_2_result = dpos_2_result = dpos_1_result = dneg_1_result = 0;
+
+	// Functions coefficients, factors and goals
+	// F1
+	float x_coef_1 = 1/core_available;
+	float y_coef_1 = -1/(core_available*5);
+	float goal1 = core_require/core_available;
+	// F2
+	float x_coef_2 = 1/(core_available*2);
+	float y_coef_2 = 1/10;
+	float goal2 = core_require/core_available;
+	// F3
+	float lambda = 1;
+	float x_coef_3 = 1;
+	float y_coef_3 = 1;
+
+	float goal3_1 = 0;
+	float goal3 = 0;
+	// Deviation variables coefficients
+	float dneg_3_coef, dpos_3_coef, dneg_2_coef, dpos_2_coef, dpos_1_coef, dneg_1_coef;
+	dneg_3_coef = dpos_3_coef = dneg_2_coef = dpos_2_coef = dpos_1_coef = dneg_1_coef = 1;
+
+	while(priority_level <= MAX_PRIORITY_LEVEL) {
+		if(priority_level == 3)
+		{
+			// Create the linear solver with the GLOP backend
+			operations_research::MPSolver solver("Solver_f1", operations_research::MPSolver::GLOP_LINEAR_PROGRAMMING);
+
+			// Create the objective function
+			operations_research::MPObjective* const objective = solver.MutableObjective();
+
+			// Infinity representation constant
+			const double infinity = solver.infinity();
+
+			// Create the desition variables with their respective constraints
+			operations_research::MPVariable* const x = solver.MakeNumVar(0.0, x_UB, "x"); // Cores
+			operations_research::MPVariable* const y = solver.MakeNumVar(1.0, 5.0, "y"); // Mem priority
+			operations_research::MPVariable* const dneg_1 = solver.MakeNumVar(0.0, infinity, "dneg_1"); // Negative deviation variable f1
+			operations_research::MPVariable* const dpos_1 = solver.MakeNumVar(0.0, infinity, "dpos_1"); // Positive deviation variable f1
+			operations_research::MPVariable* const dneg_2 = solver.MakeNumVar(dneg_2_result, dneg_2_result, "dneg_2"); // Negative deviation variable f2
+			operations_research::MPVariable* const dpos_2 = solver.MakeNumVar(0.0, infinity, "dpos_2"); // Positive deviation variable f2
+			operations_research::MPVariable* const dneg_3 = solver.MakeNumVar(0.0, infinity, "dneg_3"); // Negative deviation variable f3
+			operations_research::MPVariable* const dpos_3 = solver.MakeNumVar(dpos_3_result, dpos_3_result, "dpos_3"); // Positive deviation variable f3
+
+			// Funcion restriction
+			operations_research::MPConstraint* const ct1 = solver.MakeRowConstraint(goal1, goal1, "ct1");
+			ct1->SetCoefficient(x, x_coef_1);
+			ct1->SetCoefficient(y, y_coef_1);
+			ct1->SetCoefficient(dneg_1, dneg_1_coef);
+			ct1->SetCoefficient(dpos_1, -dpos_1_coef);
+
+			operations_research::MPConstraint* const ct2 = solver.MakeRowConstraint(goal2, goal2, "ct2");
+			ct2->SetCoefficient(x, x_coef_2);
+			ct2->SetCoefficient(y, y_coef_2);
+			ct2->SetCoefficient(dneg_2, dneg_2_coef);
+			ct2->SetCoefficient(dpos_2, -dpos_2_coef);
+
+			operations_research::MPConstraint* const ct3 = solver.MakeRowConstraint(goal3, goal3, "ct3");
+			ct3->SetCoefficient(x, x_coef_3);
+			ct3->SetCoefficient(y, y_coef_3);
+			ct3->SetCoefficient(dneg_3, dneg_3_coef);
+			ct3->SetCoefficient(dpos_3, -dpos_3_coef);
+
+			// Objective function
+			objective->SetCoefficient(dpos_1, dpos_1_coef);
+			objective->SetCoefficient(x, 0);
+			objective->SetCoefficient(y, 0);
+			objective->SetCoefficient(dneg_1, 0);
+			objective->SetMinimization();
+
+			// Solve
+			solver.Solve();
+
+			// Assign result values
+			y_result_1 = y->solution_value();
+			x_result_1 = x->solution_value();
+			dpos_1_result = dpos_1->solution_value();
+
+			// Update total execution time
+			float total_time = getDataFromJSON(progID, "TotalExecTime");
+			float new_time = total_time + x_coef_1*x_result_1 + y_coef_1*y_result_1;
+			this->updateProgramsJSON(progID, new_time, "TotalExecTime");
+		}
+			
+		else if (priority_level == 2)
+		{
+			// Create the linear solver with the GLOP backend
+			operations_research::MPSolver solver("Solver_f2", operations_research::MPSolver::GLOP_LINEAR_PROGRAMMING);
+
+			// Create the objective function
+			operations_research::MPObjective* const objective = solver.MutableObjective();
+
+			// Infinity representation constant
+			const double infinity = solver.infinity();
+
+			// Create the desition variables with their respective constraints
+			operations_research::MPVariable* const x = solver.MakeNumVar(0.0, x_UB, "x"); // Cores
+			operations_research::MPVariable* const y = solver.MakeNumVar(1.0, 5.0, "y"); // Mem priority
+			operations_research::MPVariable* const dneg_2 = solver.MakeNumVar(0.0, infinity, "dneg_2"); // Negative eviation variable f2
+			operations_research::MPVariable* const dpos_2 = solver.MakeNumVar(0.0, infinity, "dpos_2"); // Positive deviation variable f2
+			operations_research::MPVariable* const dneg_3 = solver.MakeNumVar(0.0, infinity, "dneg_3"); // Negative deviation variable f3
+			operations_research::MPVariable* const dpos_3 = solver.MakeNumVar(dpos_3_result, dpos_3_result, "dpos_3"); // Positive deviation variable f3
+
+			// Funcion restriction
+			operations_research::MPConstraint* const ct1 = solver.MakeRowConstraint(goal2, goal2, "ct1");
+			ct1->SetCoefficient(x, x_coef_2);
+			ct1->SetCoefficient(y, y_coef_2);
+			ct1->SetCoefficient(dneg_2, dneg_2_coef);
+			ct1->SetCoefficient(dpos_2, -dpos_2_coef);
+
+			operations_research::MPConstraint* const ct2 = solver.MakeRowConstraint(goal3, goal3, "ct2");
+			ct2->SetCoefficient(x, x_coef_3);
+			ct2->SetCoefficient(y, y_coef_3);
+			ct2->SetCoefficient(dneg_3, dneg_3_coef);
+			ct2->SetCoefficient(dpos_3, -dpos_3_coef);
+
+			// Objective function
+			objective->SetCoefficient(dneg_2, dneg_2_coef);
+			objective->SetCoefficient(x, 0);
+			objective->SetCoefficient(y, 0);
+			objective->SetCoefficient(dpos_2, 0);
+			objective->SetMinimization();
+
+			// Solve
+			solver.Solve();
+
+			// Assign result values
+			y_result_2 = y->solution_value();
+			x_result_2 = x->solution_value();
+			dneg_2_result = dneg_2->solution_value();
+		}
+		else if(priority_level == 1)
+		{
+			// Create the linear solver with the GLOP backend
+			operations_research::MPSolver solver("Solver_f3", operations_research::MPSolver::GLOP_LINEAR_PROGRAMMING);
+
+			// Create the objective function
+			operations_research::MPObjective* const objective = solver.MutableObjective();
+
+			// Infinity representation constant
+			const double infinity = solver.infinity();
+
+			// Create the desition variables with their respective constraints
+			operations_research::MPVariable* const x = solver.MakeNumVar(0.0, x_UB, "x"); // Cores
+			operations_research::MPVariable* const y = solver.MakeNumVar(1.0, 5.0, "y"); // Mem priority
+			operations_research::MPVariable* const dneg_3 = solver.MakeNumVar(0.0, infinity, "dneg_3"); // Negative deviation variable f3
+			operations_research::MPVariable* const dpos_3 = solver.MakeNumVar(0.0, infinity, "dpos_3"); // Positive deviation variable f3
+			
+			lambda = this->getDataFromJSON(progID, "lambda");
+			goal3_1 = ( lambda == 0 ? 0 : ( (core_available/core_require) >= 5 ? 5 : std::floor(core_available/core_require) ) ); // Computational resources from mem priority term
+			goal3 = std::round(core_require*lambda) + goal3_1;
+
+			// Funcion restriction
+			operations_research::MPConstraint* const ct1 = solver.MakeRowConstraint(goal3, goal3, "ct1");
+			ct1->SetCoefficient(x, x_coef_3);
+			ct1->SetCoefficient(y, y_coef_3);
+			ct1->SetCoefficient(dneg_3, dneg_3_coef);
+			ct1->SetCoefficient(dpos_3, -dpos_3_coef);
+
+			// Objective function
+			objective->SetCoefficient(dpos_3, dpos_3_coef);
+			objective->SetCoefficient(x, 0);
+			objective->SetCoefficient(y, 0);
+			objective->SetCoefficient(dneg_3, 0);
+			objective->SetMinimization();
+
+			// Solve
+			solver.Solve();
+
+			// Assign result values
+			y_result_3 = y->solution_value();
+			x_result_3 = x->solution_value();
+			dpos_3_result = dpos_3->solution_value();
+
+			// Update lambda factor
+			float total_time = getDataFromJSON(progID, "TotalExecTime");
+			float new_lambda = lambda - (0.001*total_time);
+			float l = (new_lambda >= 0) ? new_lambda : 0;
+			this->updateProgramsJSON(progID, l, "lambda");
+		}
+
+		priority_level += 1;
+	}
+
+	// Build result vector
+	int x_result_1_int = (int) std::ceil(x_result_1);
+	int y_result_1_int = (int) std::ceil(y_result_1);
+
+	result.push_back(x_result_1_int);
+	result.push_back(y_result_1_int);
+
+	return result;
+}
+
+/**
+ * @brief Get data number from JSON file for programs data.
+ * 
+ * @param progID Program ID
+ * @return parameter value
+ */
+float ResourceAdmin::getDataFromJSON(int progID, std::string parameter)
+{
+	std::string path = "bin/";
+	path.append("program_");
+	path.append(std::to_string(progID));
+	path.append(".json");
+
+	float result = 0;
+
+	//Read json file from disk
+    std::string line;
+    std::ifstream r_file(path.c_str());
+    std::getline(r_file, line);
+    r_file.close();
+
+	//Append data and create string
+    JSON old_content = JSON::parse(line);
+
+	result = old_content[0][parameter];
+
+	return result;
+}
+
+/**
+ * @brief Update data number to JSON file for programs data.
+ * 
+ * @param progID Program ID
+ */
+void ResourceAdmin::updateProgramsJSON(int progID, float dataToUpdate, std::string parameter)
+{
+	std::string path = "bin/";
+	path.append("program_");
+	path.append(std::to_string(progID));
+	path.append(".json");
+
+	//Read json file from disk
+    std::string line;
+    std::ifstream r_file(path.c_str());    
+    std::getline(r_file, line);
+    r_file.close();
+
+	//Append data and create string
+    JSON old_content = JSON::parse(line);
+	old_content[0][parameter] = dataToUpdate;
+
+	std::string data_w = old_content.dump();
+    //Write in disk
+	std::ofstream resources_file(path.c_str());
+	resources_file << data_w << std::endl;
+	resources_file.close();
 }

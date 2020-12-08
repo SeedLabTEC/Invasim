@@ -79,6 +79,7 @@ class Monitor
 		void write_components(JSON * info);
 		void write_system(JSON * info);
 		void write_ilets(JSON * info);
+		void write_programs(JSON * info);
 
 		static void *monitoring(void *obj);
 

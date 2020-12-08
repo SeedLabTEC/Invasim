@@ -50,7 +50,10 @@ public:
 
 	void start();
 
-	JSON *monitoring();
+	JSON *monitoring_Ilet();
+
+	JSON *monitoring_program();
+
 
 private:
 	pthread_t seq_thread;
@@ -80,6 +83,12 @@ private:
 		 * 
 		 */
 	JSON *ilets_info;
+
+	/**
+		 * @brief Json with all programs
+		 * 
+		 */
+	JSON *programs_info;
 
 	/**
 		 * @brief Decision probability to start and end an iLet
@@ -113,9 +122,16 @@ private:
 		 */
 	bool ilet_check = false;
 
+	/**
+		 * @brief Flag that notice when a program is created
+		 * 
+		 */
+	bool program_check = false;
+
 	std::string loadFlow;
 
-	ILet *generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog, int _priority);
+	ILet *generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog);
+	void generate_program(int prog_id, int ilets_count);
 	void init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float _decision_probability, int _seed);
 	static void *generate(void *obj);
 	bool checkTerminated(int prog, std::vector<ILet *> iletsList);

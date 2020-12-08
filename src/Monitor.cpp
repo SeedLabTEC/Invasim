@@ -174,6 +174,33 @@ void Monitor::write_ilets(JSON *info)
 	path.clear();
 }
 
+/**
+ * @brief Function that writes programs info
+ * 
+ * @param info 
+ */
+void Monitor::write_programs(JSON *info)
+{
+	std::string path = "";
+
+	for (JSON::iterator it = (*info).begin(); it != (*info).end(); ++it) {
+		path.append(this->path_files);
+		path.append("/");
+		path.append("program_");
+		path.append(std::to_string((int)((*it)["Id"])));
+		path.append(".json");
+
+		JSON program = (*it);
+
+		JSON array = JSON::array();
+		array.push_back(program);
+		
+		this->write_disk(path, array, false);
+
+		path.clear();
+    }
+}
+
 void Monitor::write_diskMem(JSON data)
 {
     std::string path = "";
@@ -251,7 +278,8 @@ void *Monitor::monitoring(void *obj)
 
         //Request components information
         JSON *system_info = current->manycore_ptr->monitoring();
-        JSON *ilet_info = current->seq_ilet_ptr->monitoring();
+        JSON *ilet_info = current->seq_ilet_ptr->monitoring_Ilet();
+		JSON *program_info = current->seq_ilet_ptr->monitoring_program();
 		JSON arrayMem = current->intNet->monitoring();
         //Write data in disk
 		current->write_diskMem(arrayMem);
@@ -261,6 +289,10 @@ void *Monitor::monitoring(void *obj)
 		if (ilet_info->size() > 0)
 		{
 			current->write_ilets(ilet_info);
+		}
+		if (program_info->size() > 0)
+		{
+			current->write_programs(program_info);
 		}
 
 		//Deallocate mempry

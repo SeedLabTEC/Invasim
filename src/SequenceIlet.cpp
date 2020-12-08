@@ -83,7 +83,7 @@ void SequenceIlet::start()
  * 
  * @return JSON* 
  */
-JSON *SequenceIlet::monitoring()
+JSON *SequenceIlet::monitoring_Ilet()
 {
     JSON *array_info = new JSON;
     *array_info = JSON::array();
@@ -93,6 +93,26 @@ JSON *SequenceIlet::monitoring()
     {
         array_info->push_back(*this->ilets_info);
         this->ilet_check = false;
+    }
+
+    return array_info;
+}
+
+/**
+ * @brief Function that gets the information of the generated programs
+ * 
+ * @return JSON* 
+ */
+JSON *SequenceIlet::monitoring_program()
+{
+    JSON *array_info = new JSON;
+    *array_info = JSON::array();
+
+    //Check if there are programs info
+    if (this->program_check)
+    {
+        array_info = this->programs_info;
+        this->program_check = false;
     }
 
     return array_info;
@@ -114,6 +134,7 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
     this->clk_instance = _clk_instance;
     this->manycore_ptr = _manycore_ptr;
     this->ilets_info = new JSON;
+    this->programs_info = new JSON;
     this->max_clocks = MAX_CLOCKS;
     this->max_loads = MAX_LOADS;
     this->max_resources = float(this->manycore_ptr->get_procs()) * float(MAX_RESOURCES);
@@ -128,29 +149,51 @@ void SequenceIlet::init(Clock *_clk_instance, ManyCoreArch *_manycore_ptr, float
  * @param _priority 
  * @return ILet* 
  */
-ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog, int _priority)
+ILet *SequenceIlet::generate_ilet(int index, std::vector<subProcess> codeFlow, int _id_Prog)
 {
+    //int priority = this->manycore_ptr->getPriority(index, _id_Prog, codeFlow.size());
+
+    std::vector<int> resources = this->manycore_ptr->getResourcesFromAdmin(index, _id_Prog, codeFlow.size());
+
     //Generate a iLet according to the parameters
-    ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability, _id_Prog, _priority);
+    ILet *new_ilet = new ILet(NORMAL, index, this->decision_probability, _id_Prog, resources[1]);
 
-    int resources = this->manycore_ptr->getResourcesFromAdmin(codeFlow.size());
+    new_ilet->add_operation(INVADE, resources[0]); // add operation invade
 
-    new_ilet->add_operation(INVADE, resources); // add operation invade
-
-    new_ilet->add_operation(INFECT, resources, codeFlow); // add operation infect
+    new_ilet->add_operation(INFECT, resources[0], codeFlow); // add operation infect
 
     new_ilet->add_operation(RETREAT, 0); // add operation retreat
 
     //Store in info json
     JSON ilet_info = {
+        {"ProgramId",_id_Prog},
         {"Id", index},
-        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", resources}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}};
+        {"Operations", {{{"Operation", STRING_OPERATIONS[INVADE]}, {"Parameter", resources[0]}}, {{"Operation", STRING_OPERATIONS[INFECT]}, {"Parameter", resources[0]}}, {{"Operation", STRING_OPERATIONS[RETREAT]}, {"Parameter", 0}}}}
+    };
     //Set data in pointer
     *this->ilets_info = ilet_info;
     //Set flag that an iLet has been created
     this->ilet_check = true;
 
     return new_ilet;
+}
+
+/**
+ * @brief Function that generates a new program information in JSON format
+ * 
+ * @param prog_id  
+ */
+void SequenceIlet::generate_program(int prog_id, int ilets_count)
+{
+    //Store in info json
+    JSON program_info = {
+        {"Id", prog_id},
+        {"lambda", 1},
+        {"TotalExecTime", 0},
+        {"TotalILets", ilets_count}
+    };
+    //Set data in pointer
+    (*this->programs_info).push_back(program_info);
 }
 
 /**
@@ -192,7 +235,7 @@ void *SequenceIlet::generate(void *obj)
                 {
                     //Create an iLet and invade in manycore
                     std::cout << " SEND ILET= " << i << std::endl;
-                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount, current->manycore_ptr->getPriority(i, progCount, iletsCode[progCount][ilets_control_sum[progCount]].size())); // change here
+                    ILet *new_ilet = current->generate_ilet(i, iletsCode[progCount][ilets_control_sum[progCount]], progCount);
                     current->created_ilets.push_back(new_ilet);
                     current->manycore_ptr->invade(new_ilet);
                     ilets_control_sum[progCount] = ilets_control_sum[progCount] + 1;
@@ -223,12 +266,17 @@ std::vector<std::vector<std::vector<subProcess>>> SequenceIlet::getPrograms()
     
     std::ifstream file(this->loadFlow);
     std::string str;
+    int prog_count = 0;
     while (std::getline(file, str))
     {
         //std::cout<< str << std::endl;
         programs.push_back(getBlocksCode(str));
+        generate_program(prog_count, programs[prog_count].size());
         this->manycore_ptr->newRegisterJson();
+        prog_count += 1;
     }
+
+    program_check = true;
 
     return programs;
 }

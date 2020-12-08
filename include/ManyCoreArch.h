@@ -29,9 +29,9 @@ using JSON = nlohmann::json;
 class ManyCoreArch 
 {
 	public: 
-		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance, InterconnectionNetwork*& _intNet);
+		ManyCoreArch(int _x_dim, int _y_dim, bool ai, Clock * _clk_instance, InterconnectionNetwork*& _intNet);
 
-		ManyCoreArch(int _x_dim, int _y_dim, Clock * _clk_instance, int _max_ilets, InterconnectionNetwork*& _intNet);
+		ManyCoreArch(int _x_dim, int _y_dim, bool ai, Clock * _clk_instance, int _max_ilets, InterconnectionNetwork*& _intNet);
 
 		void start();
 
@@ -45,9 +45,9 @@ class ManyCoreArch
 
 		std::vector<ILet *> get_invaded();
 
-		int getPriority(int iletID, int programID, int resourcesRequire);
+		//int getPriority(int iletID, int programID, int resourcesRequire);
 
-		int getResourcesFromAdmin(int iletReq);
+		std::vector<int> getResourcesFromAdmin(int iletID, int progID, int iletReq);
 
 		void newRegisterJson();
 

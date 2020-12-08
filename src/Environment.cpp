@@ -13,6 +13,7 @@
 Environment::Environment()
 {
     dprintf("ENVIRONMENT: Environment created.\n\t- Cores: %d.\n", DEFAULT_CORES);
+    this->ai = true;
     this->x_dim = DEFAULT_CORES;
     this->y_dim = DEFAULT_CORES;
     this->decision_probability = DEFAULT_PROBABILITY;
@@ -46,7 +47,7 @@ Environment::Environment()
  * @param _working_dir working directory
  * @param _seed to generate random numbers
  */
-Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, std::string _working_dir, int _seed)
+Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, int ai, std::string _working_dir, int _seed)
 {
     dprintf("ENVIRONMENT: Environment created.\n\t- Cores: (%d, %d).\n", _x_dim, _y_dim);
     if (_x_dim * _y_dim > 1000)
@@ -55,6 +56,7 @@ Environment::Environment(int _x_dim, int _y_dim, float _decision_probability, st
         exit(EXIT_FAILURE);
     }
     
+    this->ai = ai;
     this->x_dim = _x_dim;
     this->y_dim = _y_dim;
     this->decision_probability = _decision_probability;
@@ -87,7 +89,7 @@ void Environment::init(std::string _working_dir)
     dprintf("ENVIRONMENT: Instanciating environment clock.\n");
     this->clk_instance = new Clock();
     dprintf("ENVIRONMENT: Instanciating Many Core Architecture.\n");
-    this->many_core_instance = new ManyCoreArch(this->x_dim, this->y_dim, this->clk_instance, this->intNet);
+    this->many_core_instance = new ManyCoreArch(this->x_dim, this->y_dim, ai, this->clk_instance, this->intNet);
     this->seq_ilet = new SequenceIlet(this->clk_instance, this->many_core_instance, this->decision_probability, this->seed, _working_dir);
 }
 

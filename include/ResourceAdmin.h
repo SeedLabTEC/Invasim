@@ -22,7 +22,10 @@ using JSON = nlohmann::json;
 #include <sys/time.h>
 #include <pthread.h>
 #include <queue>
+#include <chrono>
+#include <cstdlib>
 #include "Utils.h"
+#include "ortools/linear_solver/linear_solver.h"
 
 /**
  * @brief Resource administrator class representation that handles the incomming requests for resources.
@@ -31,9 +34,9 @@ using JSON = nlohmann::json;
 class ResourceAdmin 
 {
 	public: 
-		ResourceAdmin(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, Clock * _clk_instance);
+		ResourceAdmin(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, Clock * _clk_instance, bool ai);
 
-		ResourceAdmin(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, int _max_iLets, Clock * _clk_instance);
+		ResourceAdmin(ProcessingUnit *** _pu_array_ptr, int _x_dim, int _y_dim, int _max_iLets, Clock * _clk_instance, bool ai);
 
 		void start();
 
@@ -43,9 +46,9 @@ class ResourceAdmin
 
 		std::vector<ILet *> get_invaded();
 
-		int getPriority(int iletID, int programID, int resourcesRequire);
+		//int getPriority(int iletID, int programID, int resourcesRequire);
 
-		int assignResources(int iletReq);
+		std::vector<int> assignResources(int iletID, int progID, int iletReq);
 		
 	private:
 		pthread_t pu_exe_thread;
@@ -79,6 +82,10 @@ class ResourceAdmin
 		 * 
 		 */
 		int available;
+		/**
+		 * @brief If the user wants to use artificial intelligence for resources assigning
+		*/
+		bool ai;
 		/**
 		 * @brief Control of process on programs
 		 * 
@@ -120,10 +127,15 @@ class ResourceAdmin
 
 		void resourcesCalcByProgram(int prog, int clock, int add);
 
-		int assignCores(float core_require, float core_available);
+		int AIassignCores(float core_require, float core_available);
 
-		int assignPriority(float core_require, float core_available);
+		int AIassignPriority(float core_require, float core_available);
 
+		std::vector<int> optAssignResources(float core_require, float core_available, int progID);
+
+		float getDataFromJSON(int progID, std::string parameter);
+
+		void updateProgramsJSON(int progID, float dataToUpdate, std::string parameter);
 };
 
 #endif
