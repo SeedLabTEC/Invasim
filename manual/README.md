@@ -31,7 +31,7 @@ sudo make install
 ## RISC-V GNU Compiler Toolchain
 This is the RISC-V C and C++ cross-compiler. It supports two build modes: a generic ELF/Newlib toolchain and a more sophisticated Linux-ELF/glibc toolchain.
 
-## Installation
+### Installation
 In order to install the toolchain correctly, there are some prerequisites that need to be install before On Ubuntu:
 ```bash
 sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev
@@ -67,3 +67,5 @@ In Invasim, it is found in folder **RI5CY**, and to generate the model run the f
 ```bash
 Invasim/verilator_model $: make
 ```
+## OR-Tools
+In order to use the multiobjective obtimization method for resource allocation, you must install OR-Tools library on your system. To do that you can follow the instructions in the [google developers documentation page](https://developers.google.com/optimization/install/cpp/source_linux). Once you finish the **prerequisites**, **Download the source code**, **Build third parties** and **Build the source code** sections, you can go directly to the [Installing OR-Tools on your operating system](https://developers.google.com/optimization/install/cpp/source_linux#installing-or-tools-on-your-operating-system) section
